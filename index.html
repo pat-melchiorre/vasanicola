@@ -164,6 +164,7 @@ main{flex:1;padding:0 0 96px}
 .nick svg{width:20px;height:20px}
 .care{display:flex;gap:6px;align-items:flex-start;text-align:left;font-size:12px;line-height:1.3;color:var(--water);background:var(--water-bg);border-radius:10px;padding:6px 8px;width:100%}
 .care svg{width:14px;height:14px;flex:none;margin-top:1px}
+.age{font-size:12px;font-weight:900;color:var(--sun-dark)}
 .species{font-size:12px;color:var(--ink-2);margin-top:-6px}
 .field{width:100%;min-height:52px;margin:14px 0;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:17px}
 .field:focus{outline:none;border-color:var(--water)}
@@ -403,7 +404,7 @@ const KEY = "vasanicola.v1";
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
 const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
-S.garden.forEach(g => { if (!g.area) g.area = "casa"; });
+S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const now = () => Date.now() + S.offset;
 let tab = "path";
@@ -514,7 +515,18 @@ const STATE_LINE = {
 };
 const pickLine = (k, i) => STATE_LINE[k][i % STATE_LINE[k].length];
 // Quando una pianta muore, il soprannome se ne va con lei (resta solo il ricordo, in g.rip)
-function kill(g, cause, note){ g.dead = true; g.cause = cause; g.note = note || null; delete g.em; if (g.nick) { g.rip = g.nick; delete g.nick; } }
+// Giorni di vita: dalla semina a oggi (o al giorno della morte). Primo giorno = 1.
+const ageOf = g => Math.floor(((g.dead ? g.diedAt : now()) - g.bornAt) / DAY) + 1;
+const ageText = g => { const a = ageOf(g); return a === 1 ? "Primo giorno di vita" : `${a} giorni di vita`; };
+// Traguardi da festeggiare: una settimana, un mese, cento giorni, un anno
+const MILESTONES = [[7,"Una settimana insieme."],[30,"Un mese insieme. Ormai è di famiglia."],[100,"Cento giorni. Questa pianta si fida di te."],[365,"Un anno. Chi l’avrebbe mai detto."]];
+let cheers = [];
+function settleMilestones(){
+  S.garden.forEach(g => { if (g.dead) return;
+    const m = MILESTONES.filter(([d]) => ageOf(g) >= d).pop();
+    if (m && (g.mile || 0) < m[0]) { if (g.mile !== undefined || ageOf(g) - m[0] < 7) cheers.push(`${nameOf(g)}: ${m[1]}`); g.mile = m[0]; } });
+}
+function kill(g, cause, note, at){ g.diedAt = Math.min(at || now(), now()); g.dead = true; g.cause = cause; g.note = note || null; delete g.em; if (g.nick) { g.rip = g.nick; delete g.nick; } }
 // Ogni giorno passato, ogni pianta sana senza emergenze ha una probabilità di averne una.
 // Si scelgono solo problemi di cui hai già fatto lo step, così la cura la conosci (o dovresti).
 const EM = { chance:.1, maxActive:2, deadline:7, calm:4, cureGocce:3, cureXp:5 };
@@ -536,9 +548,9 @@ function settleEmergencies(){
     });
   }
   // Un’emergenza ignorata troppo a lungo uccide la pianta
-  S.garden.forEach(g => { if (!g.dead && g.em && now() - g.em.at >= EM.deadline * DAY) kill(g, "emergenza", `Nessuno se n’è occupato. ${EMERG[g.em.id].why}`); });
+  S.garden.forEach(g => { if (!g.dead && g.em && now() - g.em.at >= EM.deadline * DAY) kill(g, "emergenza", `Nessuno se n’è occupato. ${EMERG[g.em.id].why}`, g.em.at + EM.deadline * DAY); });
 }
-function settleDeaths(){ S.garden.forEach(g => { if (!g.dead && daysSince(g.wateredAt) >= care(g).dead) kill(g, "secca"); }); }
+function settleDeaths(){ S.garden.forEach(g => { if (!g.dead && daysSince(g.wateredAt) >= care(g).dead) kill(g, "secca", null, g.wateredAt + care(g).dead * DAY); }); }
 // Piante su cui hai appena fatto la prova del dito (vale finché non annaffi o passa il tempo)
 let felt = new WeakSet();
 function soilFeel(g){
@@ -578,7 +590,8 @@ function tabbar(){
   return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}</nav>`;
 }
 function render(){
-  settleDeaths(); settleEmergencies(); save();
+  settleDeaths(); settleEmergencies(); settleMilestones(); save();
+  if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
   if (!S.onboarded) return renderOnboarding(0);
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : renderErbario();
   app.innerHTML = topbar() + `<main>${body}</main>` + tabbar();
@@ -713,13 +726,13 @@ function finishLesson(){
 /* --- Serra --- */
 function slotCard(g, i){
   const st = plantState(g), p = PLANTS[g.plant], c = care(g);
-  const line = g.dead ? `${g.rip ? `Addio, ${esc(g.rip)}. ` : ""}${g.note || (g.cause === "marcita" ? c.wetTip : c.dryTip)}`
+  const line = g.dead ? `${g.rip ? `Addio, ${esc(g.rip)}. ` : ""}Ha vissuto ${ageOf(g)} ${ageOf(g) === 1 ? "giorno" : "giorni"}. ${g.note || (g.cause === "marcita" ? c.wetTip : c.dryTip)}`
     : felt.has(g) ? `<b class="feel">Prova del dito:</b> ${soilFeel(g)}` : g.em ? "" : pickLine(st, i);
   const em = !g.dead && g.em ? `<button class="emerg" data-em="${i}">${ICON.alert}<span><b>Emergenza</b>${esc(EMERG[g.em.id].title)}</span></button>` : "";
   const action = g.dead
     ? `<button class="btn small" data-replant="${i}" ${S.gocce < RULES.replantCost ? "disabled" : ""}>Ripianta il seme ${RULES.replantCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`
     : `<div class="acts"><button class="btn small ghost" data-feel="${i}">Dito nella terra</button><button class="btn small water" data-water="${i}" ${S.gocce < RULES.waterCost ? "disabled" : ""}>Annaffia ${RULES.waterCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button></div>`;
-  return `<div class="slot${em ? " alarm" : ""}">${plantSVG(g.plant, 96, st)}<div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>${g.nick ? `<span class="species">${p.name}</span>` : ""}<span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${em}<div class="line">${line}</div><div class="care">${ICON.drop}<span>${c.rule}</span></div>${action}</div>`;
+  return `<div class="slot${em ? " alarm" : ""}">${plantSVG(g.plant, 96, st)}<div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>${g.nick ? `<span class="species">${p.name}</span>` : ""}<span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}${em}<div class="line">${line}</div><div class="care">${ICON.drop}<span>${c.rule}</span></div>${action}</div>`;
 }
 function renderArea(a){
   const A = AREAS[a];
@@ -790,7 +803,7 @@ app.addEventListener("click", e => {
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
   if (t.id === "forceEm") { const g = S.garden.find(x => !x.dead && !x.em); if (!g) return toast("Nessuna pianta viva senza emergenze."); rollEmergency(g, now()); if (!g.em) return toast("Prima fai lo step dove si impara a curarla."); render(); return; }
   if (t.dataset.feel !== undefined) { felt.add(S.garden[+t.dataset.feel]); render(); return; }
-  if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.wet = 0; g.wateredAt = now(); render(); toast("Il seme è a terra. Seconda vita, stessa responsabilità."); return; }
+  if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast("Il seme è a terra. Seconda vita, stessa responsabilità."); return; }
   if (t.dataset.buy) { const a = t.dataset.buy, c = RULES.slotCosts[a][slotsOf(a)]; if (S.xp < c) return; S.xp -= c; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più colpe."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
   if (t.dataset.skip) { felt = new WeakSet(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante se ne sono accorte.`); return; }
@@ -850,7 +863,7 @@ document.addEventListener("click", e => {
   if (freeSlots(pickArea) <= 0) { toast("Nessun posto libero: sbloccane uno con l’esperienza."); return; }
   if (S.xp < cost) return;
   S.xp -= cost; if (free) S.tutorialPlanted = true;
-  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), dead:false });
+  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), mile: 0, dead:false });
   document.querySelector(".modal")?.remove(); render(); bump("#pXp");
   toast(id === "basilico" ? "Il basilico è in serra. Stavolta va diversamente." : `${PLANTS[id].name} ${gen(id, "piantato", "piantata")}. ${gen(id, "Benvenuto", "Benvenuta")} in famiglia.`);
 });
