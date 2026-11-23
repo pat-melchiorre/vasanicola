@@ -369,9 +369,84 @@ STEPS.push(
     { t:"match", q:"Abbina pianta e superpotere", pairs:[["Olivo","Foglie argentate anti-sole"],["Fico d’India","Pale serbatoio"],["Lavanda","Si pota dopo i fiori"],["Rosmarino","Talee facili"]] }
   ]}
 );
+// ---------- Zona 3: Giungla in salotto (tutte piante da casa) ----------
+Object.assign(PLANTS, {
+  monstera:{ name:"Monstera", g:"f", indoor:true, sci:"Monstera deliciosa", cost:30,
+    care:{ soak:5, thirsty:8, wilt:14, dead:25, rot:3, rule:"Circa una volta a settimana, quando i primi centimetri sono asciutti",
+      dryTip:"La monstera regge un po’ di sete, ma non settimane di abbandono.", wetTip:"Con la terra sempre bagnata le radici della monstera marciscono e le foglie ingialliscono." }, facts:[
+    "Luce indiretta e intensa: il sole diretto le brucia le foglie.",
+    "I buchi nelle foglie arrivano con l’età e con la luce giusta: le foglie giovani sono intere.",
+    "Le radici che escono dal fusto servono ad aggrapparsi: si possono guidare verso un tutore.",
+    "È tossica per cani e gatti, come il suo parente pothos."] },
+  calathea:{ name:"Calathea", g:"f", indoor:true, sci:"Calathea, oggi spesso chiamata Goeppertia", cost:35,
+    care:{ soak:2, thirsty:4, wilt:7, dead:12, rot:3, rule:"Ogni 3-4 giorni: terra appena umida, mai zuppa",
+      dryTip:"La calathea non perdona la terra secca: arriccia le foglie e si arrende presto.", wetTip:"La calathea vuole terra umida, non fradicia: le radici devono respirare." }, facts:[
+    "Di sera alza le foglie e al mattino le riabbassa: per questo la chiamano pianta della preghiera.",
+    "Vuole luce indiretta: il sole diretto sbiadisce i disegni delle foglie.",
+    "Punte marroni e foglie arricciate: aria troppo secca o acqua troppo calcarea.",
+    "Non è tossica per cani e gatti."] },
+  orchidea:{ name:"Orchidea", g:"f", indoor:true, sci:"Phalaenopsis, l’orchidea farfalla", cost:35,
+    care:{ soak:5, thirsty:8, wilt:14, dead:30, rot:2, rule:"Circa una volta a settimana, per immersione, quando le radici sono argentate",
+      feelWet:"Corteccia fradicia e radici verde scuro. Niente acqua per un po’.", feelReady:"Corteccia asciutta e radici argentate: è il momento di immergerla.",
+      dryTip:"L’orchidea accumula acqua nelle foglie spesse, ma non all’infinito.", wetTip:"L’acqua ferma tra la corteccia fa marcire le radici: dopo l’immersione va scolata bene." }, facts:[
+    "Non vive nella terra: in natura sta aggrappata agli alberi, nel vaso ha la corteccia.",
+    "Le radici fanno anche la fotosintesi: per questo il vaso è trasparente.",
+    "Si annaffia per immersione: 10-15 minuti in acqua, poi si scola bene.",
+    "Dopo i fiori non è morta: riposa, e con qualche notte più fresca può rifiorire."] },
+  felce:{ name:"Felce", g:"f", indoor:true, sci:"Nephrolepis exaltata, la felce di Boston", cost:25,
+    care:{ soak:1, thirsty:3, wilt:5, dead:9, rot:4, rule:"Ogni 2-3 giorni: terra sempre un po’ umida",
+      dryTip:"Con la terra secca la felce perde le fogliette a pioggia, poi si arrende.", wetTip:"Anche la felce, che ama l’umido, soffre se l’acqua ristagna nel vaso." }, facts:[
+    "Ama l’aria umida: un bagno luminoso è il suo paradiso, il termosifone il suo inferno.",
+    "Se la terra si secca, perde fogliette a pioggia.",
+    "Non fa né fiori né semi: si riproduce con le spore, i puntini marroni sotto le fronde.",
+    "Le felci esistevano già prima dei dinosauri."] }
+});
+PLANTS.sansevieria.care.feelReady = "Asciutta anche in profondità. Adesso sì, si può annaffiare.";
+STEPS.push(
+  { id:"j1", zone:"z3", title:"Luce filtrata", icon:"sun", items:[
+    { t:"card", plant:"monstera", title:"Benvenuti nella giungla", body:"Nella foresta tropicale la luce arriva filtrata dagli alberi altissimi. Le piante che vivono sotto sono abituate a tanta luce, ma mai diretta. In casa vuol dire: vicino alla finestra, ma senza il sole sulle foglie." },
+    { t:"mc", plant:"monstera", q:"Dove sta meglio la monstera?", o:["Vicino a una finestra luminosa, senza sole diretto sulle foglie","Sul balcone in pieno sole","In un corridoio senza finestre"], a:0, why:"Luce indiretta e intensa. Il sole diretto le brucia le foglie, il buio la fa crescere storta e senza buchi." },
+    { t:"tf", plant:"monstera", q:"Le foglie giovani della monstera sono già piene di buchi.", a:false, why:"I buchi arrivano con l’età e con la luce giusta: le prime foglie sono intere. Se continuano a uscire intere, chiede più luce." },
+    { t:"id", plant:"calathea", q:"Quale è la calathea?", o:["monstera","calathea","orchidea","felce"], a:"calathea", why:"Foglie larghe e decorate, come disegnate a pennarello. Sembrano finte, ma pretendono attenzioni vere." },
+    { t:"tf", plant:"calathea", q:"Il sole diretto rende più belli i disegni delle foglie della calathea.", a:false, why:"Li sbiadisce e brucia le foglie. Vuole luce indiretta." },
+    { t:"mc", plant:"calathea", q:"La sera la calathea alza le foglie. Cosa vuol dire?", o:["Niente di grave: si muove così ogni giorno, al mattino le riabbassa","Ha sete, subito","Ha freddo e va spostata"], a:0, why:"È un movimento naturale, giorno e notte. Per questo la chiamano pianta della preghiera." }
+  ]},
+  { id:"j2", zone:"z3", title:"Aria umida", icon:"drop", items:[
+    { t:"card", plant:"felce", title:"Il problema è l’aria", body:"Le piante tropicali vengono da posti dove l’aria è umida tutto l’anno. In casa, d’inverno, con i termosifoni accesi, l’aria è secca come in un deserto. Le prime a lamentarsi sono le punte delle foglie." },
+    { t:"mc", plant:"calathea", q:"Punte delle foglie marroni e secche sulla calathea vogliono dire...", o:["Aria troppo secca, o acqua troppo calcarea","Troppa luce della luna","Che sta per fiorire"], a:0, why:"È il segnale classico. Si taglia la parte secca e si cerca di dare più umidità." },
+    { t:"tf", plant:"felce", q:"Spruzzare acqua sulle foglie ogni tanto risolve il problema dell’aria secca.", a:false, why:"L’effetto dura pochi minuti. Funziona meglio raggruppare le piante, o mettere il vaso su un sottovaso con argilla espansa e acqua, senza che il fondo tocchi l’acqua." },
+    { t:"mc", plant:"felce", q:"Dove sta bene una felce in casa?", o:["In un bagno luminoso, dove l’aria è più umida","Sopra il termosifone, al calduccio","Sul balcone, in pieno sole d’agosto"], a:0, why:"Il bagno, se ha una finestra, è il suo paradiso: umido e luminoso. Il termosifone è il suo inferno." },
+    { t:"id", plant:"felce", q:"Riconosci la felce?", o:["orchidea","felce","calathea","monstera"], a:"felce", why:"Fronde lunghe e arcuate, piene di fogliette. È più antica dei dinosauri, e si vede." },
+    { t:"tf", plant:"felce", q:"Se la terra della felce si secca, perde fogliette a pioggia.", a:true, why:"Ama la terra sempre un po’ umida. Se si secca, te lo dice spargendo foglioline sul pavimento." }
+  ]},
+  { id:"j3", zone:"z3", title:"Radici strane", icon:"leaf", items:[
+    { t:"card", plant:"orchidea", title:"Non tutte le radici stanno sotto terra", body:"Nella foresta molte piante vivono aggrappate agli alberi. L’orchidea non tocca mai terra: le sue radici stanno all’aria, avvolte ai rami. La monstera si arrampica sui tronchi con radici che escono dal fusto." },
+    { t:"tf", plant:"orchidea", q:"L’orchidea si pianta nel terriccio normale, come il basilico.", a:false, why:"Nel terriccio le radici soffocano e marciscono. Vuole corteccia, che lascia passare l’aria." },
+    { t:"mc", plant:"orchidea", q:"Perché l’orchidea sta spesso in un vaso trasparente?", o:["Perché le radici fanno anche la fotosintesi","Per controllare che non ci siano pesci","Perché costa meno"], a:0, why:"Le radici verdi-argentate fanno la fotosintesi. E il vaso trasparente aiuta anche te: vedi quando hanno sete." },
+    { t:"mc", plant:"orchidea", q:"Come si annaffia un’orchidea?", o:["Immergi il vaso in acqua per 10-15 minuti, poi la lasci scolare bene","Un bicchiere d’acqua sulle foglie ogni giorno","Riempi il vaso d’acqua e la lasci lì"], a:0, why:"Per immersione, quando le radici sono argentate. Poi si scola bene: l’acqua ferma la fa marcire." },
+    { t:"mc", plant:"monstera", q:"Le radici che escono dal fusto della monstera...", o:["Servono ad aggrapparsi: si possono guidare verso un tutore","Sono un sintomo di malattia","Vanno annaffiate ogni giorno"], a:0, why:"Sono radici aeree: in natura si aggrappano ai tronchi. Un tutore di fibra di cocco la aiuta a crescere dritta." },
+    { t:"id", plant:"monstera", q:"Quale è la monstera?", o:["felce","orchidea","monstera","calathea"], a:"monstera", why:"Foglie enormi con i buchi. La pianta più fotografata di Instagram." }
+  ]},
+  { id:"j4", zone:"z3", title:"Fiori e riposo", icon:"pot", items:[
+    { t:"card", plant:"orchidea", title:"Dopo i fiori", body:"L’orchidea regalata fiorisce per settimane, poi i fiori cadono. Ed è lì che quasi tutti la buttano. Peccato: non è morta, sta solo riposando. Con le cure giuste rifiorisce, anche ogni anno." },
+    { t:"tf", plant:"orchidea", q:"Quando cadono i fiori, l’orchidea è morta.", a:false, why:"Sta riposando. Foglie e radici sono vive: la pianta si prepara alla prossima fioritura." },
+    { t:"mc", plant:"orchidea", q:"Cosa aiuta l’orchidea a fare un nuovo stelo di fiori?", o:["Qualche settimana con le notti più fresche del giorno","Tenerla al buio totale","Annaffiarla il doppio"], a:0, why:"La differenza di temperatura tra giorno e notte le dà il segnale. In autunno, vicino a una finestra, spesso basta." },
+    { t:"tf", plant:"felce", q:"La felce fa fiori piccolissimi, difficili da vedere.", a:false, why:"Le felci non fanno né fiori né semi: si riproducono con le spore, i puntini marroni sotto le fronde." },
+    { t:"mc", plant:"felce", q:"Puntini marroni in file ordinate sotto le fronde della felce...", o:["Sono le spore: è tutto normale","Sono parassiti da eliminare subito","Sono bruciature del sole"], a:0, why:"Sono gruppi di spore. Non confonderli con le cocciniglie, che invece sono sparse e si staccano con l’unghia." },
+    { t:"tf", plant:"calathea", q:"La calathea è tossica per cani e gatti, come il pothos.", a:false, why:"Buona notizia: la calathea non è tossica. Il gatto può fissarla in pace. La monstera invece sì." }
+  ]},
+  { id:"j5", zone:"z3", title:"Ripasso", icon:"star", items:[
+    { t:"id", plant:"orchidea", q:"Quale è l’orchidea?", o:["calathea","monstera","felce","orchidea"], a:"orchidea", why:"Foglie larghe e spesse alla base, uno stelo con fiori a farfalla, radici argentate che escono dal vaso." },
+    { t:"mc", plant:"monstera", q:"La monstera fa foglie nuove piccole e senza buchi. Cosa le manca?", o:["Più luce indiretta","Più acqua","Un tutore più alto"], a:0, why:"Con poca luce risparmia energie e fa foglie piccole e intere." },
+    { t:"tf", plant:"calathea", q:"Con l’acqua di casa molto calcarea, la calathea può farsi le punte marroni.", a:true, why:"È sensibile al calcare: meglio acqua piovana o filtrata, se quella di casa è molto dura." },
+    { t:"mc", plant:"felce", q:"Intorno alla felce l’aria è secca. La cosa più utile è...", o:["Raggrupparla con altre piante o metterla su argilla espansa bagnata","Spruzzarla una volta al mese","Avvicinarla al termosifone"], a:0, why:"Le piante vicine si fanno umidità a vicenda, e l’acqua nell’argilla evapora intorno al vaso." },
+    { t:"match", q:"Abbina pianta e mania", pairs:[["Monstera","Foglie con i buchi"],["Calathea","Prega la sera"],["Orchidea","Radici al sole"],["Felce","Spore, non semi"]] }
+  ]}
+);
 const ZONES = [
   { id:"z1", title:"Casa tua", desc:"Il davanzale, dove tutto ha inizio. E dove tutto, finora, è morto." },
-  { id:"z2", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." }
+  { id:"z2", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." },
+  { id:"z3", title:"Giungla in salotto", desc:"Luce filtrata, aria umida, piante che vogliono attenzioni. Tutte da casa, nessuna al sole." }
 ];
 
 // ---------- Emergenze: problemi reali, si curano sapendo la risposta ----------
@@ -394,6 +469,16 @@ const EMERG = {
   fic_pala:{ plant:"ficodindia", step:"m3", title:"Gli si è staccata una pala", q:"Cosa ne fai?", o:["La lasci asciugare qualche giorno e poi la pianti","La pianti subito e la annaffi","La butti"], a:0, why:"Con il taglio cicatrizzato mette radici: è una pianta nuova gratis." },
   fic_pioggia:{ plant:"ficodindia", step:"m4", title:"Inverno piovoso e il vaso è sotto la pioggia", q:"Cosa fai?", o:["Lo sposti al riparo dalla pioggia","Lo lasci, è un cactus resistente","Lo annaffi anche tu, per sicurezza"], a:0, why:"Freddo e umidità insieme fanno marcire le pale. D’inverno all’asciutto." }
 };
+Object.assign(EMERG, {
+  mon_sole:{ plant:"monstera", step:"j1", title:"Macchie gialle e secche sulle foglie vicino al vetro", q:"Cosa fai?", o:["La allontani un po’ dal sole diretto","La annaffi di più","Tagli tutte le foglie macchiate e la lasci lì"], a:0, why:"Sono scottature: il sole diretto attraverso il vetro brucia le foglie. Luce sì, sole sulle foglie no." },
+  mon_intere:{ plant:"monstera", step:"j1", title:"Le foglie nuove escono piccole e senza buchi", q:"Cosa le manca?", o:["Più luce indiretta","Più acqua","Un vaso più piccolo"], a:0, why:"Con poca luce fa foglie piccole e intere. Avvicinala a una finestra luminosa, senza sole diretto." },
+  cal_punte:{ plant:"calathea", step:"j2", title:"Punte delle foglie marroni e arricciate", q:"Cosa fai?", o:["La raggruppi con altre piante o la metti su argilla espansa bagnata","Le dai più sole","La spruzzi una volta e basta"], a:0, why:"Aria troppo secca. Più umidità intorno, e se l’acqua di casa è calcarea, meglio quella filtrata." },
+  cal_sbiadita:{ plant:"calathea", step:"j1", title:"I disegni delle foglie si stanno sbiadendo", q:"Cosa fai?", o:["La sposti lontano dal sole diretto","La concimi il doppio","La metti in bagno al buio"], a:0, why:"Il sole diretto sbiadisce e brucia le foglie: vuole luce indiretta." },
+  orc_fiori:{ plant:"orchidea", step:"j4", title:"Sono caduti tutti i fiori", q:"Cosa fai?", o:["Continui a curarla: sta riposando","La butti, è finita","La metti al buio per farla dormire"], a:0, why:"Dopo i fiori riposa. Foglie e radici sono vive, e con qualche notte fresca rifiorirà." },
+  orc_radici:{ plant:"orchidea", step:"j3", title:"Nel vaso trasparente le radici sono molli e marroni", q:"Cosa fai?", o:["Togli le radici marce, la rinvasi in corteccia nuova e la annaffi meno","La annaffi di più, sembrano secche","Le copri con il terriccio"], a:0, why:"Radici molli e marroni sono marce: troppa acqua ferma. Si tolgono e si riparte da corteccia fresca." },
+  fel_termo:{ plant:"felce", step:"j2", title:"È sopra il termosifone e perde foglie a pioggia", q:"Cosa fai?", o:["La sposti lontano dal termosifone, in un posto più umido","La annaffi ogni ora","Le togli le foglie rimaste, così non le perde"], a:0, why:"Il caldo secco del termosifone la disidrata. Meglio un bagno luminoso o un angolo lontano dal calore." },
+  fel_puntini:{ plant:"felce", step:"j4", title:"Puntini marroni sotto le fronde", q:"Cosa fai?", o:["Guardi bene: se sono in file ordinate sono spore, e va tutto bene","La butti, è malata","La spruzzi con l’insetticida senza guardare"], a:0, why:"Le spore stanno in file ordinate. Le cocciniglie sono sparse e si staccano con l’unghia." }
+});
 
 /* =========================================================
    Stato salvato sul dispositivo
@@ -427,7 +512,7 @@ const ICON = {
   pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>',
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
-const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6" };
+const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44" };
 function plantSVG(id, size = 120, state = "sana"){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
@@ -476,8 +561,35 @@ function plantSVG(id, size = 120, state = "sana"){
       [[-.4,-.4],[.3,-.5],[-.5,.1],[.4,0],[0,.45],[-.1,-.05]].map(([a,b]) => `<circle cx="${x + a * rx}" cy="${y + b * ry}" r="1.3" fill="#e9e2a6"/>`).join("") + `</g>`;
     leaves = pad(60,66,15,20,0) + pad(44,44,11,15,-25) + pad(76,42,11,15,25) + pad(60,32,9,12,0) +
       `<ellipse cx="40" cy="28" rx="4" ry="5" fill="#e8553f"/><ellipse cx="80" cy="26" rx="4" ry="5" fill="#f2a541"/><ellipse cx="60" cy="18" rx="3.6" ry="4.6" fill="#e8553f"/>`;
+  } else if (id === "monstera") {
+    // foglie grandi a cuore con i buchi (fill-rule evenodd: i cerchi interni diventano fori)
+    const hole = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+    const leaf = (x, y, r, s) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})"><path fill-rule="evenodd" fill="#2f7d4a" d="M0-24C18-26 28-8 22 8C16 22 4 26 0 18C-4 26-16 22-22 8C-28-8-18-26 0-24Z${hole(-12,-4,3.2)}${hole(12,-4,3.2)}${hole(-11,9,2.6)}${hole(11,9,2.6)}${hole(-6,-14,2.2)}${hole(6,-14,2.2)}"/><path d="M0-22V16" stroke="#4f9b66" stroke-width="1.6"/></g>`;
+    leaves = `<path d="M58 86C56 70 44 60 38 50M62 86C64 68 76 58 82 48M60 86V34" stroke="#3f7d4f" stroke-width="3" fill="none" stroke-linecap="round"/>` +
+      leaf(36, 46, -30, .85) + leaf(84, 44, 30, .85) + leaf(60, 30, 0, 1);
+  } else if (id === "calathea") {
+    // foglie ovali dritte con disegno chiaro a spina di pesce
+    const leaf = (x, h, r) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x} 86V${86 - h + 26}" stroke="#7a4b6a" stroke-width="2.4"/><ellipse cx="${x}" cy="${86 - h + 14}" rx="10" ry="16" fill="#2f6f4e"/>` +
+      [-8,-3,2,7].map(k => `<path d="M${x} ${86 - h + 14 + k}l-7 -4M${x} ${86 - h + 14 + k}l7 -4" stroke="#a6d79a" stroke-width="2.2" stroke-linecap="round"/>`).join("") +
+      `<path d="M${x} ${86 - h}V${86 - h + 30}" stroke="#a6d79a" stroke-width="1.4"/></g>`;
+    leaves = leaf(60, 66, 0) + leaf(46, 56, -20) + leaf(74, 56, 20) + leaf(38, 42, -38) + leaf(82, 42, 38);
+  } else if (id === "orchidea") {
+    // foglie larghe alla base, stelo arcuato con fiori a farfalla
+    const flower = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="-6" cy="-2" rx="6" ry="5" fill="#f3a6c9"/><ellipse cx="6" cy="-2" rx="6" ry="5" fill="#f3a6c9"/><ellipse cx="0" cy="-7" rx="4" ry="5" fill="#f7c3dc"/><ellipse cx="-4" cy="5" rx="4" ry="4" fill="#f7c3dc"/><ellipse cx="4" cy="5" rx="4" ry="4" fill="#f7c3dc"/><circle cx="0" cy="1" r="2.4" fill="#c2457d"/></g>`;
+    leaves = `<ellipse cx="46" cy="82" rx="16" ry="6" transform="rotate(-14 46 82)" fill="#2f7d4a"/><ellipse cx="74" cy="82" rx="16" ry="6" transform="rotate(14 74 82)" fill="#3a8a55"/>` +
+      `<path d="M60 82C60 56 66 36 84 26" stroke="#5b7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+      flower(66, 44, .95) + flower(76, 32, .9) + flower(88, 24, .8) + `<circle cx="92" cy="22" r="2.4" fill="#f3a6c9"/>`;
+  } else if (id === "felce") {
+    // fronde arcuate piene di fogliette, calcolate lungo una curva
+    const frond = (ex, ey, cx, cy) => { let d = `M60 86Q${cx} ${cy} ${ex} ${ey}`, l = "";
+      for (let k = 2; k < 12; k++) { const t = k / 12, x = (1 - t) ** 2 * 60 + 2 * (1 - t) * t * cx + t * t * ex, y = (1 - t) ** 2 * 86 + 2 * (1 - t) * t * cy + t * t * ey, w = 7 * (1 - t) + 2;
+        l += `<ellipse cx="${x.toFixed(1)}" cy="${(y - w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#4caf5c"/><ellipse cx="${x.toFixed(1)}" cy="${(y + w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#3e9a4f"/>`; }
+      return `<path d="${d}" stroke="#3b7d43" stroke-width="2" fill="none"/>${l}`; };
+    leaves = frond(14, 96, 30, 40) + frond(106, 96, 90, 40) + frond(26, 70, 40, 30) + frond(94, 70, 80, 30) + frond(60, 22, 56, 50);
   }
-  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${leaves}</g>${potSvg}</svg>`;
+  // L’orchidea ha il vaso trasparente: si vedono le radici argentate dentro
+  const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
+  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${leaves}</g>${potSvg}${roots}</svg>`;
 }
 const mascot = (size = 150, mood = "happy") => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';
@@ -555,10 +667,10 @@ function settleDeaths(){ S.garden.forEach(g => { if (!g.dead && daysSince(g.wate
 let felt = new WeakSet();
 function soilFeel(g){
   const c = care(g), d = daysSince(g.wateredAt), st = plantState(g);
-  if (wetLevel(g) > 0) return "Fango. Le dita escono sporche: niente acqua per un po’.";
+  if (wetLevel(g) > 0) return c.feelWet || "Fango. Le dita escono sporche: niente acqua per un po’.";
   if (d < c.soak) return "Umida, fresca sotto il dito. Ancora niente acqua.";
   if (st === "assetata" || st === "appassita") return "Secca e dura, anche più in fondo. Acqua, e in fretta.";
-  return g.plant === "sansevieria" ? "Asciutta anche in profondità. Adesso sì, si può annaffiare." : "Asciutta nei primi centimetri. È il momento giusto per annaffiare.";
+  return c.feelReady || "Asciutta nei primi centimetri. È il momento giusto per annaffiare.";
 }
 const kOf = id => S.knowledge[id] || 0;
 const isReady = id => kOf(id) >= RULES.knowledgeMax;
