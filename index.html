@@ -92,16 +92,14 @@ main{flex:1;padding:0 0 96px}
 .bubble{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);background:var(--bg);color:var(--leaf-dark);border:2px solid var(--line);padding:8px 12px;border-radius:12px;white-space:nowrap;font-weight:900;font-size:14px;animation:float 2s ease-in-out infinite}
 .bubble::after{content:"";position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:var(--line)}
 @keyframes float{50%{transform:translate(-50%,-4px)}}
-.ring{position:absolute;inset:-10px;border-radius:50%;z-index:-1;background:conic-gradient(var(--sun) calc(var(--p) * 1%), var(--surface-2) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
-.node.partial::after{display:none}
+.ring{position:absolute;inset:-11px;border-radius:50%;z-index:-1;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
+.node.ringed::after{display:none}
 .nodelabel small{display:block;font-size:12px;color:var(--sun-dark)}
-.lrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:10px 12px;min-height:56px}
-.lrow .t{flex:1}.lrow .t b{display:block;font-size:16px}.lrow .t small{color:var(--ink-2);font-size:13px}
-.lrow .lico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--leaf);color:#fff;flex:none}
-.lrow .lico svg{width:20px;height:20px}
-.lrow.done .lico{background:var(--sun);color:#3b2a00}
-.lrow.locked{opacity:.55;cursor:not-allowed}.lrow.locked .lico{background:var(--locked);color:var(--locked-dark)}
-.lrow.next{border-color:var(--leaf);box-shadow:0 4px 0 var(--leaf)}
+.steps{display:flex;gap:6px;margin:14px 0 4px}
+.steps i{flex:1;height:10px;border-radius:999px;background:var(--surface-2)}
+.steps i.on{background:var(--sun)}
+.nodecard p{color:var(--ink-2);margin:8px 0 16px;font-size:15px;line-height:1.4}
+.nodecard p b{color:var(--ink)}
 .nodelabel{font-size:13px;color:var(--ink-2);margin-top:6px;text-align:center}
 .nodewrap{display:flex;flex-direction:column;align-items:center}
 .teaser{margin:4px 16px 24px;padding:14px 16px;border:2px dashed var(--line);border-radius:16px;color:var(--ink-2);font-size:14px;line-height:1.45}
@@ -1133,9 +1131,10 @@ function renderPath(){
     const nodes = steps.map(([s, i], k) => {
       const done = S.done.includes(s.id), current = i === cur, locked = cur !== -1 && i > cur;
       const pr = progOf(s), n = lessonCount(s), partial = !done && pr > 0;
-      const cls = (done ? "done" : current ? "current" : locked ? "locked" : "") + (partial ? " partial" : "");
+      const cls = (done ? "done" : current ? "current" : locked ? "locked" : "") + ((current || partial) ? " ringed" : "");
       const ico = done ? ICON.check : locked ? ICON.lock : ICON[s.icon];
-      const ring = partial ? `<span class="ring" style="--p:${Math.round(pr / n * 100)}" aria-hidden="true"></span>` : "";
+      // Lo stepper si vede sulla casella in corso: un segmento per lezione, pieni quelli fatti
+      const ring = (current || partial) ? stepperRing(pr, n) : "";
       return `<div class="nodewrap" style="transform:translateX(${offsets[k % offsets.length]}px)">
         <button class="node ${cls}" data-step="${i}" aria-label="${esc(s.title)}${done ? ", completato" : locked ? ", bloccato" : `, lezione ${pr + 1} di ${n}`}" ${locked ? "aria-disabled=\"true\"" : ""}>${ring}${current ? `<span class="bubble">${partial ? "Continua" : S.done.length ? "Avanti" : "Inizia da qui"}</span>` : ""}${ico}</button>
         <div class="nodelabel">${esc(s.title)}${partial ? `<small>${pr}/${n}</small>` : ""}</div></div>`;
@@ -1144,26 +1143,36 @@ function renderPath(){
   }).join("") + `<div class="teaser">${cur === -1 ? "Hai finito tutte le zone. La prossima è in arrivo: intanto, le tue piante hanno bisogno di te." : "Altre zone del pianeta in arrivo nelle prossime versioni."}</div>`;
 }
 
+// Anello a segmenti: n spicchi separati da una piccola fessura, dorati quelli completati
+function stepperRing(pr, n){
+  const seg = 360 / n, gap = n > 1 ? 7 : 0;
+  const parts = Array.from({ length: n }, (_, k) => {
+    const a = k * seg + gap / 2, b = (k + 1) * seg - gap / 2, c = k < pr ? "var(--sun)" : "var(--surface-2)";
+    return `transparent ${a - gap / 2}deg ${a}deg, ${c} ${a}deg ${b}deg, transparent ${b}deg ${(k + 1) * seg}deg`;
+  });
+  return `<span class="ring" style="background:conic-gradient(${parts.join(", ")})" aria-hidden="true"></span>`;
+}
+// Toccando la casella: niente scelta della lezione. Si va avanti in ordine; a casella finita, ripasso a sorpresa.
 function openNode(i){
-  const st = STEPS[i], pr = progOf(st), n = lessonCount(st);
-  const rows = Array.from({ length: n }, (_, li) => {
-    const state = li < pr ? "done" : li === pr ? "next" : "locked";
-    const icon = state === "done" ? ICON.check : state === "next" ? ICON[st.icon] : ICON.lock;
-    const label = state === "done" ? "Rifalla" : state === "next" ? "Inizia" : "Bloccata";
-    return `<button class="lrow ${state}" data-lesson="${li}" ${state === "locked" ? "disabled" : ""}><span class="lico">${icon}</span><span class="t"><b>${esc(lessonTitle(st, li))}</b><small>Lezione ${li + 1} di ${n}</small></span><span class="tag ${state === "next" ? "ready" : "study"}">${label}</span></button>`;
-  }).join("");
-  const m = modal(`<div class="kind" style="margin:0">${esc(ZONES.find(z => z.id === st.zone).title)}</div><h2>${esc(st.title)}</h2>
-    <p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">${pr >= n ? "Fatta tutta. Puoi rifare le lezioni per ripassare (e per qualche goccia)." : `${pr} di ${n} lezioni fatte. L’ultima è un allenamento a sorpresa.`}</p>
-    <div class="pick">${rows}</div><button class="btn ghost" data-close="1">Chiudi</button>`);
-  m.querySelectorAll("[data-lesson]").forEach(b => b.onclick = () => { m.remove(); startLesson(i, +b.dataset.lesson); });
+  const st = STEPS[i], pr = progOf(st), n = lessonCount(st), done = pr >= n;
+  const bar = `<div class="steps" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < pr ? "on" : ""}"></i>`).join("")}</div>`;
+  const text = done ? `Casella completata. Il ripasso pesca a caso dalle sue domande (e porta qualche goccia).`
+    : pr === n - 1 ? `<b>Lezione ${n} di ${n}:</b> ${st.icon === "star" ? "ripasso a sorpresa, con domande da tutta la zona." : "allenamento a sorpresa, con domande da tutta la casella."}`
+    : `<b>Lezione ${pr + 1} di ${n}:</b> ${esc(lessonTitle(st, pr))}.`;
+  const m = modal(`<div class="nodecard"><div class="kind" style="margin:0">${esc(ZONES.find(z => z.id === st.zone).title)}</div><h2>${esc(st.title)}</h2>${bar}<p>${text}</p>
+    <div style="display:flex;flex-direction:column;gap:12px"><button class="btn ${done ? "sun" : ""}" id="nodeGo">${done ? "Ripassa" : pr ? "Continua" : "Inizia"}</button><button class="btn ghost" data-close="1">Non ora</button></div></div>`);
+  m.querySelector("#nodeGo").onclick = () => { m.remove(); startLesson(i, done ? "review" : undefined); };
 }
 
 /* --- Lezione --- */
 let L = null;
 function startLesson(i, li){
   const step = STEPS[i];
-  if (li === undefined) li = Math.min(progOf(step), lessonCount(step) - 1);   // di default: la prossima da fare
-  L = { i, li, step, items: lessonItems(step, li), idx: 0, mistakes: 0, gained:{}, seen:[], replay: li < progOf(step) };
+  // "review" = ripasso di una casella finita: domande pescate a caso da tutta la casella
+  const review = li === "review";
+  if (review || li === undefined) li = Math.min(progOf(step), lessonCount(step) - 1);   // di default: la prossima da fare
+  L = { i, li, step, items: review ? practiceItems(step) : lessonItems(step, li), idx: 0, mistakes: 0, gained:{}, seen:[],
+    replay: review || li < progOf(step), title: review ? "Ripasso a sorpresa" : lessonTitle(step, li) };
   showItem();
 }
 function shuffle(a){ const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
@@ -1242,7 +1251,7 @@ function finishLesson(){
     return `<div class="krow">${plantSVG(p, 46)}<div class="t"><b>${PLANTS[p].name}</b><div class="bar ${full ? "full" : ""}"><i data-to="${k / RULES.knowledgeMax * 100}" style="width:${before[p] / RULES.knowledgeMax * 100}%"></i></div></div>${full ? (inGarden(p) ? '<span class="tag planted">In serra</span>' : '<span class="tag ready">Pronta!</span>') : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</div>`; }).join("");
   const readyNow = Object.keys(L.gained).some(p => isReady(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
-  app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(lessonTitle(L.step, L.li))}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
+  app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
     <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div><div class="reward sun"><b>+${x}</b><span>Esperienza</span></div></div>
     ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
