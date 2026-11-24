@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fffaf0">
+<meta name="theme-color" content="#1f7a44">
 <title>Vasanicola</title>
 <!-- App installabile: aggiunta alla Home si apre a schermo intero, senza barre del browser -->
 <link rel="manifest" href="/manifest.webmanifest">
@@ -14,29 +14,29 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fffaf0; --surface:#f8f1de; --surface-2:#efe5c8; --ink:#1f2758; --ink-2:#5b5f86; --line:#e4d9ba; --art-line:#26306a;
+  --bg:#ffffff; --surface:#f1f8e9; --surface-2:#e3f1d3; --ink:#173b26; --ink-2:#4d6b57; --line:#d5e6c6;
   --leaf:#2f9e55; --leaf-dark:#1f7a44; --leaf-shadow:#18603a;
   --water:#1e90ff; --water-dark:#1570cc; --water-bg:#e4f1ff;
   --sun:#ffbf1f; --sun-dark:#d99a00; --sun-bg:#fff4d1;
   --bad:#e5484d; --bad-dark:#b9363a; --bad-bg:#fde8e8;
   --dry:#b5832f; --dry-bg:#f7ead2;
   --soak:#0f7f7c; --soak-bg:#d8f2ef;
-  --locked:#d9d2bd; --locked-dark:#b3aa8f;
-  --display:"Mali", "Chalkboard SE", "Comic Sans MS", system-ui, sans-serif;
+  --locked:#c7cfc4; --locked-dark:#a2ac9f;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --body:"Nunito", "Avenir Next", system-ui, -apple-system, sans-serif;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#141a30; --surface:#1d2442; --surface-2:#273058; --ink:#f6efdc; --ink-2:#b9bad3; --line:#343d68; --leaf-dark:#7ad69a;
-    --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a4166; --locked-dark:#2a304d; color-scheme:dark; }
+  :root:not([data-theme="light"]){ --bg:#0f1a13; --surface:#17271c; --surface-2:#1f3426; --ink:#e7f3e9; --ink-2:#a7c2ae; --line:#2b4433; --leaf-dark:#7ad69a;
+    --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a463d; --locked-dark:#2a332c; color-scheme:dark; }
 }
-:root[data-theme="dark"]{ --bg:#141a30; --surface:#1d2442; --surface-2:#273058; --ink:#f6efdc; --ink-2:#b9bad3; --line:#343d68; --leaf-dark:#7ad69a;
-  --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a4166; --locked-dark:#2a304d; color-scheme:dark; }
+:root[data-theme="dark"]{ --bg:#0f1a13; --surface:#17271c; --surface-2:#1f3426; --ink:#e7f3e9; --ink-2:#a7c2ae; --line:#2b4433; --leaf-dark:#7ad69a;
+  --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a463d; --locked-dark:#2a332c; color-scheme:dark; }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:700;-webkit-font-smoothing:antialiased}
@@ -81,7 +81,7 @@ main{flex:1;padding:0 0 96px}
 .zone small{display:block;font-size:13px;opacity:.9;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
 .zone h2{font-size:23px}
 .zone p{margin:4px 0 0;font-size:14px;opacity:.95}
-.path{display:flex;flex-direction:column;align-items:center;gap:22px;padding:28px 0 12px}
+.path{display:flex;flex-direction:column;align-items:center;gap:64px;padding:52px 0 12px}
 .node{position:relative;width:76px;height:70px;border-radius:50%;display:grid;place-items:center;background:var(--leaf);box-shadow:0 7px 0 var(--leaf-shadow);color:#fff;transition:transform .08s,box-shadow .08s}
 .node:active{transform:translateY(6px);box-shadow:0 1px 0 var(--leaf-shadow)}
 .node svg{width:36px;height:36px}
@@ -243,8 +243,6 @@ main{flex:1;padding:0 0 96px}
 .mascot{animation:wobble 3s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes wobble{50%{transform:rotate(-3deg)}}
 
-/* ---- Illustrazioni "fatte a mano": contorno blu + tratto tremolante (filtro #wob) ---- */
-.art :is(path,ellipse,circle,rect)[fill]:not([fill="none"]):not([stroke]):not(.no){stroke:var(--art-line);stroke-width:1.7px;stroke-linejoin:round}
 /* stati delle piante */
 .p-assetata .leaves{transform:rotate(4deg) skewX(-4deg);transform-origin:50% 90%;filter:saturate(.75) brightness(1.05)}
 .p-appassita .leaves{transform:rotate(9deg) skewX(-9deg) scaleY(.9);transform-origin:50% 95%;filter:sepia(.75) saturate(.8) hue-rotate(-15deg) brightness(.95)}
@@ -254,8 +252,6 @@ main{flex:1;padding:0 0 96px}
 </style>
 </head>
 <body>
-<!-- Filtro "tratto a mano": un rumore casuale sposta un po' ogni punto delle linee -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></svg>
 <div class="app" id="app"></div>
 <script>
 /* =========================================================
@@ -821,14 +817,7 @@ const ICON = {
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
 const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644" };
-const wobble = svg => {
-  // 1) aggiunge "art" alle classi del tag <svg> (o crea l'attributo), 2) avvolge il disegno nel filtro
-  const open = svg.slice(0, svg.indexOf(">") + 1);
-  const tag = open.includes(' class="') ? open.replace(' class="', ' class="art ') : open.replace("<svg", '<svg class="art"');
-  return tag + '<g filter="url(#wob)">' + svg.slice(open.length).replace(/<\/svg>\s*$/, "</g></svg>");
-};
-const plantSVG = (...args) => wobble(plantSVGraw(...args));
-function plantSVGraw(id, size = 120, state = "sana"){
+function plantSVG(id, size = 120, state = "sana"){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
   const wood = `<path d="M22 98c10-7 64-9 76-2c5 3 5 11 0 13c-15 6-64 6-76 0c-5-3-5-8 0-11z" fill="#a47148"/><path d="M34 103c14 2 36 2 52-1M44 98c8-1 20-1 28 0" stroke="#7a5230" stroke-width="2" fill="none" stroke-linecap="round"/>`;
@@ -964,8 +953,7 @@ function plantSVGraw(id, size = 120, state = "sana"){
   const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
   return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${leaves}</g>${potSvg}${roots}<g class="leaves">${over}</g></svg>`;
 }
-const mascot = (size = 150, mood = "happy") => wobble(mascotRaw(size, mood));
-const mascotRaw = (size, mood) => {
+const mascot = (size = 150, mood = "happy") => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';
   return `<svg class="mascot" width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">
   <ellipse cx="38" cy="30" rx="12" ry="18" transform="rotate(-30 38 30)" fill="#43b05c"/><ellipse cx="82" cy="30" rx="12" ry="18" transform="rotate(30 82 30)" fill="#43b05c"/><ellipse cx="60" cy="20" rx="11" ry="17" fill="#4fc06a"/>
