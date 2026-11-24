@@ -172,7 +172,7 @@ main{flex:1;padding:0 0 96px}
 .sec{padding:20px 16px 0}
 .sec h1{font-size:28px}
 .sec .lead{color:var(--ink-2);font-size:15px;margin:4px 0 16px;line-height:1.4}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
 .slot{border:2px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:var(--bg);box-shadow:0 4px 0 var(--line);min-height:230px}
 .slot h3{font-size:17px}
 .slot .state{font-size:12px;font-weight:900;padding:3px 9px;border-radius:999px}
@@ -199,6 +199,7 @@ main{flex:1;padding:0 0 96px}
 .acts{margin-top:auto;width:100%;display:flex;flex-direction:column;gap:10px}
 .acts .btn{margin-top:0}
 .feel{color:var(--dry)}
+.slot .line{transition:opacity .3s}.slot .line.fade{opacity:0}
 .area{margin-top:22px}
 .area h2{font-size:22px;display:flex;align-items:baseline;gap:8px}
 .area h2 span{font-family:var(--body);font-size:14px;color:var(--ink-2)}
@@ -209,6 +210,16 @@ main{flex:1;padding:0 0 96px}
 .emerg b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
 .emerg span{color:var(--ink)}.emerg b{color:var(--bad)}
 .emerg svg{width:18px;height:18px;flex:none;margin-top:2px}
+.slot.plant{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px 14px;align-items:start;text-align:left;min-height:0;padding:14px}
+.sart{display:grid;place-items:center;padding-top:4px}
+.sinfo{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.sinfo .namerow{justify-content:flex-start;margin:-6px 0 -6px}
+.sinfo .species{margin-top:-4px}
+.badges{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sfull{grid-column:1/-1;display:flex;flex-direction:column;gap:10px}
+.sfull .acts{flex-direction:row}.sfull .acts .btn{flex:1}
+.slot.plant .line{min-height:0}
+.slot.empty,.slot.locked{min-height:0;padding:18px}
 .slot.empty{border-style:dashed;justify-content:center;color:var(--ink-2)}
 .slot.locked{background:var(--surface);border-style:dashed;justify-content:center;color:var(--ink-2)}
 .plus{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--leaf-dark);font-size:32px;line-height:1}
@@ -221,9 +232,9 @@ main{flex:1;padding:0 0 96px}
 .herb{display:flex;flex-direction:column;gap:10px}
 .herb .krow{cursor:pointer;text-align:left;width:100%}
 .unknown{opacity:.55}
-.modal{position:fixed;inset:0;background:rgba(10,30,15,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.modal{position:fixed;top:0;left:0;right:0;height:100%;background:rgba(10,30,15,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
 @keyframes fade{from{opacity:0}}
-.panel{width:100%;max-width:460px;max-height:88vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s ease}
+.panel{width:100%;max-width:460px;max-height:92%;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s ease}
 @keyframes up{from{transform:translateY(40px)}}
 .panel h2{font-size:24px}
 .panel .facts{margin:12px 0 16px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
@@ -244,6 +255,9 @@ main{flex:1;padding:0 0 96px}
 .wchip b{font-family:var(--display);font-size:18px}
 .wchip.water{background:var(--water-bg);color:var(--water)}.wchip.bad{background:var(--bad-bg);color:var(--bad)}.wchip.dead{background:var(--dry-bg);color:var(--dry)}
 .wacts{width:100%;margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:12px}
+/* ---- Avviso aggiornamento ---- */
+.update{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 10px);z-index:60;width:calc(100% - 24px);max-width:436px;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:16px;background:var(--ink);color:var(--bg);font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.update span{flex:1}.update .btn{width:auto}
 /* ---- Splash ---- */
 .splash{position:fixed;inset:0;z-index:100;background:var(--leaf);color:#fff;display:grid;place-items:center;text-align:center;padding:24px;transition:opacity .35s ease,transform .35s ease}
 .splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
@@ -808,6 +822,8 @@ Object.assign(EMERG, {
    Stato salvato sul dispositivo
    ========================================================= */
 const KEY = "vasanicola.v1";
+// Versione di questa pagina: va cambiata a ogni pubblicazione. L'app confronta la sua con quella online.
+const VERSION = "2026-11-24.2";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
@@ -1062,7 +1078,10 @@ function settleEmergencies(){
 }
 function settleDeaths(){ S.garden.forEach(g => { if (!g.dead && daysSince(g.wateredAt) >= care(g).dead) kill(g, "secca", null, g.wateredAt + care(g).dead * DAY); }); }
 // Piante su cui hai appena fatto la prova del dito (vale finché non annaffi o passa il tempo)
-let felt = new WeakSet();
+// Prova del dito: per ogni pianta, fino a quando mostrare il risultato (tempo reale, non tempo di gioco)
+const FEEL_MS = 6000;
+let felt = new WeakMap();
+const feltNow = g => (felt.get(g) || 0) > Date.now();
 function soilFeel(g){
   const c = care(g), d = daysSince(g.wateredAt), st = plantState(g);
   if (wetLevel(g) > 0) return c.feelWet || "Fango. Le dita escono sporche: niente acqua per un po’.";
@@ -1178,7 +1197,7 @@ function renderPath(){
         <div class="nodelabel">${esc(s.title)}${partial ? `<small>${pr}/${n}</small>` : ""}</div></div>`;
     }).join("");
     return `<div class="zone ${open ? "" : "locked"}"><div><small>Zona ${zi + 1}</small><h2>${z.title}</h2><p>${open ? z.desc : `Si apre finendo ${ZONES[zi - 1].title}.`}</p></div></div><div class="path">${nodes}</div>`;
-  }).join("") + `<div class="teaser">${cur === -1 ? "Hai finito tutte le zone. La prossima è in arrivo: intanto, le tue piante hanno bisogno di te." : "Altre zone del pianeta in arrivo nelle prossime versioni."}</div>`;
+  }).join("") + testTools() + `<div class="teaser">${cur === -1 ? "Hai finito tutte le zone. La prossima è in arrivo: intanto, le tue piante hanno bisogno di te." : "Altre zone del pianeta in arrivo nelle prossime versioni."}</div>`;
 }
 
 // Anello a segmenti: n spicchi separati da una piccola fessura, dorati quelli completati
@@ -1314,17 +1333,28 @@ function finishLesson(){
 }
 
 /* --- Serra --- */
+// Riga di default di una pianta (quando non c'è la prova del dito in corso)
+const restLine = (g, i) => g.em ? "" : pickLine(plantState(g), i);
 function slotCard(g, i){
   const st = plantState(g), p = PLANTS[g.plant], c = care(g);
   const line = g.dead ? `${g.rip ? `Addio, ${esc(g.rip)}. ` : ""}Ha vissuto ${ageOf(g)} ${ageOf(g) === 1 ? "giorno" : "giorni"}. ${g.note || (g.cause === "marcita" ? c.wetTip : c.dryTip)}`
-    : felt.has(g) ? `<b class="feel">Prova del dito:</b> ${soilFeel(g)}` : g.em ? "" : pickLine(st, i);
+    : feltNow(g) ? `<b class="feel">Prova del dito:</b> ${soilFeel(g)}` : restLine(g, i);
   const em = !g.dead && g.em ? `<button class="emerg" data-em="${i}">${ICON.alert}<span><b>Emergenza</b>${esc(EMERG[g.em.id].title)}</span></button>` : "";
   const action = g.dead
     ? `<button class="btn small" data-replant="${i}" ${S.gocce < RULES.replantCost ? "disabled" : ""}>Ripianta il seme ${RULES.replantCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`
     : `<div class="acts"><button class="btn small ghost" data-feel="${i}">Dito nella terra</button><button class="btn small water" data-water="${i}" ${S.gocce < RULES.waterCost ? "disabled" : ""}>Annaffia ${RULES.waterCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button></div>`;
   const growing = !g.dead && g.growAt, day = growing ? Math.min(growDays(g), Math.floor(growFrac(g) * growDays(g)) + 1) : 0;
   const grow = growing ? `<div class="grow"><b>${stageLabel(g)}</b>: giorno ${day} di ${growDays(g)}<div class="bar"><i style="width:${Math.round(growFrac(g) * 100)}%"></i></div></div>` : "";
-  return `<div class="slot${em ? " alarm" : ""}">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g))}<div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>${g.nick ? `<span class="species">${p.name}</span>` : ""}<span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}${grow}${em}<div class="line">${line}</div><div class="care">${ICON.drop}<span>${c.rule}</span></div>${action}</div>`;
+  return `<div class="slot plant${em ? " alarm" : ""}">
+    <div class="sart">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g))}</div>
+    <div class="sinfo">
+      <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>
+      ${g.nick ? `<span class="species">${p.name}</span>` : ""}
+      <div class="badges"><span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}</div>
+      ${grow}<div class="line" id="line-${i}">${line}</div>
+    </div>
+    <div class="sfull">${em}<div class="care">${ICON.drop}<span>${c.rule}</span></div>${action}</div>
+  </div>`;
 }
 function renderArea(a){
   const A = AREAS[a];
@@ -1336,6 +1366,27 @@ function renderArea(a){
   if (nextCost !== undefined) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Più spazio, più piante da far sopravvivere.</span><button class="btn small sun" data-buy="${a}" ${S.xp < nextCost ? "disabled" : ""}>Sblocca ${nextCost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
+function testTools(){
+  if (!DEV) return "";
+  const b = (attr, label) => `<button class="btn small ghost" ${attr}>${label}</button>`;
+  return `<div class="test"><b>Strumenti per il test</b>Salta il tempo, sblocca le zone, fai cassa. Solo per te: i tester non li vedono.
+    <div class="row" style="margin-top:10px">${b('data-skip="3"', "+3 giorni")}${b('data-skip="7"', "+7 giorni")}${b('data-skip="14"', "+14 giorni")}${b('id="forceEm"', "Emergenza ora")}</div>
+    <div class="row" style="margin-top:8px">${ZONES.slice(1).map((z, k) => b(`data-unlock="${z.id}"`, `Apri zona ${k + 2}`)).join("")}${b('data-unlock="all"', "Finisci tutto")}</div>
+    <div class="row" style="margin-top:8px">${b('id="addRes"', "+200 gocce ed esperienza")}${b('id="reset"', "Ricomincia da zero")}</div></div>`;
+}
+// Sblocca una zona: completa tutte le caselle delle zone prima, e rende piantabili le loro piante.
+// "all" completa tutto il percorso.
+function unlockZone(zid){
+  const upto = zid === "all" ? ZONES.length : ZONES.findIndex(z => z.id === zid);
+  const zonesDone = ZONES.slice(0, upto).map(z => z.id);
+  STEPS.filter(st => zonesDone.includes(st.zone)).forEach(st => {
+    S.prog[st.id] = lessonCount(st);
+    if (!S.done.includes(st.id)) S.done.push(st.id);
+    authored(st).flatMap(l => l.items).forEach(it => { if (it.plant) {
+      S.knowledge[it.plant] = RULES.knowledgeMax;
+      if (!S.discovered.includes(it.plant)) S.discovered.push(it.plant); } });
+  });
+}
 function renderSerra(){
   const empty = !S.garden.length;
   // Piante pronte che non hanno un posto libero dove possono stare: lo diciamo chiaro
@@ -1344,7 +1395,7 @@ function renderSerra(){
   const hint = waiting.length
     ? `<p class="lead" style="color:var(--leaf-dark)">${waiting.length === 1 ? `${PLANTS[waiting[0]].name} è ${gen(waiting[0], "pronto", "pronta")}` : `${waiting.length} piante sono pronte`}, ma non c’è un posto libero adatto. Sblocca un posto con l’esperienza.</p>` : "";
   return `<section class="sec"><h1>La tua serra</h1><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${hint}${renderArea("casa")}${renderArea("balcone")}</section>
-    ${DEV ? `<div class="test"><b>Strumenti per il test</b>Simula il passare del tempo per vedere come cambiano le piante.<div class="row" style="margin-top:10px"><button class="btn small ghost" data-skip="3">+3 giorni</button><button class="btn small ghost" data-skip="7">+7 giorni</button><button class="btn small ghost" data-skip="14">+14 giorni</button><button class="btn small ghost" id="forceEm">Emergenza ora</button><button class="btn small ghost" id="reset">Ricomincia da zero</button></div></div>` : ""}`;
+    ${testTools()}`;
 }
 let pickArea = "casa";
 function openPicker(a){
@@ -1361,7 +1412,13 @@ function ask(title, text, okLabel, onOk, cancelLabel){
   const m = modal(`<h2>${title}</h2><p style="color:var(--ink-2);font-size:16px;line-height:1.45;margin:8px 0 18px">${text}</p><div style="display:flex;flex-direction:column;gap:12px"><button class="btn bad" id="askOk">${okLabel}</button><button class="btn ghost" data-close="1">${cancelLabel}</button></div>`);
   m.querySelector("#askOk").onclick = () => { m.remove(); onOk(); };
 }
-function modal(html){ const m = document.createElement("div"); m.className = "modal"; m.innerHTML = `<div class="panel" role="dialog" aria-modal="true">${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); }); return m; }
+function modal(html){ const m = document.createElement("div"); m.className = "modal";
+  // Su iPhone la tastiera copre la pagina senza rimpicciolirla: con visualViewport la finestra
+  // si adatta allo spazio che resta sopra la tastiera
+  const vv = window.visualViewport;
+  if (vv) { const fit = () => { if (!m.isConnected) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); return; }
+      m.style.top = vv.offsetTop + "px"; m.style.height = vv.height + "px"; };
+    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true">${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); }); return m; }
 
 /* --- Erbario --- */
 function renderErbario(){
@@ -1393,12 +1450,21 @@ app.addEventListener("click", e => {
   }
   if (t.dataset.nick !== undefined) return openNick(S.garden[+t.dataset.nick]);
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
+  if (t.dataset.unlock) { unlockZone(t.dataset.unlock); tab = "path"; render(); window.scrollTo(0, 0); toast(t.dataset.unlock === "all" ? "Percorso finito. Tutte le piante sono piantabili." : "Zone precedenti completate: si parte da qui."); return; }
+  if (t.id === "addRes") { S.gocce += 200; S.xp += 200; render(); bump("#pGocce"); bump("#pXp"); return; }
   if (t.id === "forceEm") { const g = S.garden.find(x => !x.dead && !x.em); if (!g) return toast("Nessuna pianta viva senza emergenze."); rollEmergency(g, now()); if (!g.em) return toast("Prima fai lo step dove si impara a curarla."); render(); return; }
-  if (t.dataset.feel !== undefined) { felt.add(S.garden[+t.dataset.feel]); render(); return; }
+  if (t.dataset.feel !== undefined) {
+    const i = +t.dataset.feel, g = S.garden[i];
+    felt.set(g, Date.now() + FEEL_MS); render();
+    // allo scadere, sfuma la riga e rimette la frase normale (solo se la riga è ancora a schermo)
+    setTimeout(() => { const el = document.getElementById("line-" + i); if (!el || feltNow(g)) return;
+      el.classList.add("fade"); setTimeout(() => { el.innerHTML = restLine(g, i); el.classList.remove("fade"); }, 300); }, FEEL_MS + 50);
+    return;
+  }
   if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
   if (t.dataset.buy) { const a = t.dataset.buy, c = RULES.slotCosts[a][slotsOf(a)]; if (S.xp < c) return; S.xp -= c; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
-  if (t.dataset.skip) { felt = new WeakSet(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
+  if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
   if (t.id === "reset") return ask("Ricominciare da zero?", "Si perde tutto: piante, gocce, esperienza. Anche la dignità.", "Ricomincia", () => { S = fresh(); tab = "path"; render(); }, "Annulla");
   if (t.dataset.card) return openCard(t.dataset.card);
 });
@@ -1460,6 +1526,24 @@ document.addEventListener("click", e => {
   toast(id === "basilico" ? "Il basilico è in serra. Stavolta va diversamente. (Diciamo sempre così.)" : `${PLANTS[id].name} ${gen(id, "piantato", "piantata")}. ${gen(id, "Benvenuto", "Benvenuta")} nella tua famiglia disfunzionale.`);
 });
 render();
+/* --- Aggiornamenti: quando l'app torna in primo piano, controlla se online c'è una versione nuova ---
+   L'app installata sulla Home a volte resta "congelata" in memoria e non ricarica la pagina:
+   così se ne accorge da sola e propone di aggiornare (senza interrompere una lezione a metà). */
+async function checkUpdate(){
+  if (!/vercel\.app$/.test(location.hostname) || document.visibilityState !== "visible") return;
+  try {
+    const html = await (await fetch(location.pathname + "?v=" + Date.now(), { cache: "no-store" })).text();
+    const online = (html.match(/const VERSION = "([^"]+)"/) || [])[1];
+    if (!online || online === VERSION || document.querySelector(".update")) return;
+    const bar = document.createElement("div");
+    bar.className = "update"; bar.setAttribute("role", "status");
+    bar.innerHTML = `<span>C’è una versione nuova di Vasanicola.</span><button class="btn small sun">Aggiorna</button>`;
+    bar.querySelector("button").onclick = () => location.reload();
+    document.body.appendChild(bar);
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", checkUpdate);
+setTimeout(checkUpdate, 3000);
 /* --- Splash: copre l'app mentre si prepara, poi sparisce da sola (o con un tocco) --- */
 const SPLASH_LINES = ["Impara a non uccidere le piante. (Più o meno.)", "Stavolta il basilico sopravvive. (Forse.)", "Caricamento sensi di colpa in corso...", "Le piante ti stavano aspettando. Con ansia."];
 (function splash(){
