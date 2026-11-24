@@ -775,11 +775,116 @@ Object.assign(EXTRA, {
   ]}]
 });
 
+// ---------- Zona 5: Piante carnivore ----------
+// bog:true = pianta "di palude": vuole la torba sempre bagnata (sottovaso pieno), non marcisce mai per troppa acqua
+const BOG_FEEL = { feelWet:"Torba bagnata come una palude. Per lei è perfetto.", feelDamp:"Torba bagnata come una palude. Per lei è perfetto.",
+  feelReady:"La torba inizia ad asciugarsi: rabbocca il sottovaso con acqua piovana.", feelDry:"Torba secca. Per una pianta di palude è un’emergenza." };
+Object.assign(PLANTS, {
+  dionea:{ name:"Dionea", g:"f", indoor:false, sci:"Dionaea muscipula, la venere acchiappamosche", cost:40,
+    care:{ bog:true, soak:1, thirsty:3, wilt:5, dead:9, rot:99, rule:"Sempre bagnata: vaso in un sottovaso d’acqua piovana o demineralizzata", ...BOG_FEEL,
+      dryTip:"Una pianta di palude con la torba secca: in pochi giorni le trappole anneriscono e se ne va.", wetTip:"" }, facts:[
+    "Viene dalle paludi della Carolina, negli Stati Uniti.",
+    "La trappola scatta solo se tocchi due volte i peli sensibili in pochi secondi.",
+    "Vuole acqua piovana o demineralizzata: i sali del rubinetto la avvelenano.",
+    "D’inverno va in letargo al fresco: sembra morta, ma riposa."] },
+  sarracenia:{ name:"Sarracenia", g:"f", indoor:false, sci:"Sarracenia, la pianta a tromba", cost:40,
+    care:{ bog:true, soak:1, thirsty:3, wilt:6, dead:10, rot:99, rule:"Sempre bagnata: sottovaso pieno di acqua piovana", ...BOG_FEEL,
+      dryTip:"La sarracenia è una pianta di palude: la torba secca la uccide in fretta.", wetTip:"" }, facts:[
+    "Le trappole sono tubi: l’insetto scivola dentro e non riesce più a uscire.",
+    "Vuole pieno sole: è così che le trombe si colorano.",
+    "Vive in torba bionda povera, senza concime.",
+    "D’inverno riposa al fresco e perde parte delle foglie."] },
+  drosera:{ name:"Drosera", g:"f", indoor:true, sci:"Drosera capensis, la rosolida", cost:30,
+    care:{ bog:true, soak:1, thirsty:2, wilt:4, dead:7, rot:99, rule:"Sempre bagnata: sottovaso pieno di acqua piovana", ...BOG_FEEL,
+      dryTip:"Senza acqua la drosera perde le goccioline, poi tutto il resto.", wetTip:"" }, facts:[
+    "Cattura gli insetti con goccioline appiccicose sui tentacoli.",
+    "Sta bene anche su un davanzale molto luminoso.",
+    "Niente concime: i nutrienti li prende dagli insetti.",
+    "Con aria troppo secca o poca luce, le goccioline spariscono."] },
+  nepenthes:{ name:"Nepenthes", g:"f", indoor:true, sci:"Nepenthes, la pianta delle anfore", cost:45,
+    care:{ soak:2, thirsty:4, wilt:8, dead:14, rot:3, rule:"Ogni 3-4 giorni: terriccio umido ma drenante, niente sottovaso pieno",
+      dryTip:"La nepenthes vuole il terriccio sempre un po’ umido: secco, smette di fare anfore e poi cede.", wetTip:"La nepenthes è carnivora ma non di palude: con i piedi nell’acqua le radici marciscono." }, facts:[
+    "Fa trappole ad anfora che pendono dalle foglie, piene di liquido digestivo.",
+    "Viene dalle foreste tropicali: niente letargo, caldo tutto l’anno.",
+    "Vuole aria umida e terriccio drenante, non i piedi nell’acqua.",
+    "Con poca luce o aria secca smette di fare anfore."] }
+});
+STEPS.push(
+  { id:"c1", zone:"z5", title:"Fame di terra", icon:"leaf", items:[
+    { t:"card", plant:"dionea", title:"Il gran finale", body:"Le piante carnivore vivono in paludi e torbiere, dove la terra è poverissima di nutrienti. Per sopravvivere hanno trovato un’altra strada: prendere l’azoto dagli insetti. L’energia la fanno col sole, come tutte. Gli insetti sono l’integratore." },
+    { t:"mc", plant:"dionea", q:"Perché le piante carnivore catturano gli insetti?", o:["Per i nutrienti che nella loro terra mancano","Perché non sanno fare la fotosintesi","Per vendetta"], a:0, why:"La terra di palude è povera: gli insetti portano azoto e minerali. La vendetta è un effetto collaterale." },
+    { t:"tf", plant:"dionea", q:"Le piante carnivore fanno la fotosintesi, come le altre.", a:true, why:"Certo: l’energia viene dal sole. Gli insetti sono un supplemento, non il pranzo." },
+    { t:"id", plant:"dionea", q:"Quale è la dionea?", o:["sarracenia","dionea","drosera","nepenthes"], a:"dionea", why:"Trappole a forma di bocca, rosse dentro, con le ciglia sui bordi. La pianta più famosa del cinema horror botanico." },
+    { t:"mc", plant:"dionea", q:"Da dove viene la dionea?", o:["Dalle paludi della Carolina, negli Stati Uniti","Dalla foresta amazzonica","Dal deserto del Sahara"], a:0, why:"Vive solo in una piccola zona di paludi tra North e South Carolina. In natura è rara e protetta." },
+    { t:"tf", plant:"dionea", q:"La dionea va nutrita con pezzetti di carne o di prosciutto.", a:false, why:"La carne marcisce nella trappola e la fa annerire. Al massimo piccoli insetti vivi, e di solito fa da sola. Il prosciutto mangialo tu." }
+  ]},
+  { id:"c2", zone:"z5", title:"Acqua di palude", icon:"drop", items:[
+    { t:"card", plant:"dionea", title:"Dimentica tutto (quasi)", body:"Per tutto il percorso ti abbiamo detto: mai acqua ferma nel sottovaso. Ecco l’eccezione. Dionea, sarracenia e drosera vivono in palude: la terra deve restare sempre bagnata, con il vaso in un sottovaso pieno d’acqua. Sì, stavolta è giusto." },
+    { t:"tf", plant:"dionea", q:"Per la dionea il sottovaso sempre pieno d’acqua va bene.", a:true, why:"È il metodo del sottovaso: un paio di centimetri d’acqua sempre lì. Per lei la torba asciutta è il vero pericolo." },
+    { t:"mc", plant:"dionea", q:"Che acqua vuole la dionea?", o:["Piovana o demineralizzata","Quella del rubinetto, più calcarea possibile","Acqua frizzante, per le bollicine"], a:0, why:"I sali del rubinetto si accumulano nella torba e le bruciano le radici. Piovana, demineralizzata o da osmosi." },
+    { t:"tf", plant:"sarracenia", q:"La sarracenia sopporta bene l’acqua calcarea del rubinetto.", a:false, why:"Come la dionea: niente calcare. Acqua piovana o demineralizzata, sempre." },
+    { t:"mc", plant:"drosera", q:"La torba della drosera si sta asciugando. Cosa fai?", o:["Riempi il sottovaso con acqua piovana","Aspetti che si secchi del tutto, come per la sansevieria","Le dai acqua del rubinetto con un po’ di concime"], a:0, why:"Piante di palude: la torba deve restare bagnata. La sansevieria qui non fa testo." }
+  ]},
+  { id:"c3", zone:"z5", title:"Sole e trappole", icon:"sun", items:[
+    { t:"card", plant:"sarracenia", title:"Più sole, più colore", body:"Le carnivore di palude vengono da posti aperti, senza alberi a fare ombra. Vogliono tanto sole: è con la luce piena che le trappole si colorano di rosso. All’ombra restano verdi, molli e tristi." },
+    { t:"mc", plant:"sarracenia", q:"Dove sta bene la sarracenia?", o:["Sul balcone in pieno sole","In un angolo buio del soggiorno","In bagno senza finestre"], a:0, why:"Pieno sole, anche tutto il giorno. Per una carnivora di palude non è mai troppo." },
+    { t:"tf", plant:"dionea", q:"Più sole prende, più l’interno delle trappole della dionea diventa rosso.", a:true, why:"Con poca luce le trappole restano verdi e deboli. Il rosso è il segno che sta bene." },
+    { t:"mc", plant:"dionea", q:"Cosa succede se fai scattare le trappole della dionea per gioco?", o:["La pianta spreca energia e la trappola può annerire","Diventa più forte","Niente, le piace"], a:0, why:"Ogni chiusura le costa fatica, e una trappola si chiude solo poche volte nella sua vita. Non è un giocattolo (purtroppo)." },
+    { t:"tf", plant:"dionea", q:"La trappola della dionea scatta al primo tocco di un solo pelo.", a:false, why:"Servono due tocchi sui peli sensibili in una ventina di secondi: così non spreca energia per una goccia di pioggia." }
+  ]},
+  { id:"c4", zone:"z5", title:"Il letargo", icon:"pot", items:[
+    { t:"card", plant:"dionea", title:"Il riposo invernale", body:"Dionea e sarracenia d’inverno vanno in letargo: smettono di crescere, alcune foglie anneriscono, e sembrano morte. Non lo sono. Senza questo riposo al fresco, in pochi anni si esauriscono. Un po’ come noi senza ferie." },
+    { t:"tf", plant:"dionea", q:"La dionea va tenuta al caldo in casa tutto l’inverno.", a:false, why:"Ha bisogno di un inverno fresco, più o meno tra 0 e 10 gradi, per riposare. Al caldo tutto l’anno si esaurisce." },
+    { t:"mc", plant:"sarracenia", q:"D’inverno la sarracenia ingiallisce e perde foglie. Cosa fai?", o:["Niente di drastico: è il riposo, togli solo le parti secche","La butti","La porti al caldo e la concimi"], a:0, why:"È il letargo. In primavera riparte con trombe nuove." },
+    { t:"mc", plant:"dionea", q:"Durante il riposo invernale, la torba della dionea...", o:["Resta umida, con meno acqua nel sottovaso","Si lascia seccare del tutto","Va allagata con acqua calda"], a:0, why:"Riposa, ma non deve seccarsi: torba umida, sottovaso più basso." },
+    { t:"tf", plant:"drosera", q:"Le piante carnivore vanno concimate come le altre.", a:false, why:"Il concime nella terra brucia le loro radici: i nutrienti li prendono dagli insetti. Niente concime, mai." }
+  ]},
+  { id:"c5", zone:"z5", title:"Ripasso", icon:"star", items:[
+    { t:"id", plant:"drosera", q:"Quale è la drosera?", o:["dionea","nepenthes","sarracenia","drosera"], a:"drosera", why:"Foglie lunghe coperte di tentacoli con goccioline lucide. Sembrano rugiada, sono colla." },
+    { t:"mc", plant:"dionea", q:"Acqua per la dionea:", o:["Piovana o demineralizzata","Del rubinetto","Minerale gassata"], a:0, why:"Niente sali, niente calcare. Sempre." },
+    { t:"tf", plant:"sarracenia", q:"La sarracenia vuole pieno sole.", a:true, why:"Sole pieno: trombe dritte e colorate." },
+    { t:"mc", plant:"nepenthes", q:"Quale di queste carnivore NON vuole i piedi nell’acqua?", o:["La nepenthes","La dionea","La sarracenia"], a:0, why:"La nepenthes viene dalla foresta, non dalla palude: terriccio umido ma drenante." },
+    { t:"match", q:"Abbina carnivora e trappola", pairs:[["Dionea","Tagliola"],["Drosera","Colla"],["Sarracenia","Tubo scivoloso"],["Nepenthes","Anfora appesa"]] }
+  ]}
+);
+Object.assign(EXTRA, {
+  c1:[{ title:"Le trappole", items:[
+    { t:"card", plant:"drosera", title:"Ognuna ha il suo trucco", body:"Non tutte le carnivore cacciano allo stesso modo. La dionea chiude una tagliola. La drosera incolla. Sarracenia e nepenthes preparano un pozzo da cui non si esce. Quattro piante, quattro film horror diversi." },
+    { t:"mc", plant:"drosera", q:"Come cattura gli insetti la drosera?", o:["Con goccioline appiccicose sui tentacoli","Con una tagliola che scatta","Rincorrendoli"], a:0, why:"L’insetto si incolla, i tentacoli si piegano piano piano e lo avvolgono." },
+    { t:"id", plant:"drosera", q:"Riconosci la drosera?", o:["nepenthes","drosera","dionea","sarracenia"], a:"drosera", why:"Foglie lunghe e sottili, piene di tentacoli con una goccia lucida in punta." },
+    { t:"mc", plant:"sarracenia", q:"Come funziona la trappola della sarracenia?", o:["È un tubo: l’insetto scivola dentro e non riesce più a uscire","Morde","Spara spine"], a:0, why:"Il bordo è scivoloso e dentro i peli puntano verso il basso: si entra, non si esce." },
+    { t:"tf", plant:"nepenthes", q:"La nepenthes fa trappole ad anfora che pendono dalle foglie.", a:true, why:"Ogni anfora nasce in punta a una foglia, appesa a un viticcio. Dentro c’è un liquido che digerisce." },
+    { t:"id", plant:"sarracenia", q:"Quale è la sarracenia?", o:["sarracenia","nepenthes","drosera","dionea"], a:"sarracenia", why:"Trombe dritte con un cappuccio in cima, spesso venate di rosso." }
+  ]}],
+  c2:[{ title:"Non sono tutte uguali", items:[
+    { t:"card", plant:"nepenthes", title:"L’eccezione dell’eccezione", body:"La nepenthes è carnivora, ma non è di palude: viene dalle foreste tropicali, dove spesso vive appesa agli alberi. Le piace l’aria umida, non i piedi nell’acqua. Sì, è una regola dentro l’eccezione. Benvenuti nel gran finale." },
+    { t:"tf", plant:"nepenthes", q:"Anche la nepenthes va tenuta con il vaso in un sottovaso sempre pieno.", a:false, why:"Con i piedi nell’acqua le sue radici marciscono. Terriccio umido ma drenante." },
+    { t:"mc", plant:"nepenthes", q:"Cosa vuole la nepenthes?", o:["Terriccio umido ma drenante, e aria umida","Piedi sempre in acqua","Sole del deserto e acqua una volta al mese"], a:0, why:"Foresta tropicale: umidità nell’aria, terra che respira." },
+    { t:"id", plant:"nepenthes", q:"Quale è la nepenthes?", o:["drosera","sarracenia","nepenthes","dionea"], a:"nepenthes", why:"Foglie lunghe e, appese ai viticci, le anfore con il coperchio." },
+    { t:"tf", plant:"nepenthes", q:"Le anfore della nepenthes contengono un liquido che digerisce gli insetti.", a:true, why:"Il liquido lo produce la pianta: chi ci cade dentro non ne esce più." }
+  ]}],
+  c3:[{ title:"Luce per tutte", items:[
+    { t:"card", plant:"drosera", title:"Il davanzale delle carnivore", body:"Se non hai un balcone al sole, non è tutto perduto. La drosera capensis sta bene anche su un davanzale molto luminoso. La nepenthes vuole tanta luce, ma non il sole diretto delle ore più calde." },
+    { t:"mc", plant:"drosera", q:"Dove metti una drosera in casa?", o:["Sul davanzale più luminoso, anche con un po’ di sole","In corridoio","In cantina"], a:0, why:"Più luce ha, più goccioline fa. Al buio smette di cacciare." },
+    { t:"mc", plant:"nepenthes", q:"La nepenthes non fa più anfore. Cosa le manca, di solito?", o:["Luce e umidità","Carne","Musica classica"], a:0, why:"Con poca luce o aria secca smette di fare anfore e fa solo foglie. La musica è facoltativa." },
+    { t:"tf", plant:"drosera", q:"Le goccioline della drosera spariscono se l’aria è troppo secca o la luce troppo poca.", a:true, why:"Senza goccioline non caccia: è il suo modo di dirti che qualcosa non va." },
+    { t:"mc", q:"Perché le trappole di molte carnivore sono rosse?", o:["Il colore aiuta ad attirare gli insetti, e col sole si accende","Perché sono arrabbiate","Perché è sangue"], a:0, why:"Rosso e nettare fanno da insegna luminosa. Col sole pieno l’insegna si accende di più." }
+  ]}],
+  c4:[{ title:"Vasi e torba", items:[
+    { t:"card", plant:"sarracenia", title:"La terra giusta", body:"Le carnivore di palude vogliono una terra povera e acida: di solito torba bionda mescolata con perlite o sabbia silicea. Il terriccio universale, ricco di concime, per loro è veleno." },
+    { t:"mc", plant:"sarracenia", q:"In che terra si coltiva la sarracenia?", o:["Torba bionda con perlite o sabbia silicea","Terriccio universale concimato","Terra del giardino"], a:0, why:"Povera e acida, come la palude da cui viene." },
+    { t:"tf", plant:"dionea", q:"Il terriccio universale va bene per la dionea.", a:false, why:"Ha concime e sali: le brucia le radici. Torba bionda e perlite, nient’altro." },
+    { t:"mc", plant:"nepenthes", q:"In che vaso sta bene la nepenthes?", o:["Un vaso appeso, così le anfore pendono libere","Un sottovaso sempre allagato","Un barattolo di vetro chiuso"], a:0, why:"Le anfore pendono dalle foglie: un vaso appeso le lascia libere. E il terriccio deve drenare." },
+    { t:"tf", plant:"nepenthes", q:"La nepenthes va in letargo d’inverno, come la dionea.", a:false, why:"Viene dai tropici: niente letargo, vuole caldo tutto l’anno." }
+  ]}]
+});
+
 const ZONES = [
   { id:"z1", color:"#d9692a", shade:"#a84f1c", title:"Casa tua", desc:"Il davanzale, dove tutto ha inizio. E dove tutto, finora, è morto." },
   { id:"z2", color:"#2284cf", shade:"#1764a0", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." },
   { id:"z3", color:"#1f9a55", shade:"#157240", title:"Giungla in salotto", desc:"Luce filtrata, aria umida, piante che vogliono attenzioni. Tutte da casa, nessuna al sole." },
-  { id:"z4", color:"#d6488d", shade:"#a8306b", title:"Fiori da balcone", desc:"Gerani, petunie, ortensie, bouganville. Il balcone della nonna, ma stavolta sopravvive (forse)." }
+  { id:"z4", color:"#d6488d", shade:"#a8306b", title:"Fiori da balcone", desc:"Gerani, petunie, ortensie, bouganville. Il balcone della nonna, ma stavolta sopravvive (forse)." },
+  { id:"z5", color:"#8e44ad", shade:"#6c3483", title:"Piante carnivore", desc:"Mangiano insetti, bevono solo acqua piovana e ti giudicano. Il gran finale." }
 ];
 
 // ---------- Emergenze: problemi reali, si curano sapendo la risposta ----------
@@ -835,13 +940,23 @@ Object.assign(EMERG, {
   bou_gelo:{ plant:"bouganville", step:"f4", lesson:0, title:"Arriva il primo gelo", q:"Cosa fai?", o:["La porti al riparo dal gelo","La copri di acqua calda","La lasci fuori, è tropicale ma coraggiosa"], a:0, why:"La bouganville teme il gelo: d’inverno al riparo, luminoso e con poca acqua." },
   bou_foglie:{ plant:"bouganville", step:"f2", lesson:1, title:"Tante foglie, zero fiori", q:"Cosa fai?", o:["Meno acqua e più sole","Più acqua e più concime per foglie","La sposti all’ombra"], a:0, why:"Troppa acqua e poca luce fanno foglie. Un po’ di secco e tanto sole la fanno fiorire." }
 });
+Object.assign(EMERG, {
+  dio_rubinetto:{ plant:"dionea", step:"c2", lesson:0, title:"Foglie che anneriscono dopo settimane di acqua del rubinetto", q:"Cosa fai?", o:["Passi all’acqua piovana o demineralizzata e sciacqui bene la torba","Aggiungi concime per tirarla su","Continui così, si abituerà"], a:0, why:"I sali del rubinetto si accumulano nella torba. Acqua pulita e un bel risciacquo per portarli via." },
+  dio_carne:{ plant:"dionea", step:"c1", lesson:0, title:"Qualcuno le ha dato un pezzo di prosciutto", q:"Cosa fai?", o:["Togli la trappola annerita e niente più carne","Le dai anche il formaggio, per bilanciare","Aspetti che lo digerisca"], a:0, why:"La carne marcisce nella trappola e la fa morire. Al massimo piccoli insetti vivi." },
+  sar_ombra:{ plant:"sarracenia", step:"c3", lesson:0, title:"Trombe verdi pallide, molli e storte", q:"Cosa le manca?", o:["Sole pieno","Più concime","Più ombra"], a:0, why:"Senza sole pieno le trombe restano deboli e senza colore. Sul balcone, nel punto più soleggiato." },
+  sar_inverno:{ plant:"sarracenia", step:"c4", lesson:0, title:"È inverno e sta ingiallendo tutta", q:"Cosa fai?", o:["Niente di drastico: è il letargo, togli solo le parti secche","La porti al caldo vicino al termosifone","La butti"], a:0, why:"Riposa al fresco e in primavera riparte. Il caldo d’inverno la esaurirebbe." },
+  dro_secca:{ plant:"drosera", step:"c2", lesson:0, title:"Niente più goccioline e torba asciutta", q:"Cosa fai?", o:["Riempi il sottovaso con acqua piovana","La lasci asciugare ancora","Le spruzzi colla vinilica sulle foglie"], a:0, why:"Pianta di palude: torba sempre bagnata. Con l’acqua tornano anche le goccioline." },
+  dro_concime:{ plant:"drosera", step:"c4", lesson:0, title:"Qualcuno l’ha concimata col concime universale", q:"Cosa fai?", o:["La rinvasi in torba nuova e niente più concime","Raddoppi il concime","La metti al buio"], a:0, why:"Il concime nella terra le brucia le radici: torba nuova, povera, e acqua piovana." },
+  nep_anfore:{ plant:"nepenthes", step:"c3", lesson:1, title:"Non fa più anfore, solo foglie", q:"Cosa fai?", o:["Le dai più luce e più umidità nell’aria","Le dai carne macinata","La concimi il doppio"], a:0, why:"Le anfore arrivano con luce e aria umida. Il resto non serve." },
+  nep_sottovaso:{ plant:"nepenthes", step:"c2", lesson:1, title:"Il sottovaso è pieno da giorni e le foglie ingialliscono", q:"Cosa fai?", o:["Svuoti il sottovaso: lei non è di palude","Lo riempi ancora di più","Aggiungi acqua del rubinetto"], a:0, why:"La nepenthes non vuole i piedi nell’acqua: terriccio umido ma drenante." }
+});
 
 /* =========================================================
    Stato salvato sul dispositivo
    ========================================================= */
 const KEY = "vasanicola.v1";
 // Versione di questa pagina: va cambiata a ogni pubblicazione. L'app confronta la sua con quella online.
-const VERSION = "2026-11-24.4";
+const VERSION = "2026-11-25.1";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
@@ -870,7 +985,7 @@ const ICON = {
   pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>',
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
-const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644" };
+const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644", dionea:"#6d597a", sarracenia:"#355070", drosera:"#b56576", nepenthes:"#e9c46a" };
 function plantSVG(id, size = 120, state = "sana", stage = "adulta"){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
@@ -1006,10 +1121,35 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta"){
     leaves = `<path d="M60 86C58 66 44 54 34 40M60 86C62 66 74 52 86 38M60 86V30" stroke="#6b4f3a" stroke-width="3" fill="none" stroke-linecap="round"/>` +
       [[42,62],[78,60],[54,48],[68,44]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.4" ry="5.5" fill="#4e8a3c"/>`).join("") +
       [[34,42],[45,54],[86,40],[76,52],[60,30],[52,66],[68,64],[60,46]].map(a => bract(...a)).join("");
+  } else if (id === "dionea") {
+    // rosetta di trappole a bocca: due lobi verdi, rossi dentro, con le ciglia sui bordi
+    const trap = (x, y, r) => `<path d="M60 84Q${(60 + x) / 2} ${y + 14} ${x} ${y + 4}" stroke="#6aa84f" stroke-width="3" fill="none" stroke-linecap="round"/><g transform="translate(${x} ${y}) rotate(${r})">` +
+      `<ellipse cx="0" cy="-4" rx="9" ry="4.8" fill="#79b85a"/><ellipse cx="0" cy="-3.4" rx="6.2" ry="2.8" fill="#d64545"/><ellipse cx="0" cy="4" rx="9" ry="4.8" fill="#79b85a"/><ellipse cx="0" cy="3.4" rx="6.2" ry="2.8" fill="#d64545"/>` +
+      [-6,-3,0,3,6].map(k => `<path d="M${k} -8.6v-3.4M${k} 8.6v3.4" stroke="#79b85a" stroke-width="1.3" stroke-linecap="round"/>`).join("") + `</g>`;
+    leaves = trap(36, 66, -35) + trap(84, 66, 35) + trap(46, 46, -15) + trap(74, 44, 15) + trap(60, 30, 0);
+  } else if (id === "sarracenia") {
+    // trombe dritte con il cappuccio, venate di rosso
+    const tube = (x, h, r) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x - 2} 86L${x - 7} ${86 - h}Q${x} ${82 - h} ${x + 7} ${86 - h}L${x + 2} 86z" fill="#c2d04f"/>` +
+      `<ellipse cx="${x + 3}" cy="${80 - h}" rx="8.5" ry="4.5" transform="rotate(-20 ${x + 3} ${80 - h})" fill="#a3b83c"/><path d="M${x - 4} ${92 - h}l2 12M${x} ${90 - h}l0.5 16M${x + 3} ${92 - h}l-1 12" stroke="#c0392b" stroke-width="1.3"/></g>`;
+    leaves = tube(60, 60, 0) + tube(47, 48, -10) + tube(73, 52, 10) + tube(38, 34, -20) + tube(82, 36, 20);
+  } else if (id === "drosera") {
+    // foglie lunghe coperte di tentacoli con la goccia di colla
+    const leaf = (x, h, r) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x} 86V${86 - h}" stroke="#8fc25a" stroke-width="5" stroke-linecap="round"/>` +
+      Array.from({ length: Math.floor(h / 6) }, (_, k) => { const y = 82 - k * 6 - (86 - h > 0 ? 0 : 0); return y < 86 - h + 6 ? "" : `<circle cx="${x - 4}" cy="${y}" r="1.6" fill="#d64545"/><circle cx="${x + 4}" cy="${y - 3}" r="1.6" fill="#d64545"/><circle cx="${x - 4.4}" cy="${y - .5}" r=".6" fill="#ffffff"/><circle cx="${x + 3.6}" cy="${y - 3.5}" r=".6" fill="#ffffff"/>`; }).join("") + `</g>`;
+    leaves = leaf(60, 58, 0) + leaf(52, 50, -14) + leaf(68, 52, 14) + leaf(44, 40, -30) + leaf(76, 42, 30) + leaf(36, 28, -48) + leaf(84, 30, 48);
+  } else if (id === "nepenthes") {
+    // foglie lunghe e anfore appese ai viticci: le anfore si disegnano sopra il vaso (pendono di lato)
+    const lf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="15" transform="rotate(${r} ${x} ${y})" fill="#4f9a4a"/>`;
+    const pitcher = (x, y) => `<path d="M${x - 5} ${y - 8}c-3 8-3 16 5 18 8-2 8-10 5-18z" fill="#a7c957"/><ellipse cx="${x}" cy="${y - 8}" rx="5.5" ry="2" fill="#c0392b"/><ellipse cx="${x + 2}" cy="${y - 12}" rx="5" ry="2.4" fill="#8aa83a"/><circle cx="${x - 2}" cy="${y + 2}" r="1.2" fill="#c0392b"/><circle cx="${x + 2}" cy="${y + 5}" r="1.2" fill="#c0392b"/>`;
+    leaves = `<path d="M60 86V44" stroke="#3f7d3a" stroke-width="3" stroke-linecap="round"/>` + lf(46, 60, -50) + lf(74, 58, 50) + lf(52, 44, -20) + lf(68, 42, 20) +
+      `<path d="M34 68c-6 6-8 14-6 22M86 66c6 6 8 14 6 22" stroke="#6aa84f" stroke-width="1.6" fill="none"/>`;
+    over = pitcher(28, 100) + pitcher(92, 98);
   }
+  // Le piante di palude stanno in un sottovaso pieno d’acqua (stavolta è giusto così)
+  const tray = PLANTS[id]?.care?.bog ? `<path d="M22 124h76l-3 8H25z" fill="#8fcaff" opacity=".9"/><path d="M28 126h64" stroke="#ffffff" stroke-width="1.5" opacity=".7"/>` : "";
   // L’orchidea ha il vaso trasparente: si vedono le radici argentate dentro
   const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
-  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g></svg>`;
+  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g>${tray}</svg>`;
 }
 const mascot = (size = 150, mood = "happy") => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';
@@ -1033,7 +1173,7 @@ const nameOf = g => g.nick || PLANTS[g.plant].name;
 // Accordo maschile/femminile in base alla pianta (il basilico, la menta...)
 const gen = (id, m, f) => PLANTS[id].g === "m" ? m : f;
 function plantState(g){ if (g.dead) return g.cause === "marcita" ? "marcita" : "secca";
-  const w = wetLevel(g); if (w >= 2) return "fradicia"; if (w === 1) return "zuppa";
+  const w = care(g).bog ? 0 : wetLevel(g); if (w >= 2) return "fradicia"; if (w === 1) return "zuppa";
   const d = daysSince(g.wateredAt), c = care(g);
   if (d >= c.dead) return "secca"; if (d >= c.wilt) return "appassita"; if (d >= c.thirsty) return "assetata"; return "sana"; }
 const STATE_LINE = {
@@ -1060,7 +1200,7 @@ function settleMilestones(){
 }
 // Dopo la risemina la pianta ricresce: giorni di gioco per tornare adulta, in proporzione alla realtà
 const GROW_DAYS = { basilico:6, menta:6, petunia:8, felce:12, spatifillo:10, calathea:12, salvia:10, geranio:10, rosmarino:14, lavanda:14,
-  pothos:10, ortensia:14, zamioculcas:20, sansevieria:21, ficus:18, monstera:18, bouganville:25, ficodindia:25, tillandsia:25, orchidea:30, limone:35, olivo:40 };
+  pothos:10, ortensia:14, zamioculcas:20, sansevieria:21, ficus:18, monstera:18, bouganville:25, ficodindia:25, tillandsia:25, orchidea:30, limone:35, olivo:40, drosera:14, dionea:30, sarracenia:30, nepenthes:30 };
 const STAGES = [[.15, "seme", "Seme"], [.45, "germoglio", "Germoglio"], [1, "piantina", "Piantina"]];
 const growDays = g => GROW_DAYS[g.plant] || 10;
 const growFrac = g => g.growAt ? (now() - g.growAt) / (growDays(g) * DAY) : 1;
@@ -1466,7 +1606,7 @@ app.addEventListener("click", e => {
   if (t.dataset.water !== undefined) {
     const g = S.garden[+t.dataset.water]; if (S.gocce < RULES.waterCost) return toast("Zero gocce. Fai una lezione e torna (la pianta aspetta) (non a lungo).");
     // Annaffiare con la terra ancora umida alza il livello di "zuppo"; con la terra asciutta lo azzera
-    const level = daysSince(g.wateredAt) < care(g).soak ? wetLevel(g) + 1 : 0;
+    const level = !care(g).bog && daysSince(g.wateredAt) < care(g).soak ? wetLevel(g) + 1 : 0;   // le piante di palude non si "inzuppano"
     if (level >= care(g).rot) return ask("Ancora acqua?", `${esc(nameOf(g))} ha la terra ancora bagnata: con un altro sorso le radici marciscono${g.nick ? " e il soprannome se ne va con lei" : ""}. ${care(g).wetTip}`, "Annaffia lo stesso", () => water(g, level), "Aspetto");
     return water(g, level);
   }
