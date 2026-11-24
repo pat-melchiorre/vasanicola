@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1f7a44">
+<meta name="theme-color" content="#fffaf0">
 <title>Vasanicola</title>
 <!-- App installabile: aggiunta alla Home si apre a schermo intero, senza barre del browser -->
 <link rel="manifest" href="/manifest.webmanifest">
@@ -14,29 +14,29 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --surface:#f1f8e9; --surface-2:#e3f1d3; --ink:#173b26; --ink-2:#4d6b57; --line:#d5e6c6;
+  --bg:#fffaf0; --surface:#f8f1de; --surface-2:#efe5c8; --ink:#1f2758; --ink-2:#5b5f86; --line:#e4d9ba; --art-line:#26306a;
   --leaf:#2f9e55; --leaf-dark:#1f7a44; --leaf-shadow:#18603a;
   --water:#1e90ff; --water-dark:#1570cc; --water-bg:#e4f1ff;
   --sun:#ffbf1f; --sun-dark:#d99a00; --sun-bg:#fff4d1;
   --bad:#e5484d; --bad-dark:#b9363a; --bad-bg:#fde8e8;
   --dry:#b5832f; --dry-bg:#f7ead2;
   --soak:#0f7f7c; --soak-bg:#d8f2ef;
-  --locked:#c7cfc4; --locked-dark:#a2ac9f;
-  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --locked:#d9d2bd; --locked-dark:#b3aa8f;
+  --display:"Mali", "Chalkboard SE", "Comic Sans MS", system-ui, sans-serif;
   --body:"Nunito", "Avenir Next", system-ui, -apple-system, sans-serif;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#0f1a13; --surface:#17271c; --surface-2:#1f3426; --ink:#e7f3e9; --ink-2:#a7c2ae; --line:#2b4433;
-    --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a463d; --locked-dark:#2a332c; color-scheme:dark; }
+  :root:not([data-theme="light"]){ --bg:#141a30; --surface:#1d2442; --surface-2:#273058; --ink:#f6efdc; --ink-2:#b9bad3; --line:#343d68; --leaf-dark:#7ad69a;
+    --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a4166; --locked-dark:#2a304d; color-scheme:dark; }
 }
-:root[data-theme="dark"]{ --bg:#0f1a13; --surface:#17271c; --surface-2:#1f3426; --ink:#e7f3e9; --ink-2:#a7c2ae; --line:#2b4433;
-  --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a463d; --locked-dark:#2a332c; color-scheme:dark; }
+:root[data-theme="dark"]{ --bg:#141a30; --surface:#1d2442; --surface-2:#273058; --ink:#f6efdc; --ink-2:#b9bad3; --line:#343d68; --leaf-dark:#7ad69a;
+  --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a4166; --locked-dark:#2a304d; color-scheme:dark; }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:700;-webkit-font-smoothing:antialiased}
@@ -92,6 +92,16 @@ main{flex:1;padding:0 0 96px}
 .bubble{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);background:var(--bg);color:var(--leaf-dark);border:2px solid var(--line);padding:8px 12px;border-radius:12px;white-space:nowrap;font-weight:900;font-size:14px;animation:float 2s ease-in-out infinite}
 .bubble::after{content:"";position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:var(--line)}
 @keyframes float{50%{transform:translate(-50%,-4px)}}
+.ring{position:absolute;inset:-10px;border-radius:50%;z-index:-1;background:conic-gradient(var(--sun) calc(var(--p) * 1%), var(--surface-2) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
+.node.partial::after{display:none}
+.nodelabel small{display:block;font-size:12px;color:var(--sun-dark)}
+.lrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:10px 12px;min-height:56px}
+.lrow .t{flex:1}.lrow .t b{display:block;font-size:16px}.lrow .t small{color:var(--ink-2);font-size:13px}
+.lrow .lico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--leaf);color:#fff;flex:none}
+.lrow .lico svg{width:20px;height:20px}
+.lrow.done .lico{background:var(--sun);color:#3b2a00}
+.lrow.locked{opacity:.55;cursor:not-allowed}.lrow.locked .lico{background:var(--locked);color:var(--locked-dark)}
+.lrow.next{border-color:var(--leaf);box-shadow:0 4px 0 var(--leaf)}
 .nodelabel{font-size:13px;color:var(--ink-2);margin-top:6px;text-align:center}
 .nodewrap{display:flex;flex-direction:column;align-items:center}
 .teaser{margin:4px 16px 24px;padding:14px 16px;border:2px dashed var(--line);border-radius:16px;color:var(--ink-2);font-size:14px;line-height:1.45}
@@ -233,6 +243,8 @@ main{flex:1;padding:0 0 96px}
 .mascot{animation:wobble 3s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes wobble{50%{transform:rotate(-3deg)}}
 
+/* ---- Illustrazioni "fatte a mano": contorno blu + tratto tremolante (filtro #wob) ---- */
+.art :is(path,ellipse,circle,rect)[fill]:not([fill="none"]):not([stroke]):not(.no){stroke:var(--art-line);stroke-width:1.7px;stroke-linejoin:round}
 /* stati delle piante */
 .p-assetata .leaves{transform:rotate(4deg) skewX(-4deg);transform-origin:50% 90%;filter:saturate(.75) brightness(1.05)}
 .p-appassita .leaves{transform:rotate(9deg) skewX(-9deg) scaleY(.9);transform-origin:50% 95%;filter:sepia(.75) saturate(.8) hue-rotate(-15deg) brightness(.95)}
@@ -242,6 +254,8 @@ main{flex:1;padding:0 0 96px}
 </style>
 </head>
 <body>
+<!-- Filtro "tratto a mano": un rumore casuale sposta un po' ogni punto delle linee -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></svg>
 <div class="app" id="app"></div>
 <script>
 /* =========================================================
@@ -462,10 +476,262 @@ STEPS.push(
     { t:"match", q:"Abbina pianta e mania", pairs:[["Monstera","Foglie con i buchi"],["Calathea","Prega la sera"],["Orchidea","Radici al sole"],["Felce","Spore, non semi"]] }
   ]}
 );
+// ---------- Caselle a più lezioni ----------
+// Ogni casella (step) ha: le lezioni scritte (la prima è step.items, le altre in EXTRA) + un "Allenamento"
+// generato pescando a caso le sue domande. Il Ripasso di fine zona pesca da tutta la zona.
+const EXTRA = {};
+const authored = st => [{ title:"Le basi", items: st.items }, ...(EXTRA[st.id] || [])];
+const lessonCount = st => authored(st).length + 1;
+const lessonTitle = (st, li) => li < authored(st).length ? authored(st)[li].title : (st.icon === "star" ? "Ripasso a sorpresa" : "Allenamento");
+function practiceItems(st){
+  const pool = (st.icon === "star" ? STEPS.filter(x => x.zone === st.zone) : [st]).flatMap(x => authored(x).flatMap(l => l.items)).filter(it => it.t !== "card");
+  return shuffle(pool).slice(0, 6);
+}
+const lessonItems = (st, li) => li < authored(st).length ? authored(st)[li].items : practiceItems(st);
+const progOf = st => S.prog[st.id] || (S.done.includes(st.id) ? lessonCount(st) : 0);
+const stepDone = st => progOf(st) >= lessonCount(st);
+// ---------- Piante nuove: zone 1-3 (seconde lezioni) e zona 4 Fiori da balcone ----------
+Object.assign(PLANTS, {
+  zamioculcas:{ name:"Zamioculcas", g:"f", indoor:true, sci:"Zamioculcas zamiifolia, la ZZ", cost:25,
+    care:{ soak:10, thirsty:16, wilt:30, dead:50, rot:2, rule:"Ogni 2-3 settimane: i rizomi le fanno da borraccia",
+      feelReady:"Asciutta anche in profondità. Adesso sì, un po’ d’acqua.",
+      dryTip:"Per seccare una zamioculcas ci vuole impegno: complimenti, in un certo senso.", wetTip:"I rizomi della zamioculcas marciscono con la terra bagnata: meglio dimenticarla che annegarla." }, facts:[
+    "Sotto terra ha dei rizomi che accumulano acqua: sopporta settimane di dimenticanza.",
+    "Tollera la poca luce meglio di quasi tutte le piante da casa.",
+    "Le foglie lucide sembrano finte. Non lo sono.",
+    "È irritante se mangiata: lontana da cani e gatti."] },
+  spatifillo:{ name:"Spatifillo", g:"m", indoor:true, sci:"Spathiphyllum, il giglio della pace", cost:25,
+    care:{ soak:2, thirsty:4, wilt:6, dead:12, rot:3, rule:"Ogni 3-5 giorni: quando si affloscia, sei in ritardo",
+      dryTip:"Lo spatifillo avvisa con una scena madre. Ignorata troppe volte, la scena diventa finale.", wetTip:"Lo spatifillo ama l’umido, ma non il vaso allagato: le radici devono respirare." }, facts:[
+    "Quando ha sete si affloscia tutto, e dopo l’acqua si rialza in poche ore.",
+    "Fiorisce anche con poca luce, cosa rara tra le piante da casa.",
+    "La vela bianca è una brattea: i fiori veri sono sulla spiga al centro.",
+    "È irritante per bocca e stomaco di cani e gatti."] },
+  limone:{ name:"Limone", g:"m", indoor:false, sci:"Citrus limon, il limone", cost:40,
+    care:{ soak:3, thirsty:5, wilt:10, dead:20, rot:2, rule:"Ogni 3-5 giorni d’estate, quando la superficie è asciutta",
+      dryTip:"In vaso il limone si secca in fretta: le foglie si arrotolano, poi cadono.", wetTip:"Con l’acqua ferma il limone perde le foglie: vuole acqua regolare, mai ristagni." }, facts:[
+    "Vuole pieno sole: senza, niente fiori e niente limoni.",
+    "Foglie gialle con le venature verdi: manca ferro, spesso per colpa del calcare.",
+    "D’inverno, al Nord, va in un posto riparato e luminoso: teme il gelo.",
+    "I rami dritti che spuntano dalla base vengono dal portainnesto: si tagliano."] },
+  salvia:{ name:"Salvia", g:"f", indoor:false, sci:"Salvia officinalis, la salvia", cost:25,
+    care:{ soak:3, thirsty:6, wilt:12, dead:24, rot:2, rule:"Poca: ogni 5-7 giorni, in terra drenante",
+      dryTip:"La salvia è resistente, ma in un vaso piccolo e sotto il sole ha un limite.", wetTip:"Con la terra sempre bagnata la salvia marcisce: drenaggio, sempre." }, facts:[
+    "Le foglie grigie e vellutate la aiutano a perdere meno acqua al sole.",
+    "È parente stretta del rosmarino, che dal 2017 si chiama Salvia rosmarinus.",
+    "Si pota in primavera, senza arrivare al legno vecchio e spoglio.",
+    "Regge il freddo molto meglio del limone."] },
+  tillandsia:{ name:"Tillandsia", g:"f", indoor:true, sci:"Tillandsia, la pianta dell’aria", cost:25,
+    care:{ soak:3, thirsty:5, wilt:10, dead:20, rot:2, rule:"1-2 volte a settimana: bagno di 20-30 minuti, poi ad asciugare capovolta",
+      feelWet:"Acqua ancora nel centro della rosetta. Falla asciugare a testa in giù, subito.", feelDamp:"Foglie verdi e pesanti: ha bevuto da poco.",
+      feelReady:"Foglie argentate e leggere: è ora di un bagno.", feelDry:"Foglie arricciate e leggerissime. Bagno, subito.",
+      dryTip:"Vive d’aria, ma non solo d’aria: senza bagni si accartoccia.", wetTip:"L’acqua ferma al centro della rosetta la fa marcire dall’interno." }, facts:[
+    "Vive senza terra: beve dalle foglie, coperte di minuscole squame argentate.",
+    "Le radici servono solo ad aggrapparsi.",
+    "Dopo il bagno va asciugata a testa in giù, o marcisce al centro.",
+    "Fiorisce una volta sola, poi fa i figli alla base."] },
+  ficus:{ name:"Ficus elastica", g:"m", indoor:true, sci:"Ficus elastica, l’albero della gomma", cost:35,
+    care:{ soak:5, thirsty:8, wilt:14, dead:25, rot:2, rule:"Circa una volta a settimana, quando i primi centimetri sono asciutti",
+      dryTip:"Il ficus regge un po’ di sete, poi inizia a lasciar cadere le foglie in basso.", wetTip:"Terra sempre bagnata, foglie che cadono: il ficus odia i ristagni." }, facts:[
+    "Odia i traslochi: se lo sposti spesso, perde le foglie.",
+    "La polvere sulle foglie ruba luce: un panno umido ogni tanto.",
+    "Se tagli un ramo esce lattice bianco, irritante: guanti.",
+    "Un tempo dal suo lattice si ricavava la gomma."] },
+  geranio:{ name:"Geranio", g:"m", indoor:false, sci:"Pelargonium, il geranio dei balconi", cost:25,
+    care:{ soak:2, thirsty:4, wilt:8, dead:15, rot:2, rule:"Ogni 2-4 giorni d’estate, a terra asciutta: odia i ristagni",
+      dryTip:"Il geranio sopporta un po’ di secco, non un’estate intera di abbandono.", wetTip:"Le radici del geranio marciscono in fretta: meglio poca acqua che troppa." }, facts:[
+    "Il geranio dei balconi in realtà è un Pelargonium.",
+    "Più sole prende, più fiorisce.",
+    "Togliendo gli steli dei fiori secchi, ne arrivano di nuovi.",
+    "Si moltiplica facilmente per talea, e d’inverno va al riparo dal gelo."] },
+  petunia:{ name:"Petunia", g:"f", indoor:false, sci:"Petunia, la petunia", cost:20,
+    care:{ soak:1, thirsty:2, wilt:4, dead:7, rot:3, rule:"Quasi ogni giorno d’estate: in vaso si secca in fretta",
+      dryTip:"In un vaso piccolo e al sole, la petunia si secca in un pomeriggio.", wetTip:"Anche la petunia, assetata com’è, soffre se il vaso ristagna." }, facts:[
+    "Togliendo i fiori secchi non fa semi e continua a fiorire.",
+    "Le foglie sono un po’ appiccicose: sono peli, non sporco.",
+    "Si coltiva di solito come annuale: dalla primavera all’autunno.",
+    "A metà estate una spuntatina la fa ramificare e rifiorire."] },
+  ortensia:{ name:"Ortensia", g:"f", indoor:false, sci:"Hydrangea macrophylla, l’ortensia", cost:35,
+    care:{ soak:1, thirsty:2, wilt:3, dead:6, rot:4, rule:"Tanta: terra sempre umida, d’estate anche ogni giorno",
+      dryTip:"Hydrangea vuol dire “vaso d’acqua”: senza acqua si affloscia in poche ore.", wetTip:"Anche l’ortensia, la più assetata del balcone, soffre se l’acqua ristagna." }, facts:[
+    "Hydrangea, dal greco: “vaso d’acqua”. È tra le più assetate del balcone.",
+    "Vuole mezz’ombra: il sole del pomeriggio la brucia.",
+    "Alcune cambiano colore: blu in terra acida, rosa in terra calcarea.",
+    "Fiorisce sui rami dell’anno prima: potarla in autunno toglie i fiori futuri."] },
+  bouganville:{ name:"Bouganville", g:"f", indoor:false, sci:"Bougainvillea, la bouganville", cost:40,
+    care:{ soak:4, thirsty:7, wilt:14, dead:28, rot:2, rule:"Poca: circa una volta a settimana, a terra asciutta",
+      dryTip:"La bouganville ama il secco, ma un vaso dimenticato per settimane è troppo anche per lei.", wetTip:"Troppa acqua: tante foglie, niente fiori, poi marciume." }, facts:[
+    "La parte colorata sono brattee: i fiori veri sono i tubetti bianchi al centro.",
+    "Vuole sole pieno e caldo per fiorire tanto.",
+    "Teme il gelo: al Nord, d’inverno, va al riparo.",
+    "Si pota dopo la fioritura: rifiorisce sui rami nuovi."] }
+});
+
+// Seconde lezioni delle caselle delle zone 1-3
+Object.assign(EXTRA, {
+  s1:[{ title:"Raccolto e semina", items:[
+    { t:"card", plant:"basilico", title:"Mangiarlo senza ucciderlo", body:"Il basilico si mangia, ma c’è modo e modo. Se strappi le foglie grandi in basso, la pianta si spoglia. Se raccogli dall’alto, la spingi a ramificare. È la cimatura, ma con la mozzarella." },
+    { t:"mc", plant:"basilico", q:"Come si raccoglie il basilico senza rovinarlo?", o:["Dall’alto, tagliando sopra una coppia di foglie","Strappando le foglie grandi in basso","Sradicando una piantina alla volta"], a:0, why:"Raccogliendo dall’alto fai raccolto e cimatura insieme: lui ringrazia facendo due rametti." },
+    { t:"tf", plant:"basilico", q:"Il basilico soffre il freddo: sotto i 10 gradi circa inizia a stare male.", a:true, why:"È una pianta da estate. Una notte fredda sul davanzale d’autunno e le foglie anneriscono." },
+    { t:"mc", plant:"basilico", q:"Il basilico si può seminare?", o:["Sì, in primavera e al caldo: germoglia in una o due settimane","No, nasce solo al supermercato","Solo in Liguria, per legge"], a:0, why:"Si semina in primavera, al caldo. Germoglia in fretta e dà soddisfazione (per una volta)." },
+    { t:"tf", plant:"basilico", q:"Le foglie annerite dal freddo tornano verdi in qualche giorno.", a:false, why:"Sono danni da freddo: quelle foglie non tornano. Si tolgono e si spera nel resto della pianta." }
+  ]}],
+  s2:[{ title:"Poca luce, nessuna scusa", items:[
+    { t:"card", plant:"zamioculcas", title:"Le piante da corridoio", body:"Non tutte le case hanno finestre a sud. Per fortuna esistono piante che si accontentano di poca luce. Si accontentano, non la adorano: crescono piano, ma sopravvivono." },
+    { t:"id", plant:"zamioculcas", q:"Quale è la zamioculcas?", o:["spatifillo","zamioculcas","pothos","sansevieria"], a:"zamioculcas", why:"Steli dritti con foglioline lucide a coppie, come plastificate. Molti la credono finta (lei se ne offende)." },
+    { t:"tf", plant:"zamioculcas", q:"La zamioculcas sopravvive anche lontano dalla finestra.", a:true, why:"Tollera la poca luce meglio di quasi tutte. Cresce più lenta, ma non si lamenta." },
+    { t:"mc", plant:"spatifillo", q:"Lo spatifillo fiorisce anche con poca luce?", o:["Sì, è una delle poche piante da casa che fiorisce in mezza ombra","No, solo in pieno sole","Solo se gli canti qualcosa"], a:0, why:"È il suo superpotere: fiori bianchi anche lontano dalla finestra. Basta che non sia buio pesto." },
+    { t:"id", plant:"spatifillo", q:"Riconosci lo spatifillo?", o:["zamioculcas","menta","spatifillo","basilico"], a:"spatifillo", why:"Foglie lunghe e lucide, e quel “fiore” bianco a vela con una spiga al centro." },
+    { t:"tf", plant:"spatifillo", q:"Il “fiore” bianco dello spatifillo è in realtà una foglia trasformata.", a:true, why:"La vela bianca è una brattea: i fiori veri, minuscoli, stanno sulla spiga al centro." }
+  ]}],
+  s3:[{ title:"Chi parla e chi tace", items:[
+    { t:"card", plant:"spatifillo", title:"Piante drammatiche e piante stoiche", body:"Alcune piante ti avvisano quando hanno sete, con una scena madre. Altre accumulano acqua e stanno zitte per settimane. Conoscerne il carattere evita omicidi." },
+    { t:"mc", plant:"spatifillo", q:"Lo spatifillo ha tutte le foglie afflosciate. Cosa fai?", o:["Lo annaffi: in poche ore si rialza","Lo butti, è morto","Lo metti al sole per tirarlo su"], a:0, why:"Quando ha sete si affloscia in modo teatrale, e dopo l’acqua si riprende. Meglio non farglielo fare spesso." },
+    { t:"tf", plant:"zamioculcas", q:"La zamioculcas va annaffiata spesso, come la menta.", a:false, why:"I rizomi sotto terra le fanno da borraccia: ogni 2-3 settimane basta. Il pericolo è l’acqua in più." },
+    { t:"mc", plant:"zamioculcas", q:"Cosa sono i bulbi grossi sotto terra della zamioculcas?", o:["Rizomi che accumulano acqua","Patate dimenticate","Uova di lumaca"], a:0, why:"Sono rizomi, riserve d’acqua. Per questo perdona le dimenticanze e odia l’acqua ferma." },
+    { t:"tf", plant:"spatifillo", q:"Lo spatifillo è innocuo se lo morde il gatto.", a:false, why:"Come il pothos, irrita bocca e stomaco di cani e gatti. Meglio fuori portata." }
+  ]}],
+  s4:[{ title:"Il rinvaso", items:[
+    { t:"card", title:"Casa nuova, ma non troppo grande", body:"Prima o poi ogni pianta diventa troppo grande per il suo vaso. Il rinvaso è un trasloco: va fatto al momento giusto, e senza esagerare con lo spazio. Il monolocale in sei non va bene, ma neanche la villa con piscina." },
+    { t:"mc", q:"Come capisci che una pianta va rinvasata?", o:["Le radici escono dai fori o girano attorno al vaso","Ha compiuto un anno","Ti sembra annoiata"], a:0, why:"Radici dai fori o arrotolate in cerchio: il vaso è diventato stretto." },
+    { t:"mc", q:"Quanto più grande deve essere il vaso nuovo?", o:["Poco: qualche centimetro di diametro in più","Il doppio, così non ci pensi più","Uguale, ma di un altro colore"], a:0, why:"Troppa terra in più resta bagnata a lungo e rischia di far marcire le radici." },
+    { t:"tf", plant:"zamioculcas", q:"I rizomi della zamioculcas possono deformare un vaso di plastica stretto.", a:true, why:"Crescono e spingono: a volte il vaso si gonfia o si spacca. È il suo modo di chiedere casa nuova." },
+    { t:"mc", plant:"spatifillo", q:"Lo spatifillo è diventato un cespuglio enorme. Puoi...", o:["Dividerlo in più ciuffi, ognuno con le sue radici, e rinvasarli","Tagliarlo a metà con le forbici, foglie comprese","Lasciarlo esplodere"], a:0, why:"Si divide il cespo con le radici: da una pianta ne ottieni due o tre." }
+  ]}],
+  m1:[{ title:"Agrumi e salvia", items:[
+    { t:"card", plant:"limone", title:"Il limone in vaso", body:"Il limone è il sogno di ogni balcone: fiori profumati, frutti gialli, foglie lucide tutto l’anno. È mediterraneo d’adozione: viene dall’Asia, ma ormai qui è di casa." },
+    { t:"mc", plant:"limone", q:"Dove sta bene il limone in vaso d’estate?", o:["In pieno sole, al riparo dal vento forte","In un angolo d’ombra fresca","In casa vicino al termosifone"], a:0, why:"Sole pieno: senza, niente fiori e niente limoni. Solo foglie e delusione." },
+    { t:"id", plant:"limone", q:"Quale è il limone?", o:["salvia","olivo","limone","lavanda"], a:"limone", why:"Foglie lucide e ovali, e i limoni appesi. Con i limoni è facile, ammettiamolo." },
+    { t:"id", plant:"salvia", q:"Riconosci la salvia?", o:["rosmarino","salvia","limone","lavanda"], a:"salvia", why:"Foglie ovali, grigio-verdi e vellutate. Profumo di burro e salvia." },
+    { t:"tf", plant:"salvia", q:"Le foglie vellutate e grigie aiutano la salvia a perdere meno acqua al sole.", a:true, why:"I peli sottili riflettono la luce e trattengono umidità: la stessa strategia dell’olivo." },
+    { t:"tf", plant:"salvia", q:"Salvia e rosmarino sono parenti stretti.", a:true, why:"Così stretti che dal 2017 il rosmarino si chiama Salvia rosmarinus. Riunione di famiglia sul balcone." }
+  ]}],
+  m2:[{ title:"Acqua e calcare", items:[
+    { t:"card", plant:"limone", title:"Foglie gialle, ma non per l’autunno", body:"Il limone vuole acqua regolare, ma odia i ristagni. E ha un nemico nascosto: il calcare. Con acqua e terra troppo calcaree, le foglie ingialliscono anche se le venature restano verdi." },
+    { t:"mc", plant:"limone", q:"Le foglie del limone ingialliscono, ma le venature restano verdi. Cosa vuol dire?", o:["Gli manca il ferro, spesso per colpa del calcare","Ha preso troppo sole","Sta per fare i limoni"], a:0, why:"È la clorosi ferrica: con il calcare il ferro non viene assorbito. Si usa un concime con ferro per agrumi." },
+    { t:"mc", plant:"limone", q:"Quando si annaffia il limone in vaso d’estate?", o:["Quando i primi centimetri di terra sono asciutti","Tutti i giorni, a prescindere","Una volta al mese"], a:0, why:"Regolare, ma a terra asciutta in superficie. I ristagni gli fanno cadere le foglie." },
+    { t:"tf", plant:"salvia", q:"La salvia vuole la terra sempre bagnata.", a:false, why:"Come il rosmarino, preferisce terra drenante e poca acqua. Bagnata di continuo marcisce." },
+    { t:"mc", plant:"salvia", q:"La salvia in vaso: meglio una terra...", o:["Drenante, anche con un po’ di sabbia","Argillosa e pesante","Sempre allagata"], a:0, why:"Drenante: le radici devono respirare tra un’annaffiatura e l’altra." }
+  ]}],
+  m3:[{ title:"Potare salvia e limone", items:[
+    { t:"card", plant:"salvia", title:"Legno, ma non troppo", body:"Come la lavanda, anche la salvia con gli anni diventa legnosa alla base. Una potatura in primavera la tiene giovane e folta. Magari funzionasse anche con noi." },
+    { t:"mc", plant:"salvia", q:"Quando si pota la salvia?", o:["In primavera, quando riparte, accorciando i rami","In pieno inverno, a raso","Mai, si offende"], a:0, why:"In primavera, togliendo i rami secchi e accorciando gli altri. Senza arrivare al legno vecchio e spoglio." },
+    { t:"tf", plant:"salvia", q:"Raccogliere spesso le punte della salvia la aiuta a restare compatta.", a:true, why:"Raccogliere le punte è una piccola potatura: la pianta ramifica. E tu cucini." },
+    { t:"mc", plant:"limone", q:"Dalla base del limone spuntano rami dritti e velocissimi, con le spine. Cosa sono?", o:["Polloni del portainnesto, da tagliare","Rami nuovi che faranno limoni giganti","Un regalo della natura da lasciare"], a:0, why:"Spesso il limone è innestato su un’altra pianta: quei rami vengono da lì e gli rubano energie. Si tagliano." },
+    { t:"tf", plant:"limone", q:"Il limone va potato a fondo ogni anno per fare frutti.", a:false, why:"Basta una potatura leggera: rami secchi, incrociati e polloni. Troppi tagli, meno fiori." }
+  ]}],
+  m4:[{ title:"Il limone d’inverno", items:[
+    { t:"card", plant:"limone", title:"La limonaia", body:"Sul lago di Garda, secoli fa, si costruivano le limonaie: serre di pietra e vetro per far passare l’inverno ai limoni. Sul balcone basta meno, ma il principio è lo stesso: luce e niente gelo." },
+    { t:"mc", plant:"limone", q:"D’inverno, al Nord, il limone in vaso...", o:["Va in un posto riparato e luminoso, dove non gela","Resta fuori, è robusto","Va in cantina al buio fino a marzo"], a:0, why:"Teme il gelo ma vuole luce anche d’inverno: veranda, scala luminosa, o vicino al muro e coperto." },
+    { t:"tf", plant:"limone", q:"D’inverno il limone va annaffiato come d’estate.", a:false, why:"Con il freddo beve molto meno: troppa acqua fredda nel vaso e le radici soffrono." },
+    { t:"tf", plant:"salvia", q:"La salvia sopporta bene il freddo dell’inverno.", a:true, why:"È più rustica del limone: regge il freddo, basta che la terra non resti fradicia." },
+    { t:"mc", plant:"salvia", q:"Perché salvia e limone d’inverno si trattano in modo diverso?", o:["Il limone teme il gelo, la salvia lo sopporta","La salvia costa di più","Il limone va in letargo come gli orsi"], a:0, why:"Stessa zona, caratteri diversi: il limone è freddoloso, la salvia no." }
+  ]}],
+  j1:[{ title:"Il ficus permaloso", items:[
+    { t:"card", plant:"ficus", title:"Il gigante di gomma", body:"Il ficus elastica ha foglie grandi, spesse e lucide, come di gomma. Un tempo dal suo lattice si ricavava proprio la gomma. In casa è facile, se rispetti una regola: non spostarlo di continuo." },
+    { t:"mc", plant:"ficus", q:"Dove sta bene il ficus elastica?", o:["In un posto luminoso, senza sole diretto che scotta","Al buio, tanto è robusto","Sul balcone in pieno inverno"], a:0, why:"Luce indiretta e intensa. Al buio si allunga e perde le foglie in basso." },
+    { t:"tf", plant:"ficus", q:"Se sposti spesso il ficus, può perdere le foglie per protesta.", a:true, why:"Odia i cambi di luce e di posto: trovagli un angolo buono e lascialo in pace." },
+    { t:"id", plant:"ficus", q:"Quale è il ficus elastica?", o:["monstera","ficus","calathea","felce"], a:"ficus", why:"Un fusto dritto con foglie grandi, ovali e lucidissime. E una punta rossa da cui esce la foglia nuova." },
+    { t:"mc", plant:"ficus", q:"Le foglie del ficus sono piene di polvere. Perché è un problema?", o:["La polvere ruba luce alla foglia","Gli viene l’allergia","Non è un problema, è vintage"], a:0, why:"La polvere fa da tenda: un panno umido sulle foglie ogni tanto e torna a respirare." }
+  ]}],
+  j2:[{ title:"Bere dall’aria", items:[
+    { t:"card", plant:"tillandsia", title:"La pianta senza terra", body:"La tillandsia non ha bisogno di terra: assorbe acqua e nutrienti dalle foglie, coperte di minuscole squame argentate. In natura sta appesa agli alberi e beve pioggia e umidità." },
+    { t:"tf", plant:"tillandsia", q:"La tillandsia va piantata nel terriccio per sopravvivere.", a:false, why:"Vive senza terra. Nel terriccio sempre umido marcisce." },
+    { t:"mc", plant:"tillandsia", q:"Come si annaffia la tillandsia?", o:["Un bagno di 20-30 minuti in acqua, poi ad asciugare capovolta","Una goccia al mese","Si interra e si annaffia la terra"], a:0, why:"Ammollo, poi asciugatura a testa in giù: l’acqua ferma al centro della rosetta la fa marcire." },
+    { t:"id", plant:"tillandsia", q:"Riconosci la tillandsia?", o:["felce","orchidea","tillandsia","calathea"], a:"tillandsia", why:"Un ciuffo di foglie argentate e arricciate, senza vaso. Sembra un ragno vegetale (simpatico)." },
+    { t:"tf", plant:"tillandsia", q:"Il colore argentato della tillandsia viene da minuscole squame che catturano l’acqua.", a:true, why:"Si chiamano tricomi: sono le sue cannucce. Più è argentata, più ama la luce." }
+  ]}],
+  j3:[{ title:"Radici che non bevono", items:[
+    { t:"card", plant:"tillandsia", title:"A cosa servono le radici?", body:"Siamo abituati a pensare che le radici servano a bere. Per alcune piante non è così: la tillandsia usa le radici solo per aggrapparsi, come ancore." },
+    { t:"mc", plant:"tillandsia", q:"A cosa servono le radici della tillandsia?", o:["Solo ad aggrapparsi","A bere tantissimo","A niente, sono decorative"], a:0, why:"Per bere usa le foglie. Le radici sono ganci per restare attaccata ai rami." },
+    { t:"tf", plant:"tillandsia", q:"Tillandsia e orchidea sono epifite: in natura vivono sopra gli alberi.", a:true, why:"Epifita vuol dire che vive sopra un’altra pianta senza rubarle niente: la usa solo come appoggio." },
+    { t:"mc", plant:"ficus", q:"Se tagli un ramo del ficus esce un liquido bianco. Cos’è?", o:["Lattice: appiccicoso e irritante, meglio usare i guanti","Latte vegetale da bere","Il segno che è malato"], a:0, why:"È lattice: irrita pelle e occhi. Guanti, e niente esperimenti culinari." },
+    { t:"tf", plant:"ficus", q:"In natura, le radici aeree del ficus elastica possono diventare nuovi tronchi.", a:true, why:"Scendono dai rami e diventano colonne. In casa succede di rado, per fortuna del soffitto." }
+  ]}],
+  j4:[{ title:"Figli e fioriture", items:[
+    { t:"card", plant:"tillandsia", title:"Fiorire una volta sola", body:"La tillandsia fiorisce una sola volta nella vita, con colori accesissimi. Dopo, lentamente, la pianta madre declina. Ma prima fa i figli. Un finale da film drammatico, ma con lieto fine." },
+    { t:"tf", plant:"tillandsia", q:"Dopo la fioritura la tillandsia fa dei piccoli figli alla base.", a:true, why:"Crescono attaccati alla madre e diventano piante nuove." },
+    { t:"mc", plant:"tillandsia", q:"Quando puoi staccare un figlio della tillandsia?", o:["Quando è grande circa un terzo della madre","Appena spunta","Mai, va lasciato attaccato per sempre"], a:0, why:"Quando è abbastanza grande si stacca con delicatezza. Oppure li lasci insieme e fai un ciuffo enorme." },
+    { t:"mc", plant:"ficus", q:"Il ficus perde le foglie in basso, una dopo l’altra. Cosa controlli?", o:["Luce e acqua: spesso è poca luce o terra sempre bagnata","Se ha visto un fantasma","Niente, per lui è autunno"], a:0, why:"Poca luce o troppa acqua sono le cause più comuni. E il trasloco, se l’hai spostato da poco." }
+  ]}]
+});
+
+// Zona 4: Fiori da balcone
+STEPS.push(
+  { id:"f1", zone:"z4", title:"Sole e fioriture", icon:"sun", items:[
+    { t:"card", plant:"geranio", title:"Il re dei balconi", body:"Il geranio dei balconi in realtà non è un geranio: è un Pelargonium. I botanici li hanno separati da secoli, ma il nome è rimasto. Un errore diventato tradizione, come la panna nella carbonara (no)." },
+    { t:"mc", plant:"geranio", q:"Quanto sole vuole il geranio?", o:["Tanto: almeno mezza giornata di sole","Pochissimo, è timido","Solo luce artificiale"], a:0, why:"Più sole, più fiori. All’ombra fa foglie e basta." },
+    { t:"tf", plant:"geranio", q:"Il geranio dei balconi in realtà è un Pelargonium.", a:true, why:"Il vero geranio è un’altra pianta, più da prato. Ma ormai lo chiamiamo così tutti." },
+    { t:"id", plant:"petunia", q:"Quale è la petunia?", o:["geranio","petunia","ortensia","bouganville"], a:"petunia", why:"Fiori a trombetta, tantissimi, che ricadono dal vaso. E foglie un po’ appiccicose." },
+    { t:"mc", plant:"petunia", q:"La petunia in vaso d’estate beve...", o:["Tanto: a volte ogni giorno","Pochissimo, una volta al mese","Solo quando piove"], a:0, why:"In un vaso piccolo e al sole si secca in fretta. D’estate controllala ogni giorno." },
+    { t:"tf", plant:"ortensia", q:"L’ortensia vuole sole pieno tutto il giorno.", a:false, why:"Preferisce mezz’ombra: con il sole forte del pomeriggio si affloscia e si brucia." }
+  ]},
+  { id:"f2", zone:"z4", title:"Fiori a ripetizione", icon:"leaf", items:[
+    { t:"card", plant:"petunia", title:"Togli il vecchio, arriva il nuovo", body:"Quando un fiore appassisce, la pianta inizia a fare semi. E fare semi stanca: restano meno energie per i fiori nuovi. Togliendo i fiori secchi, la convinci a fiorire ancora." },
+    { t:"mc", plant:"petunia", q:"Perché si tolgono i fiori appassiti della petunia?", o:["Così non fa semi e continua a fiorire","Perché sono brutti e basta","Per darli alle formiche"], a:0, why:"Senza semi da preparare, la pianta investe in fiori nuovi." },
+    { t:"tf", plant:"geranio", q:"Anche il geranio fiorisce di più se togli gli steli dei fiori secchi.", a:true, why:"Si stacca tutto lo stelo del fiore appassito: così ne arrivano altri." },
+    { t:"mc", q:"Che concime aiuta le piante da fiore?", o:["Uno ricco di potassio, per le fioriture","Solo azoto, per fare tante foglie","Il fondo della moka, a cucchiaiate"], a:0, why:"Il potassio aiuta i fiori, l’azoto spinge le foglie. Per i balconi fioriti c’è il concime per piante da fiore." },
+    { t:"tf", plant:"petunia", q:"Le foglie della petunia sono un po’ appiccicose al tatto.", a:true, why:"Sono coperte di peli ghiandolari. Non è sporco, è lei." }
+  ]},
+  { id:"f3", zone:"z4", title:"Colori che cambiano", icon:"drop", items:[
+    { t:"card", plant:"ortensia", title:"Il trucco dell’ortensia", body:"Alcune ortensie cambiano colore a seconda della terra. In terra acida diventano blu, in terra calcarea rosa. È chimica, non magia. Ma sembra magia." },
+    { t:"mc", plant:"ortensia", q:"In che terra un’ortensia tende a diventare blu?", o:["Acida","Calcarea","Sabbia di mare"], a:0, why:"Nella terra acida l’alluminio si scioglie e la pianta lo assorbe: i fiori diventano blu." },
+    { t:"tf", plant:"ortensia", q:"Tutte le ortensie cambiano colore con la terra.", a:false, why:"Solo alcune, soprattutto quelle colorate. Le ortensie bianche restano bianche, coerenti." },
+    { t:"mc", plant:"bouganville", q:"La parte colorata della bouganville è...", o:["Brattee: foglie colorate attorno ai fiori veri","Petali giganti","Frutti a forma di foglia"], a:0, why:"I fiori veri sono i tubetti bianchi al centro. Il colore lo fanno le brattee, come la vela dello spatifillo." },
+    { t:"tf", plant:"bouganville", q:"I veri fiori della bouganville sono piccoli e bianchi.", a:true, why:"Piccolissimi, al centro delle brattee colorate. I veri protagonisti, e nessuno li nota." }
+  ]},
+  { id:"f4", zone:"z4", title:"Inverno e potatura", icon:"pot", items:[
+    { t:"card", plant:"geranio", title:"Passare l’inverno", body:"Gerani e bouganville vengono da posti caldi: il gelo li uccide. L’ortensia invece l’inverno lo regge, ma va potata con attenzione, o l’anno dopo niente fiori." },
+    { t:"mc", plant:"geranio", q:"Come fai passare l’inverno al geranio, al Nord?", o:["In un posto luminoso e fresco, al riparo dal gelo, con pochissima acqua","Fuori sotto la neve, così si fortifica","Vicino al termosifone, annaffiato ogni giorno"], a:0, why:"Luminoso, fresco e riparato, con acqua quasi zero: aspetta la primavera." },
+    { t:"tf", plant:"geranio", q:"Il geranio si moltiplica facilmente per talea.", a:true, why:"Un rametto di una decina di centimetri in terra: radica in poche settimane. Gerani gratis per tutti." },
+    { t:"mc", plant:"ortensia", q:"Se poti l’ortensia nel momento sbagliato, rischi...", o:["Di tagliare i boccioli dei fiori dell’anno dopo","Che diventi un cactus","Niente, si può tagliare quando vuoi"], a:0, why:"Molte ortensie fioriscono sui rami dell’anno prima: tagliandoli in autunno togli i fiori futuri." },
+    { t:"tf", plant:"bouganville", q:"La bouganville sopporta bene il gelo.", a:false, why:"Teme il freddo: sotto lo zero si rovina. Al Nord, d’inverno, va al riparo." }
+  ]},
+  { id:"f5", zone:"z4", title:"Ripasso", icon:"star", items:[
+    { t:"id", plant:"bouganville", q:"Quale è la bouganville?", o:["geranio","ortensia","petunia","bouganville"], a:"bouganville", why:"Rami lunghi e legnosi coperti di brattee fucsia, come carta velina." },
+    { t:"mc", plant:"ortensia", q:"Ortensia blu, terra...", o:["Acida","Calcarea","Di Marte"], a:0, why:"Acida. Su Marte non abbiamo dati." },
+    { t:"tf", plant:"petunia", q:"Togliere i fiori secchi della petunia la fa fiorire di più.", a:true, why:"Niente semi, più fiori. Funziona sempre." },
+    { t:"mc", plant:"geranio", q:"Il geranio dei balconi in realtà è...", o:["Un Pelargonium","Una rosa travestita","Un cactus"], a:0, why:"Pelargonium. Ma continueremo tutti a chiamarlo geranio." },
+    { t:"match", q:"Abbina fiore e segreto", pairs:[["Geranio","In realtà è un Pelargonium"],["Petunia","Foglie appiccicose"],["Ortensia","Cambia colore con la terra"],["Bouganville","Il colore è nelle brattee"]] }
+  ]}
+);
+Object.assign(EXTRA, {
+  f1:[{ title:"Chi vuole il sole, chi no", items:[
+    { t:"card", plant:"ortensia", title:"Sole sì, ma con giudizio", body:"Sullo stesso balcone puoi avere il geranio che si abbronza e l’ortensia che cerca l’ombra. Il trucco è sapere chi va dove: il lato del sole del mattino per le delicate, quello del pomeriggio per le sole-dipendenti." },
+    { t:"mc", plant:"ortensia", q:"Dove metti l’ortensia sul balcone?", o:["In mezz’ombra, magari con il sole solo al mattino","Nel punto più assolato","Dentro casa, al buio"], a:0, why:"Sole del mattino e ombra nel pomeriggio: il suo compromesso ideale." },
+    { t:"id", plant:"ortensia", q:"Riconosci l’ortensia?", o:["bouganville","geranio","petunia","ortensia"], a:"ortensia", why:"Grandi palle di fiori, blu o rosa, e foglie larghe seghettate. La nonna ne aveva una, sicuro." },
+    { t:"mc", plant:"bouganville", q:"Di cosa ha bisogno la bouganville per fiorire tanto?", o:["Sole pieno e caldo","Ombra e umidità","Musica classica"], a:0, why:"Viene da posti caldi e soleggiati: più sole prende, più si copre di colore." },
+    { t:"id", plant:"bouganville", q:"Quale è la bouganville?", o:["ortensia","bouganville","petunia","geranio"], a:"bouganville", why:"Rami lunghi e legnosi, coperti di “fiori” fucsia come carta velina." },
+    { t:"tf", plant:"geranio", q:"Il geranio teme i ristagni d’acqua.", a:true, why:"Le sue radici marciscono facilmente: meglio poca acqua che troppa, e mai sottovaso pieno." }
+  ]}],
+  f2:[{ title:"Tanta sete, poca sete", items:[
+    { t:"card", plant:"ortensia", title:"Il nome dice tutto", body:"Il nome scientifico dell’ortensia, Hydrangea, viene dal greco e vuol dire più o meno “vaso d’acqua”. Non è un caso: tra le piante da balcone è una delle più assetate." },
+    { t:"mc", plant:"ortensia", q:"L’ortensia in vaso d’estate...", o:["Vuole terra sempre umida, a volte acqua ogni giorno","Si annaffia ogni due settimane","Si annaffia solo sulle foglie"], a:0, why:"Assetatissima: con la terra secca si affloscia in poche ore." },
+    { t:"tf", plant:"ortensia", q:"Se l’ortensia è afflosciata nel pomeriggio d’estate, è morta.", a:false, why:"Spesso si affloscia per il caldo e si riprende la sera. Controlla la terra: se è secca, acqua; se è umida, ombra." },
+    { t:"mc", plant:"bouganville", q:"Come si annaffia la bouganville?", o:["Poco, lasciando asciugare la terra tra una volta e l’altra","Ogni giorno, tanta","Mai"], a:0, why:"Ama il secco: troppa acqua fa foglie e pochi fiori, e rischia di marcire." },
+    { t:"tf", plant:"bouganville", q:"Un po’ di sete controllata aiuta la bouganville a fiorire.", a:true, why:"Un leggero stress da secco la spinge a fiorire. Leggero, non abbandono." }
+  ]}],
+  f3:[{ title:"Foglie che parlano", items:[
+    { t:"card", plant:"geranio", title:"Non solo fiori", body:"Molti gerani hanno foglie con una fascia più scura, come un anello. E se le sfreghi, profumano. Alcuni si coltivano apposta per il profumo delle foglie." },
+    { t:"tf", plant:"geranio", q:"Alcune foglie di geranio hanno una fascia scura a forma di anello.", a:true, why:"Si chiamano gerani zonali proprio per questo: hanno una “zona” più scura sulla foglia." },
+    { t:"id", plant:"geranio", q:"Quale è il geranio?", o:["petunia","geranio","bouganville","ortensia"], a:"geranio", why:"Foglie rotonde e vellutate, ciuffi di fiori rossi su steli dritti. Il balcone della nonna, parte due." },
+    { t:"mc", plant:"petunia", q:"La petunia ha fusti lunghi e spogli, con pochi fiori in punta. Cosa fai?", o:["La accorci un po’: rifarà rami e fiori","La lasci, è il suo stile","La annaffi il triplo"], a:0, why:"Una spuntatina a metà estate la rinnova: ramifica e rifiorisce." },
+    { t:"mc", q:"Un fiore che cambia colore con la terra, un “fiore” che è una foglia. Cosa insegnano?", o:["Che le piante non sono come sembrano: guarda meglio","Che i botanici si annoiano","Niente, è un caso"], a:0, why:"Brattee, terra acida, nomi sbagliati: osservare bene è metà del pollice verde." }
+  ]}],
+  f4:[{ title:"Annuali e ripartenze", items:[
+    { t:"card", plant:"petunia", title:"Annuale o no?", body:"Molte piante da balcone si comprano in primavera e si buttano in autunno. Alcune potrebbero vivere di più, con un po’ di cura. Altre no: è il loro ciclo, come per il basilico. Non è colpa tua. Stavolta." },
+    { t:"tf", plant:"petunia", q:"La petunia da balcone di solito si coltiva come annuale.", a:true, why:"Si compra in primavera e dura fino all’autunno. Con tanta pazienza può svernare, ma di solito non ne vale la pena." },
+    { t:"mc", plant:"bouganville", q:"Come si pota la bouganville?", o:["Dopo la fioritura, accorciando i rami lunghi","Mai, si offende","A zero ogni mese"], a:0, why:"Dopo i fiori si accorciano i rami: rifiorisce sui rami nuovi." },
+    { t:"mc", plant:"ortensia", q:"Le teste secche dell’ortensia, in inverno...", o:["Si possono lasciare: proteggono le gemme dal freddo, si tolgono a fine inverno","Vanno tolte a ottobre con tutto il ramo","Diventano blu se le annaffi"], a:0, why:"Fanno da cappotto alle gemme sotto. A fine inverno si tolgono, sopra la prima coppia di gemme buone." },
+    { t:"tf", plant:"geranio", q:"D’inverno il geranio al riparo va annaffiato come d’estate.", a:false, why:"A riposo beve pochissimo: troppa acqua al fresco e marcisce." }
+  ]}]
+});
+
 const ZONES = [
   { id:"z1", title:"Casa tua", desc:"Il davanzale, dove tutto ha inizio. E dove tutto, finora, è morto." },
   { id:"z2", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." },
-  { id:"z3", title:"Giungla in salotto", desc:"Luce filtrata, aria umida, piante che vogliono attenzioni. Tutte da casa, nessuna al sole." }
+  { id:"z3", title:"Giungla in salotto", desc:"Luce filtrata, aria umida, piante che vogliono attenzioni. Tutte da casa, nessuna al sole." },
+  { id:"z4", title:"Fiori da balcone", desc:"Gerani, petunie, ortensie, bouganville. Il balcone della nonna, ma stavolta sopravvive (forse)." }
 ];
 
 // ---------- Emergenze: problemi reali, si curano sapendo la risposta ----------
@@ -498,6 +764,29 @@ Object.assign(EMERG, {
   fel_termo:{ plant:"felce", step:"j2", title:"È sopra il termosifone e perde foglie a pioggia", q:"Cosa fai?", o:["La sposti lontano dal termosifone, in un posto più umido","La annaffi ogni ora","Le togli le foglie rimaste, così non le perde"], a:0, why:"Il caldo secco del termosifone la disidrata. Meglio un bagno luminoso o un angolo lontano dal calore." },
   fel_puntini:{ plant:"felce", step:"j4", title:"Puntini marroni sotto le fronde", q:"Cosa fai?", o:["Guardi bene: se sono in file ordinate sono spore, e va tutto bene","La butti, è malata","La spruzzi con l’insetticida senza guardare"], a:0, why:"Le spore stanno in file ordinate. Le cocciniglie sono sparse e si staccano con l’unghia." }
 });
+// Emergenze delle piante nuove. "lesson" = in quale lezione della casella si impara la cura (0 = Le basi)
+Object.assign(EMERG, {
+  zam_acqua:{ plant:"zamioculcas", step:"s3", lesson:1, title:"Steli gialli alla base e terra sempre bagnata", q:"Cosa fai?", o:["Smetti di annaffiare e lasci asciugare bene la terra","Annaffi di più, sembra sofferente","La metti al sole per asciugarla in fretta"], a:0, why:"I rizomi stanno marcendo: troppa acqua. La zamioculcas va dimenticata, non annegata." },
+  zam_vaso:{ plant:"zamioculcas", step:"s4", lesson:1, title:"Il vaso di plastica si è deformato", q:"Cosa fai?", o:["La rinvasi in un vaso appena più grande","Lo stringi con il nastro adesivo","Tagli i rizomi che spingono"], a:0, why:"I rizomi sono cresciuti e chiedono spazio: vaso nuovo, qualche centimetro più largo." },
+  spa_floscio:{ plant:"spatifillo", step:"s3", lesson:1, title:"Tutte le foglie afflosciate a terra", q:"Cosa fai?", o:["Lo annaffi: in poche ore si rialza","Lo butti, è finita","Lo leghi a un bastone"], a:0, why:"È la sua scena madre per dire che ha sete. Acqua, e domani è come nuovo." },
+  spa_gatto:{ plant:"spatifillo", step:"s3", lesson:1, title:"Il gatto ha morsicchiato una foglia", q:"Cosa fai?", o:["Lo sposti fuori portata e, se il gatto sta male, chiami il veterinario","Niente, è una pianta, cosa vuoi che sia","Spruzzi la foglia con il limone"], a:0, why:"Lo spatifillo irrita bocca e stomaco degli animali: va tenuto dove non arrivano." },
+  lim_giallo:{ plant:"limone", step:"m2", lesson:1, title:"Foglie gialle con le venature verdi", q:"Cosa fai?", o:["Gli dai un concime con ferro per agrumi","Lo sposti all’ombra","Gli togli tutte le foglie gialle e basta"], a:0, why:"È clorosi ferrica: il calcare blocca il ferro. Concime con ferro, e se puoi acqua meno calcarea." },
+  lim_polloni:{ plant:"limone", step:"m3", lesson:1, title:"Dalla base spuntano rami dritti pieni di spine", q:"Cosa fai?", o:["Li tagli: sono polloni del portainnesto","Li lasci, faranno limoni enormi","Li leghi al tronco"], a:0, why:"Vengono dalla pianta su cui è innestato e rubano energie al limone vero." },
+  sal_legnosa:{ plant:"salvia", step:"m3", lesson:1, title:"Tutta legno alla base, poche foglie in cima", q:"Cosa fai?", o:["In primavera la accorci, senza arrivare al legno spoglio","La tagli a raso, così riparte","La annaffi il doppio"], a:0, why:"Una potatura in primavera la ringiovanisce. Il legno vecchio e spoglio non si tocca." },
+  sal_fradicia:{ plant:"salvia", step:"m2", lesson:1, title:"Foglie molli e annerite, terra sempre bagnata", q:"Cosa fai?", o:["Svuoti il sottovaso e la rinvasi in terra drenante","La annaffi di più","La porti in casa al caldo"], a:0, why:"La salvia marcisce con i piedi bagnati: terra che drena e niente acqua ferma." },
+  til_centro:{ plant:"tillandsia", step:"j2", lesson:1, title:"Il centro della rosetta è scuro e molle", q:"Cosa fai?", o:["Togli le foglie marce e da ora la fai asciugare capovolta dopo ogni bagno","La pianti nel terriccio","La lasci in ammollo per una notte"], a:0, why:"L’acqua ferma al centro l’ha fatta marcire. Dopo il bagno, sempre a testa in giù." },
+  til_secca:{ plant:"tillandsia", step:"j2", lesson:1, title:"Foglie arricciate e leggerissime", q:"Cosa fai?", o:["Un bagno di 20-30 minuti, poi ad asciugare capovolta","La metti al sole diretto","Niente, vive d’aria"], a:0, why:"Vive d’aria, ma non solo d’aria: ha sete. Bagno e asciugatura, e si riprende." },
+  fic_trasloco:{ plant:"ficus", step:"j1", lesson:1, title:"Perde foglie dopo che l’hai spostato", q:"Cosa fai?", o:["Lo lasci nel nuovo posto, se è luminoso, e smetti di spostarlo","Lo sposti ancora, finché trova il posto giusto","Gli togli tutte le foglie, così non le perde"], a:0, why:"Il ficus odia i traslochi: perde foglie per protesta, poi si abitua. Basta non spostarlo di nuovo." },
+  fic_polvere:{ plant:"ficus", step:"j1", lesson:1, title:"Le foglie sono grigie di polvere", q:"Cosa fai?", o:["Le pulisci con un panno umido","Le lucidi con l’olio","Le lasci, è un effetto vintage"], a:0, why:"La polvere ruba luce. Un panno umido basta: l’olio chiude i pori della foglia." },
+  ger_sfiorito:{ plant:"geranio", step:"f2", lesson:0, title:"Pieno di fiori secchi, pochi nuovi", q:"Cosa fai?", o:["Togli gli steli dei fiori secchi","Lo annaffi il doppio","Lo sposti all’ombra"], a:0, why:"Senza semi da fare, la pianta torna a fiorire." },
+  ger_gelo:{ plant:"geranio", step:"f4", lesson:0, title:"Stanotte gela e il geranio è fuori", q:"Cosa fai?", o:["Lo porti al riparo, in un posto fresco e luminoso","Lo annaffi per scaldarlo","Lo lasci, è un duro"], a:0, why:"Il geranio non regge il gelo: al riparo, con pochissima acqua, fino a primavera." },
+  pet_spoglia:{ plant:"petunia", step:"f3", lesson:1, title:"Fusti lunghi e spogli, fiori solo in punta", q:"Cosa fai?", o:["La accorci un po’","La annaffi il triplo","La lasci, prima o poi si sistema"], a:0, why:"Una spuntatina a metà estate: ramifica e rifiorisce." },
+  pet_sete:{ plant:"petunia", step:"f1", lesson:0, title:"Afflosciata dopo una giornata di sole", q:"Cosa fai?", o:["La annaffi: in vaso al sole si secca in fretta","La sposti in casa","Le togli i fiori"], a:0, why:"Vaso piccolo e sole pieno: d’estate beve quasi ogni giorno." },
+  ort_sole:{ plant:"ortensia", step:"f1", lesson:1, title:"Foglie bruciate dopo il sole del pomeriggio", q:"Cosa fai?", o:["La sposti in mezz’ombra, con il sole solo al mattino","La annaffi solo sulle foglie, al sole","La lasci, si abituerà"], a:0, why:"Il sole forte del pomeriggio la brucia: mezz’ombra è casa sua." },
+  ort_rosa:{ plant:"ortensia", step:"f3", lesson:0, title:"Era blu e ora fa fiori rosa", q:"Cosa è successo?", o:["La terra è diventata meno acida, magari per l’acqua calcarea","Ha cambiato idea","Ha preso troppo sole"], a:0, why:"Il colore dipende dalla terra: con il calcare torna rosa. Terriccio per acidofile e acqua meno dura, se la vuoi blu." },
+  bou_gelo:{ plant:"bouganville", step:"f4", lesson:0, title:"Arriva il primo gelo", q:"Cosa fai?", o:["La porti al riparo dal gelo","La copri di acqua calda","La lasci fuori, è tropicale ma coraggiosa"], a:0, why:"La bouganville teme il gelo: d’inverno al riparo, luminoso e con poca acqua." },
+  bou_foglie:{ plant:"bouganville", step:"f2", lesson:1, title:"Tante foglie, zero fiori", q:"Cosa fai?", o:["Meno acqua e più sole","Più acqua e più concime per foglie","La sposti all’ombra"], a:0, why:"Troppa acqua e poca luce fanno foglie. Un po’ di secco e tanto sole la fanno fiorire." }
+});
 
 /* =========================================================
    Stato salvato sul dispositivo
@@ -506,7 +795,7 @@ const KEY = "vasanicola.v1";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
-const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
+const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
 S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -531,14 +820,22 @@ const ICON = {
   pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>',
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
-const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44" };
-function plantSVG(id, size = 120, state = "sana"){
+const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644" };
+const wobble = svg => {
+  // 1) aggiunge "art" alle classi del tag <svg> (o crea l'attributo), 2) avvolge il disegno nel filtro
+  const open = svg.slice(0, svg.indexOf(">") + 1);
+  const tag = open.includes(' class="') ? open.replace(' class="', ' class="art ') : open.replace("<svg", '<svg class="art"');
+  return tag + '<g filter="url(#wob)">' + svg.slice(open.length).replace(/<\/svg>\s*$/, "</g></svg>");
+};
+const plantSVG = (...args) => wobble(plantSVGraw(...args));
+function plantSVGraw(id, size = 120, state = "sana"){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
-  const potSvg = `<path d="M30 92h60l-6 36H36z" fill="${pot}"/><rect x="26" y="84" width="68" height="12" rx="4" fill="${pot}"/><rect x="26" y="84" width="68" height="5" rx="2.5" fill="#000" opacity=".12"/><ellipse cx="60" cy="86" rx="30" ry="3.5" fill="${wet ? "#33200f" : "#5a3b22"}" opacity=".9"/>${wet ? '<ellipse cx="66" cy="85.5" rx="13" ry="1.8" fill="#8fcaff" opacity=".85"/>' : ""}`;
+  const wood = `<path d="M22 98c10-7 64-9 76-2c5 3 5 11 0 13c-15 6-64 6-76 0c-5-3-5-8 0-11z" fill="#a47148"/><path d="M34 103c14 2 36 2 52-1M44 98c8-1 20-1 28 0" stroke="#7a5230" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  const potSvg = id === "tillandsia" ? wood : `<path d="M30 92h60l-6 36H36z" fill="${pot}"/><rect x="26" y="84" width="68" height="12" rx="4" fill="${pot}"/><rect x="26" y="84" width="68" height="5" rx="2.5" fill="#000" opacity=".12"/><ellipse cx="60" cy="86" rx="30" ry="3.5" fill="${wet ? "#33200f" : "#5a3b22"}" opacity=".9"/>${wet ? '<ellipse cx="66" cy="85.5" rx="13" ry="1.8" fill="#8fcaff" opacity=".85"/>' : ""}`;
   if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
   if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
-  let leaves = "";
+  let leaves = "", over = "";
   if (id === "basilico") {
     const pairs = [[60,40,0],[47,52,-28],[73,52,28],[44,66,-35],[76,66,35],[60,26,0]];
     leaves = `<path d="M60 86V30M60 70l-14-10M60 70l14-10M60 56l-12-8M60 56l12-8" stroke="#2c7d3f" stroke-width="3" stroke-linecap="round" fill="none"/>` +
@@ -602,15 +899,73 @@ function plantSVG(id, size = 120, state = "sana"){
     // fronde arcuate piene di fogliette, calcolate lungo una curva
     const frond = (ex, ey, cx, cy) => { let d = `M60 86Q${cx} ${cy} ${ex} ${ey}`, l = "";
       for (let k = 2; k < 12; k++) { const t = k / 12, x = (1 - t) ** 2 * 60 + 2 * (1 - t) * t * cx + t * t * ex, y = (1 - t) ** 2 * 86 + 2 * (1 - t) * t * cy + t * t * ey, w = 7 * (1 - t) + 2;
-        l += `<ellipse cx="${x.toFixed(1)}" cy="${(y - w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#4caf5c"/><ellipse cx="${x.toFixed(1)}" cy="${(y + w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#3e9a4f"/>`; }
+        l += `<ellipse class="no" cx="${x.toFixed(1)}" cy="${(y - w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#4caf5c"/><ellipse class="no" cx="${x.toFixed(1)}" cy="${(y + w / 2).toFixed(1)}" rx="1.8" ry="${w.toFixed(1)}" fill="#3e9a4f"/>`; }
       return `<path d="${d}" stroke="#3b7d43" stroke-width="2" fill="none"/>${l}`; };
     leaves = frond(14, 96, 30, 40) + frond(106, 96, 90, 40) + frond(26, 70, 40, 30) + frond(94, 70, 80, 30) + frond(60, 22, 56, 50);
+  } else if (id === "zamioculcas") {
+    // steli dritti con foglioline lucide a coppie
+    const stem = (x, h, r) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x} 86V${86 - h}" stroke="#3d6b35" stroke-width="2.6" stroke-linecap="round"/>` +
+      Array.from({ length: Math.floor(h / 10) }, (_, k) => { const y = 82 - k * 10; return `<ellipse cx="${x - 5}" cy="${y}" rx="3.4" ry="6.5" transform="rotate(-40 ${x - 5} ${y})" fill="#2b8048"/><ellipse cx="${x + 5}" cy="${y}" rx="3.4" ry="6.5" transform="rotate(40 ${x + 5} ${y})" fill="#2b8048"/>`; }).join("") +
+      `<ellipse cx="${x}" cy="${83 - h}" rx="3.2" ry="6" fill="#33925a"/></g>`;
+    leaves = stem(60, 60, 0) + stem(48, 48, -14) + stem(72, 50, 14) + stem(40, 36, -28) + stem(80, 38, 28);
+  } else if (id === "spatifillo") {
+    // foglie lunghe e lucide, una vela bianca con la spiga
+    const leaf = (x, y, r, l) => `<ellipse cx="${x}" cy="${y}" rx="6.5" ry="${l}" transform="rotate(${r} ${x} ${y})" fill="#2c6e49"/>`;
+    leaves = `<path d="M60 86C58 70 46 62 40 56M60 86C62 70 74 62 80 56M60 86V40M60 86C56 66 52 52 50 42M60 86C64 68 70 54 72 46" stroke="#3e7a52" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+      leaf(38, 52, -38, 15) + leaf(82, 52, 38, 15) + leaf(49, 40, -14, 16) + leaf(73, 44, 18, 15) +
+      `<path d="M60 42c10-8 10-26 0-34c-10 8-10 26 0 34z" fill="#fbfbf5"/><ellipse cx="60" cy="30" rx="2.2" ry="7" fill="#f0dc82"/>`;
+  } else if (id === "limone") {
+    // alberello: tronco, chioma di foglie, limoni gialli e un fiore
+    const lf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="4.5" ry="8.5" transform="rotate(${r} ${x} ${y})" fill="#2f8a4a"/>`;
+    leaves = `<path d="M60 86V56M60 66l-10-8M60 62l10-8" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/>` +
+      [[44,46,-40],[52,36,-20],[60,30,0],[68,36,20],[76,46,40],[40,58,-70],[80,58,70],[52,50,-10],[68,50,10],[60,44,0]].map(a => lf(...a)).join("") +
+      `<ellipse cx="46" cy="54" rx="5" ry="6.5" fill="#f7d63c"/><ellipse cx="73" cy="48" rx="5" ry="6.5" fill="#f7d63c"/><ellipse cx="59" cy="26" rx="4" ry="5" fill="#f7d63c"/><circle cx="80" cy="36" r="2.6" fill="#ffffff"/>`;
+  } else if (id === "salvia") {
+    // cespuglio basso di foglie grigio-verdi vellutate e una spiga viola
+    const lf = (x, y, r) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="5.5" ry="9.5" fill="#9fb59c"/><path d="M${x} ${y - 8}v16" stroke="#c9d7c5" stroke-width="1.2"/></g>`;
+    leaves = `<path d="M60 86V54M60 86C56 74 48 66 44 60M60 86C64 74 72 66 76 60" stroke="#7e8f6e" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+      [[44,60,-35],[52,54,-15],[68,54,15],[76,60,35],[46,72,-55],[74,72,55],[56,66,-8],[64,66,8]].map(a => lf(...a)).join("") +
+      `<path d="M60 56V24" stroke="#7e8f6e" stroke-width="2"/>` + [0,1,2,3,4].map(k => `<ellipse cx="${k % 2 ? 62 : 58}" cy="${48 - k * 5}" rx="3" ry="2.6" fill="#7b6cc9"/>`).join("");
+  } else if (id === "tillandsia") {
+    // rosetta di foglie argentate arricciate, con una spiga rosa
+    leaves = [[-34,-6,-44,-22],[-26,-18,-30,-38],[-12,-26,-10,-46],[12,-26,10,-46],[26,-18,30,-38],[34,-6,44,-22],[-20,-4,-36,-6],[20,-4,36,-6]]
+      .map(([cx, cy, ex, ey]) => `<path d="M60 94Q${60 + cx} ${94 + cy} ${60 + ex} ${94 + ey}" stroke="#b9cdbf" stroke-width="4.6" fill="none" stroke-linecap="round"/>`).join("") +
+      `<ellipse cx="60" cy="62" rx="4.5" ry="11" fill="#e35d8c"/><path d="M58 52l-3-6M62 52l3-6M60 51v-7" stroke="#7b4bd1" stroke-width="2" stroke-linecap="round"/>`;
+  } else if (id === "ficus") {
+    // fusto dritto con grandi foglie ovali lucide e la punta rossa
+    const lf = (x, y, r) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="8.5" ry="15" fill="#1f5f3a"/><ellipse class="no" cx="${x - 2.5}" cy="${y - 3}" rx="2.2" ry="8" fill="#3f8a5c"/><path d="M${x} ${y - 13}v26" stroke="#4d8a64" stroke-width="1.2"/></g>`;
+    leaves = `<path d="M60 88V22" stroke="#5a4630" stroke-width="3.5" stroke-linecap="round"/>` + lf(46, 72, -55) + lf(74, 62, 55) + lf(46, 50, -40) + lf(74, 40, 40) + lf(50, 30, -20) +
+      `<ellipse cx="61" cy="18" rx="2.6" ry="7" fill="#c0392b"/>`;
+  } else if (id === "geranio") {
+    // foglie tonde con l’anello scuro e due ciuffi di fiori rossi
+    const lf = (x, y) => `<circle cx="${x}" cy="${y}" r="9" fill="#4f9a4a"/><circle cx="${x}" cy="${y}" r="5" fill="none" stroke="#38702f" stroke-width="2"/>`;
+    const cluster = (x, y) => [[0,0],[5,-3],[-5,-3],[3,4],[-3,4],[0,-6]].map(([a, b]) => `<circle cx="${x + a}" cy="${y + b}" r="4" fill="#e63946"/>`).join("") + `<circle class="no" cx="${x}" cy="${y}" r="1.4" fill="#ffd166"/>`;
+    leaves = `<path d="M52 72V40M67 72V34" stroke="#4a7a3a" stroke-width="2.2" stroke-linecap="round"/>` +
+      [[44,74],[56,70],[68,72],[78,76],[50,80],[66,80]].map(a => lf(...a)).join("") + cluster(52, 38) + cluster(67, 32);
+  } else if (id === "petunia") {
+    // tante foglioline, i fiori a trombetta si disegnano sopra il vaso (cadono di lato)
+    leaves = [[40,80],[50,76],[60,73],[70,76],[80,80],[46,70],[74,70]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="6" ry="4.5" fill="#5c9e4c"/>`).join("") +
+      [[46,64,"#9b5de5"],[60,60,"#f15bb5"],[74,64,"#9b5de5"],[53,72,"#f15bb5"],[67,72,"#9b5de5"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="7.5" fill="${c}"/><circle class="no" cx="${x}" cy="${y}" r="2.6" fill="#4a1d5e"/>`).join("");
+    over = [[28,92,"#f15bb5"],[92,92,"#9b5de5"],[24,106,"#9b5de5"],[96,106,"#f15bb5"]].map(([x, y, c]) => `<ellipse cx="${x}" cy="${y - 8}" rx="3.5" ry="4" fill="#5c9e4c"/><circle cx="${x}" cy="${y}" r="7" fill="${c}"/><circle class="no" cx="${x}" cy="${y}" r="2.4" fill="#4a1d5e"/>`).join("");
+  } else if (id === "ortensia") {
+    // foglie larghe e tre teste di fiori: due blu e una rosa (cambia colore con la terra)
+    const head = (x, y, r, c, f) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>` +
+      Array.from({ length: 9 }, (_, k) => { const a = k * 2.4, d = r * .55 * ((k % 3) / 2 + .3); return `<circle class="no" cx="${(x + Math.cos(a) * d).toFixed(1)}" cy="${(y + Math.sin(a) * d).toFixed(1)}" r="2.6" fill="${f}"/>`; }).join("");
+    leaves = [[40,72,-50],[80,72,50],[50,80,-70],[70,80,70]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="8" ry="12.5" transform="rotate(${r} ${x} ${y})" fill="#3f7f4a"/>`).join("") +
+      head(45, 54, 15, "#5aa9e6", "#a9d2f5") + head(74, 50, 16, "#5aa9e6", "#a9d2f5") + head(60, 34, 13, "#f28bb5", "#fbc6dc");
+  } else if (id === "bouganville") {
+    // rami legnosi coperti di brattee fucsia a gruppi di tre
+    const bract = (x, y) => [0, 120, 240].map(r => `<ellipse cx="${x}" cy="${y - 5}" rx="4.6" ry="6.5" transform="rotate(${r} ${x} ${y})" fill="#d63384"/>`).join("") + `<circle class="no" cx="${x}" cy="${y}" r="1.6" fill="#fffbe6"/>`;
+    leaves = `<path d="M60 86C58 66 44 54 34 40M60 86C62 66 74 52 86 38M60 86V30" stroke="#6b4f3a" stroke-width="3" fill="none" stroke-linecap="round"/>` +
+      [[42,62],[78,60],[54,48],[68,44]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.4" ry="5.5" fill="#4e8a3c"/>`).join("") +
+      [[34,42],[45,54],[86,40],[76,52],[60,30],[52,66],[68,64],[60,46]].map(a => bract(...a)).join("");
   }
   // L’orchidea ha il vaso trasparente: si vedono le radici argentate dentro
   const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
-  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${leaves}</g>${potSvg}${roots}</svg>`;
+  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${leaves}</g>${potSvg}${roots}<g class="leaves">${over}</g></svg>`;
 }
-const mascot = (size = 150, mood = "happy") => {
+const mascot = (size = 150, mood = "happy") => wobble(mascotRaw(size, mood));
+const mascotRaw = (size, mood) => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';
   return `<svg class="mascot" width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">
   <ellipse cx="38" cy="30" rx="12" ry="18" transform="rotate(-30 38 30)" fill="#43b05c"/><ellipse cx="82" cy="30" rx="12" ry="18" transform="rotate(30 82 30)" fill="#43b05c"/><ellipse cx="60" cy="20" rx="11" ry="17" fill="#4fc06a"/>
@@ -687,8 +1042,8 @@ let felt = new WeakSet();
 function soilFeel(g){
   const c = care(g), d = daysSince(g.wateredAt), st = plantState(g);
   if (wetLevel(g) > 0) return c.feelWet || "Fango. Le dita escono sporche: niente acqua per un po’.";
-  if (d < c.soak) return "Umida, fresca sotto il dito. Ancora niente acqua.";
-  if (st === "assetata" || st === "appassita") return "Secca e dura, anche più in fondo. Acqua, e in fretta.";
+  if (d < c.soak) return c.feelDamp || "Umida, fresca sotto il dito. Ancora niente acqua.";
+  if (st === "assetata" || st === "appassita") return c.feelDry || "Secca e dura, anche più in fondo. Acqua, e in fretta.";
   return c.feelReady || "Asciutta nei primi centimetri. È il momento giusto per annaffiare.";
 }
 const kOf = id => S.knowledge[id] || 0;
@@ -789,21 +1144,38 @@ function renderPath(){
     const first = steps[0][1], open = cur === -1 || first <= cur;
     const nodes = steps.map(([s, i], k) => {
       const done = S.done.includes(s.id), current = i === cur, locked = cur !== -1 && i > cur;
-      const cls = done ? "done" : current ? "current" : locked ? "locked" : "";
+      const pr = progOf(s), n = lessonCount(s), partial = !done && pr > 0;
+      const cls = (done ? "done" : current ? "current" : locked ? "locked" : "") + (partial ? " partial" : "");
       const ico = done ? ICON.check : locked ? ICON.lock : ICON[s.icon];
+      const ring = partial ? `<span class="ring" style="--p:${Math.round(pr / n * 100)}" aria-hidden="true"></span>` : "";
       return `<div class="nodewrap" style="transform:translateX(${offsets[k % offsets.length]}px)">
-        <button class="node ${cls}" data-step="${i}" aria-label="${esc(s.title)}${done ? ", completato" : locked ? ", bloccato" : ""}" ${locked ? "aria-disabled=\"true\"" : ""}>${current ? `<span class="bubble">${S.done.length ? "Avanti" : "Inizia da qui"}</span>` : ""}${ico}</button>
-        <div class="nodelabel">${esc(s.title)}</div></div>`;
+        <button class="node ${cls}" data-step="${i}" aria-label="${esc(s.title)}${done ? ", completato" : locked ? ", bloccato" : `, lezione ${pr + 1} di ${n}`}" ${locked ? "aria-disabled=\"true\"" : ""}>${ring}${current ? `<span class="bubble">${partial ? "Continua" : S.done.length ? "Avanti" : "Inizia da qui"}</span>` : ""}${ico}</button>
+        <div class="nodelabel">${esc(s.title)}${partial ? `<small>${pr}/${n}</small>` : ""}</div></div>`;
     }).join("");
     return `<div class="zone ${open ? "" : "locked"}"><div><small>Zona ${zi + 1}</small><h2>${z.title}</h2><p>${open ? z.desc : `Si apre finendo ${ZONES[zi - 1].title}.`}</p></div></div><div class="path">${nodes}</div>`;
   }).join("") + `<div class="teaser">${cur === -1 ? "Hai finito tutte le zone. La prossima è in arrivo: intanto, le tue piante hanno bisogno di te." : "Altre zone del pianeta in arrivo nelle prossime versioni."}</div>`;
 }
 
+function openNode(i){
+  const st = STEPS[i], pr = progOf(st), n = lessonCount(st);
+  const rows = Array.from({ length: n }, (_, li) => {
+    const state = li < pr ? "done" : li === pr ? "next" : "locked";
+    const icon = state === "done" ? ICON.check : state === "next" ? ICON[st.icon] : ICON.lock;
+    const label = state === "done" ? "Rifalla" : state === "next" ? "Inizia" : "Bloccata";
+    return `<button class="lrow ${state}" data-lesson="${li}" ${state === "locked" ? "disabled" : ""}><span class="lico">${icon}</span><span class="t"><b>${esc(lessonTitle(st, li))}</b><small>Lezione ${li + 1} di ${n}</small></span><span class="tag ${state === "next" ? "ready" : "study"}">${label}</span></button>`;
+  }).join("");
+  const m = modal(`<div class="kind" style="margin:0">${esc(ZONES.find(z => z.id === st.zone).title)}</div><h2>${esc(st.title)}</h2>
+    <p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">${pr >= n ? "Fatta tutta. Puoi rifare le lezioni per ripassare (e per qualche goccia)." : `${pr} di ${n} lezioni fatte. L’ultima è un allenamento a sorpresa.`}</p>
+    <div class="pick">${rows}</div><button class="btn ghost" data-close="1">Chiudi</button>`);
+  m.querySelectorAll("[data-lesson]").forEach(b => b.onclick = () => { m.remove(); startLesson(i, +b.dataset.lesson); });
+}
+
 /* --- Lezione --- */
 let L = null;
-function startLesson(i){
+function startLesson(i, li){
   const step = STEPS[i];
-  L = { i, step, items: step.items, idx: 0, mistakes: 0, gained:{}, seen:[], replay: S.done.includes(step.id) };
+  if (li === undefined) li = Math.min(progOf(step), lessonCount(step) - 1);   // di default: la prossima da fare
+  L = { i, li, step, items: lessonItems(step, li), idx: 0, mistakes: 0, gained:{}, seen:[], replay: li < progOf(step) };
   showItem();
 }
 function shuffle(a){ const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
@@ -872,7 +1244,9 @@ function finishLesson(){
   const before = {};
   Object.entries(L.gained).forEach(([p, n]) => { before[p] = kOf(p); S.knowledge[p] = Math.min(RULES.knowledgeMax, kOf(p) + n); });
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
-  if (!S.done.includes(L.step.id)) S.done.push(L.step.id);
+  if (!L.replay) S.prog[L.step.id] = L.li + 1;
+  const nodeDone = stepDone(L.step) && !S.done.includes(L.step.id);
+  if (stepDone(L.step) && !S.done.includes(L.step.id)) S.done.push(L.step.id);
   const unblocked = S.garden.filter(x => x.em && x.em.retryAt > now() && EMERG[x.em.id].step === L.step.id);
   unblocked.forEach(x => x.em.retryAt = 0);
   save();
@@ -880,7 +1254,7 @@ function finishLesson(){
     return `<div class="krow">${plantSVG(p, 46)}<div class="t"><b>${PLANTS[p].name}</b><div class="bar ${full ? "full" : ""}"><i data-to="${k / RULES.knowledgeMax * 100}" style="width:${before[p] / RULES.knowledgeMax * 100}%"></i></div></div>${full ? (inGarden(p) ? '<span class="tag planted">In serra</span>' : '<span class="tag ready">Pronta!</span>') : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</div>`; }).join("");
   const readyNow = Object.keys(L.gained).some(p => isReady(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
-  app.innerHTML = `<section class="result">${mascot(130)}<h1>${L.replay ? "Ripasso fatto!" : "Step completato!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
+  app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(lessonTitle(L.step, L.li))}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
     <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div><div class="reward sun"><b>+${x}</b><span>Esperienza</span></div></div>
     ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
@@ -960,7 +1334,7 @@ function openCard(id){
 app.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
   if (t.dataset.tab) { tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
-  if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } startLesson(+t.dataset.step); return; }
+  if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } openNode(+t.dataset.step); return; }
   if (t.dataset.water !== undefined) {
     const g = S.garden[+t.dataset.water]; if (S.gocce < RULES.waterCost) return toast("Zero gocce. Fai una lezione e torna (la pianta aspetta) (non a lungo).");
     // Annaffiare con la terra ancora umida alza il livello di "zuppo"; con la terra asciutta lo azzera
@@ -997,7 +1371,7 @@ function openEmergency(g){
   if (g.em.retryAt > now()) {
     const m = modal(`${head}<p class="lead" style="font-size:16px;line-height:1.45;margin:14px 0">Hai già provato una cura, e non era quella giusta. Riprova domani, oppure ripassa lo step “${esc(step.title)}”: la risposta è lì, e dopo puoi riprovare subito.</p>
       <div style="display:flex;flex-direction:column;gap:12px"><button class="btn" id="goStep">Ripassa “${esc(step.title)}”</button><button class="btn ghost" data-close="1">Chiudi</button></div>`);
-    m.querySelector("#goStep").onclick = () => { m.remove(); startLesson(stepIdx); };
+    m.querySelector("#goStep").onclick = () => { m.remove(); startLesson(stepIdx, Math.min(e.lesson || 0, progOf(step) - 1)); };
     return;
   }
   const m = modal(`${head}<div class="q" style="font-size:20px;margin:16px 0 12px">${esc(e.q)}</div><div class="opts">${shuffle(e.o.map((o, k) => [o, k])).map(([o, k]) => `<button class="opt" data-cure="${k}">${esc(o)}</button>`).join("")}</div><div id="emOut"></div><button class="btn ghost" data-close="1" style="margin-top:14px">Ci penso dopo</button>`);
