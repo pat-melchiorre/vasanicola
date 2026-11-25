@@ -158,6 +158,9 @@ main{flex:1;padding:0 0 96px}
 .disc{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:14px;padding:8px 12px;margin:0 0 14px}
 .disc .t{flex:1}.disc b{display:block;font-size:15px}.disc small{display:block;font-size:13px;color:var(--ink-2)}
 .disc .bar{margin-top:6px}
+.disc.xp-up{border:2px solid var(--sun)}
+.dots{display:flex;gap:5px;margin-top:6px}.dots i{width:12px;height:12px;border-radius:50%;background:var(--surface-2)}.dots i.on{background:var(--sun)}
+.lvtag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--bad-bg);color:var(--bad);font-size:11px;vertical-align:middle}
 .sheet p{margin:0 0 14px;font-size:15px;line-height:1.45}
 
 /* ---- Risultato ---- */
@@ -244,6 +247,17 @@ main{flex:1;padding:0 0 96px}
 
 /* ---- Erbario e schede ---- */
 .herb{display:flex;flex-direction:column;gap:10px}
+.xtitle{display:block;font-size:12px;color:var(--sun-dark);margin-top:1px}
+.xbox{margin:14px 0 0;padding:12px;border-radius:14px;border:2px solid var(--sun);background:var(--sun-bg)}
+.xbox b{font-size:16px}.xnote{margin:6px 0 0;font-size:14px;color:var(--ink-2);line-height:1.4}
+.shop{display:flex;flex-direction:column;gap:14px}
+.shopcard{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:start;padding:14px;border:2px solid var(--line);border-radius:20px;box-shadow:0 4px 0 var(--line);background:var(--bg)}
+.shopcard.owned{border-color:var(--leaf);box-shadow:0 4px 0 var(--leaf)}
+.shopcard h3{font-size:18px}.shopcard p{margin:4px 0 0;font-size:14px;line-height:1.4;color:var(--ink-2)}
+.shopcard .btn,.shopcard .tag{margin-top:10px;display:inline-flex}
+.pnote{display:block;font-size:13px;color:var(--ink-2);line-height:1.35}.pnote b{color:var(--ink)}
+.potbtn.gift{color:var(--ink-2)}
+.potbtn{margin-top:4px;font-size:12px;font-weight:900;color:var(--water);padding:6px 4px;min-height:32px}
 .herb .krow{cursor:pointer;text-align:left;width:100%}
 .unknown{opacity:.7}
 /* Sagoma: il disegno della pianta tutto pieno di un solo colore, senza dettagli */
@@ -310,7 +324,7 @@ main{flex:1;padding:0 0 96px}
    Dati: piante, step, regole
    ========================================================= */
 const DAY = 86400000;
-const RULES = { waterCost:5, replantCost:10, stepGocce:10, stepXp:20, perfectBonusGocce:4, perfectBonusXp:5, replayGocce:6, replayXp:8, knowledgeMax:3, slotCosts:{ casa:[0,30,50,80], balcone:[60,60,90,90] } };
+const RULES = { waterCost:5, replantCost:10, stepGocce:10, stepXp:20, perfectBonusGocce:4, perfectBonusXp:5, replayGocce:6, replayXp:8, knowledgeMax:3, slotCosts:{ casa:[0,30,50,80,150,220], balcone:[60,60,90,90,170,240] } };
 const PLANTS = {
   basilico:{ name:"Basilico", g:"m", indoor:true, sci:"Ocimum basilicum, in abruzzese vasanicola", cost:0,
     care:{ soak:1, thirsty:2, wilt:4, dead:7, rot:3, rule:"Ogni 1-2 giorni: in vaso beve tanto",
@@ -879,12 +893,321 @@ Object.assign(EXTRA, {
   ]}]
 });
 
+// ---------- Zone 6-8: domande difficili (lv 3) su piante già fatte + piante nuove rare (lv 2) ----------
+// gate = titolo di esperto da avere sulla "cugina facile" per poter piantare questa
+Object.assign(PLANTS, {
+  alocasia:{ name:"Alocasia", g:"f", indoor:true, sci:"Alocasia, l’orecchio di elefante", cost:50, gate:{ plant:"monstera", grade:1 },
+    care:{ soak:3, thirsty:6, wilt:10, dead:18, rot:2, rule:"Quando i primi centimetri sono asciutti: terra che drena, mai zuppa",
+      dryTip:"L’alocasia regge poco la terra secca: le foglie si accartocciano e cadono.", wetTip:"L’alocasia è una diva: terra zuppa e le radici marciscono in fretta." }, facts:[
+    "È cugina della monstera: foglie enormi a freccia, venature chiare.",
+    "Le gocce sulle punte al mattino (guttazione) dicono che stai annaffiando un po’ troppo.",
+    "D’inverno può perdere foglie e quasi sparire: il rizoma sotto terra è vivo.",
+    "Irritante se masticata: lontana da cani e gatti."] },
+  fittonia:{ name:"Fittonia", g:"f", indoor:true, sci:"Fittonia, la pianta mosaico", cost:35, gate:{ plant:"spatifillo", grade:1 },
+    care:{ soak:1, thirsty:2, wilt:3, dead:6, rot:3, rule:"Ogni 2-3 giorni: terra sempre leggermente umida",
+      dryTip:"La fittonia crolla al primo segno di sete. Una volta sì, dieci volte no.", wetTip:"Umida sì, zuppa no: anche la fittonia marcisce nell’acqua ferma." }, facts:[
+    "Foglie a mosaico con venature bianche o rosa.",
+    "Se ha sete crolla tutta, poi si rialza dopo l’acqua.",
+    "Ama l’aria umida: in un terrario sta benissimo.",
+    "Il sole diretto le brucia le foglie."] },
+  maranta:{ name:"Maranta", g:"f", indoor:true, sci:"Maranta leuconeura, la pianta della preghiera", cost:40, gate:{ plant:"calathea", grade:1 },
+    care:{ soak:2, thirsty:4, wilt:7, dead:12, rot:3, rule:"Ogni 3-4 giorni: terra sempre leggermente umida, acqua poco calcarea",
+      dryTip:"Terra secca e la maranta arrotola le foglie come una pergamena.", wetTip:"Anche la maranta, come la calathea, soffre con le radici a mollo." }, facts:[
+    "È cugina della calathea, e il soprannome “pianta della preghiera” in origine è suo.",
+    "La sera alza le foglie come mani giunte.",
+    "Punte secche: aria secca o acqua troppo calcarea.",
+    "Luce indiretta: il sole diretto sbiadisce i disegni."] },
+  begonia:{ name:"Begonia maculata", g:"f", indoor:true, sci:"Begonia maculata, la begonia a pois", cost:45, gate:{ plant:"felce", grade:1 },
+    care:{ soak:3, thirsty:5, wilt:9, dead:16, rot:2, rule:"Quando i primi centimetri sono asciutti, senza bagnare le foglie",
+      dryTip:"La begonia a pois perde le foglie se la terra resta secca a lungo.", wetTip:"Il fusto della begonia marcisce alla base con la terra zuppa." }, facts:[
+    "Foglie verde scuro con pois argentati e retro rosso.",
+    "Niente acqua sulle foglie: rischia l’oidio, una muffa bianca.",
+    "Umidità sì, ma intorno: altre piante vicine o argilla espansa bagnata.",
+    "Si moltiplica per talea di fusto con un nodo."] },
+  echeveria:{ name:"Echeveria", g:"f", indoor:false, sci:"Echeveria, la rosa di pietra", cost:40, gate:{ plant:"sansevieria", grade:1 },
+    care:{ soak:6, thirsty:12, wilt:24, dead:40, rot:2, rule:"A fondo, solo quando la terra è asciutta fino in fondo",
+      feelReady:"Asciutta fino in fondo. Adesso sì: acqua a fondo, senza bagnare la rosetta.",
+      dryTip:"Anche le grasse hanno un limite: foglie raggrinzite, poi niente.", wetTip:"Acqua ferma nella rosetta o terra sempre umida: l’echeveria marcisce dal centro." }, facts:[
+    "Viene dalle zone aride del Messico.",
+    "In casa si “fila”: si allunga verso la finestra per cercare luce.",
+    "La polverina chiara (pruina) la protegge dal sole: non va pulita.",
+    "Si annaffia col metodo “bagna e asciuga”."] },
+  haworthia:{ name:"Haworthia", g:"f", indoor:true, sci:"Haworthia, la piccola zebra", cost:35, gate:{ plant:"zamioculcas", grade:1 },
+    care:{ soak:6, thirsty:12, wilt:24, dead:40, rot:2, rule:"A fondo, solo quando la terra è asciutta fino in fondo",
+      feelReady:"Asciutta fino in fondo. Adesso sì: acqua a fondo.",
+      dryTip:"Anche l’haworthia, dopo settimane di secco, si raggrinzisce.", wetTip:"Terra sempre umida: le radici dell’haworthia marciscono in silenzio." }, facts:[
+    "Piccola succulenta a rosetta, spesso con strisce bianche in rilievo.",
+    "In natura vive all’ombra di rocce e cespugli: ama la luce indiretta.",
+    "Al sole cocente diventa rossastra e soffre.",
+    "Si moltiplica staccando i figli alla base."] },
+  mammillaria:{ name:"Mammillaria", g:"f", indoor:true, sci:"Mammillaria, il cactus a cuscino", cost:40, gate:{ plant:"ficodindia", grade:1 },
+    care:{ soak:8, thirsty:16, wilt:32, dead:55, rot:2, rule:"D’estate a fondo quando è asciutto, d’inverno quasi niente",
+      feelReady:"Terriccio asciutto fino in fondo: d’estate è il momento di un’annaffiatura vera.",
+      dryTip:"Il cactus resiste, ma un vaso secco per mesi in estate è troppo anche per lui.", wetTip:"Base molle e scura: marciume. Nei cactus l’acqua in più non perdona." }, facts:[
+    "Piccolo cactus tondo che in primavera si fa una corona di fiori.",
+    "Per fiorire vuole un inverno fresco e quasi senz’acqua.",
+    "Terriccio per cactacee, molto drenante.",
+    "D’estate cresce e beve, d’inverno riposa."] },
+  lithops:{ name:"Lithops", g:"m", indoor:true, sci:"Lithops, il sasso vivente", cost:60, gate:{ plant:"ficodindia", grade:2 },
+    care:{ soak:14, thirsty:25, wilt:45, dead:70, rot:2, rule:"Pochissima e solo in certi periodi: spesso il segreto è non annaffiare",
+      feelReady:"Asciutto da tanto. Solo se non sta facendo foglie nuove, un po’ d’acqua.",
+      dryTip:"Il lithops resiste a tutto, quasi: dopo mesi di secco totale si accartoccia.", wetTip:"Troppa acqua: il lithops si gonfia, si spacca e marcisce." }, facts:[
+    "Due foglie carnose unite, colorate come i sassi del deserto: mimetismo.",
+    "Quando fa foglie nuove, quelle vecchie si svuotano per nutrirle: non va annaffiato.",
+    "Se si gonfia e la pelle si spacca, ha avuto troppa acqua.",
+    "Vuole tanta luce, anche sole diretto."] },
+  gardenia:{ name:"Gardenia", g:"f", indoor:false, sci:"Gardenia jasminoides, la gardenia", cost:55, gate:{ plant:"ortensia", grade:1 },
+    care:{ soak:2, thirsty:4, wilt:7, dead:13, rot:3, rule:"Ogni 3-4 giorni: terra acida sempre leggermente umida, acqua non calcarea",
+      dryTip:"Terra secca e la gardenia lascia cadere boccioli e foglie.", wetTip:"Umida sì, fradicia no: anche la gardenia ha radici che respirano." }, facts:[
+    "Fiori bianchi dal profumo fortissimo.",
+    "Vuole terriccio acido e acqua non calcarea.",
+    "Sbalzi di temperatura o spostamenti le fanno cadere i boccioli.",
+    "Foglie gialle con venature verdi: manca ferro."] },
+  kumquat:{ name:"Kumquat", g:"m", indoor:false, sci:"Citrus japonica, il mandarino cinese", cost:50, gate:{ plant:"limone", grade:1 },
+    care:{ soak:3, thirsty:5, wilt:10, dead:20, rot:2, rule:"Ogni 3-5 giorni d’estate, quando la superficie è asciutta",
+      dryTip:"Come il limone, in vaso il kumquat si secca in fretta.", wetTip:"Ristagni d’acqua: il kumquat perde le foglie come il limone." }, facts:[
+    "I frutti si mangiano interi, con la buccia: dolce fuori, aspro dentro.",
+    "Regge il freddo meglio del limone, ma non le gelate forti.",
+    "Stesse manie degli agrumi: sole, acqua non calcarea, niente ristagni.",
+    "Foglie gialle con venature verdi: concime con ferro."] },
+  cephalotus:{ name:"Cephalotus", g:"m", indoor:true, sci:"Cephalotus follicularis, l’anfora australiana", cost:70, gate:{ plant:"dionea", grade:2 },
+    care:{ soak:1, thirsty:3, wilt:5, dead:9, rot:5, rule:"Torba sempre umida, acqua piovana: poca acqua nel sottovaso, non allagato",
+      feelWet:"Torba bagnata. Per lui va bene, basta che non resti allagata a lungo.", feelDamp:"Torba umida, come piace a lui.",
+      feelReady:"La torba inizia ad asciugarsi: un po’ di acqua piovana.", feelDry:"Torba secca: per una carnivora è un’emergenza.",
+      dryTip:"Torba secca: il cephalotus non perdona.", wetTip:"Anche il cephalotus, a mollo per settimane, finisce per marcire." }, facts:[
+    "Viene da un angolo minuscolo dell’Australia occidentale.",
+    "Fa piccole anfore pelose con il coperchio, come una nepenthes in miniatura.",
+    "Torba umida e acqua piovana, ma senza stare sempre allagato.",
+    "Più luce riceve, più le anfore diventano rosso scuro."] },
+  vanda:{ name:"Vanda", g:"f", indoor:true, noPot:true, sci:"Vanda, l’orchidea a radice nuda", cost:70, gate:{ plant:"orchidea", grade:2 },
+    care:{ soak:1, thirsty:2, wilt:4, dead:8, rot:4, rule:"Radici immerse spesso, d’estate anche ogni giorno, poi all’aria",
+      feelWet:"Radici verdi e bagnate: ha appena bevuto.", feelDamp:"Radici verdi e bagnate: ha appena bevuto.",
+      feelReady:"Radici argentate: è ora di un bagno.", feelDry:"Radici secche e foglie raggrinzite. Bagno, subito.",
+      dryTip:"Radici nude e secche per giorni: la vanda si arrende.", wetTip:"Radici sempre bagnate e senz’aria: marciscono anche quelle della vanda." }, facts:[
+    "Orchidea dai fiori enormi, spesso blu-viola.",
+    "Si coltiva a radice nuda, in un cesto o in un vaso di vetro vuoto.",
+    "Vuole più luce della phalaenopsis.",
+    "D’estate le radici si immergono anche ogni giorno."] }
+});
+const lv = (n, items) => items.map(it => ({ lv:n, ...it }));
+STEPS.push(
+  { id:"d1", zone:"z6", title:"Foglie che parlano", icon:"leaf", items:lv(3, [
+    { t:"card", title:"Da qui si fa sul serio", body:"Le domande diventano più difficili: niente più “quale è il basilico?”. Sintomi, situazioni, casi veri, e due risposte su tre sembrano giuste. Sbagliare è previsto. (Anche incoraggiato.)" },
+    { t:"mc", plant:"pothos", q:"Il pothos fa foglie nuove sempre più piccole, distanziate sul fusto e tutte verdi. La causa più probabile?", o:["Troppo poca luce","Troppa acqua","Troppo concime"], a:0, why:"Foglie piccole, fusto allungato e striature sparite: sta cercando luce. Più luce indiretta e una spuntatina." },
+    { t:"mc", plant:"calathea", q:"Calathea con i bordi marroni, terra umida al punto giusto, vicina al termosifone. Cosa cambi per prima cosa?", o:["La allontani dal termosifone e alzi l’umidità intorno","La annaffi di più","La metti al sole"], a:0, why:"La terra è a posto: il problema è l’aria secca e calda. Cambiare l’acqua non serve." },
+    { t:"mc", plant:"monstera", q:"Monstera con foglie gialle che partono dal basso, terra fradicia e odore di stantio dal vaso. Cosa sospetti?", o:["Marciume delle radici per troppa acqua","Poca luce","Fame di concime"], a:0, why:"Terra fradicia e cattivo odore: radici marce. Si controllano, si tolgono quelle molli, terra nuova e meno acqua." },
+    { t:"tf", plant:"ficus", q:"Il ficus perde foglie dopo il trasloco in un angolo più luminoso: va riportato subito al posto vecchio.", a:false, why:"Si sta adattando: spostarlo ancora lo stressa di più. Se il posto nuovo è buono, pazienza." },
+    { t:"mc", plant:"spatifillo", q:"Spatifillo con punte marroni e croccanti, ma non si affloscia mai. La causa più probabile?", o:["Aria secca o sali nell’acqua","Sete grave","Troppa luce della luna"], a:0, why:"Con la sete si affloscerebbe. Punte secche senza crolli: aria secca o sali accumulati dall’acqua del rubinetto." }
+  ])},
+  { id:"d2", zone:"z6", title:"Acqua: casi difficili", icon:"drop", items:lv(3, [
+    { t:"card", title:"Il dito non mente (quasi mai)", body:"La prova del dito funziona, ma con giudizio: vasi grandi, terricci diversi, stagioni. Ecco i casi in cui la risposta facile è quella sbagliata." },
+    { t:"mc", plant:"sansevieria", q:"Sansevieria in un vaso enorme di plastica, d’inverno. I primi centimetri sono asciutti. Annaffi?", o:["Non ancora: in un vaso grande la terra in profondità resta umida a lungo","Sì, la regola dei primi centimetri vale sempre","Sì, e abbondante"], a:0, why:"Per chi accumula acqua conta la terra in profondità. D’inverno ancora di più." },
+    { t:"mc", plant:"orchidea", q:"Nel vaso trasparente le radici dell’orchidea sono verdi e lucide. Annaffi?", o:["No: verdi vuol dire che hanno ancora acqua","Sì, subito","Sì, con un cubetto di ghiaccio"], a:0, why:"Si annaffia quando sono argentate. Verdi significa ancora idratate." },
+    { t:"mc", plant:"menta", q:"Menta in pieno sole a luglio, in un vaso piccolo: si affloscia ogni pomeriggio anche se la annaffi al mattino. La soluzione migliore?", o:["Un vaso più grande, o ombra nel pomeriggio","Annaffiarla tre volte al giorno","Tagliarla a raso"], a:0, why:"Vaso piccolo e sole forte: poca terra non trattiene abbastanza acqua. Più terra, o meno sole pomeridiano." },
+    { t:"tf", plant:"zamioculcas", q:"Se la zamioculcas ha gli steli molli alla base, va annaffiata di più per farla riprendere.", a:false, why:"Steli molli alla base sono marciume da troppa acqua: si controllano i rizomi, si tolgono le parti marce e si lascia asciugare." },
+    { t:"mc", plant:"basilico", q:"Basilico con foglie basse gialle, terra sempre bagnata e sottovaso pieno. Cosa fai?", o:["Svuoti il sottovaso e lasci asciugare la superficie prima di annaffiare","Concimi di più","Lo sposti all’ombra"], a:0, why:"Radici a mollo: il basilico vuole terra fresca, non palude." }
+  ])},
+  { id:"d3", zone:"z6", title:"Luce: casi difficili", icon:"sun", items:lv(3, [
+    { t:"card", title:"Quanta luce è “tanta luce”?", body:"Una finestra a nord, un davanzale a sud senza tenda, un corridoio. Dire “luce indiretta” è facile; capire quale finestra fa per quale pianta è un altro mestiere." },
+    { t:"mc", plant:"monstera", q:"Monstera vicino a una finestra a nord: foglie grandi ma senza buchi, piccioli lunghissimi. Cosa le manca?", o:["Luce: la finestra a nord non basta","Acqua","Un vaso più piccolo"], a:0, why:"Piccioli lunghi e foglie intere: cerca luce. Serve una finestra più luminosa, senza sole diretto." },
+    { t:"tf", plant:"calathea", q:"Una calathea davanti a una finestra a sud, senza tenda, sta benissimo perché ha tanta luce.", a:false, why:"Il sole diretto da sud brucia e sbiadisce le foglie: tenda o qualche metro di distanza." },
+    { t:"mc", plant:"zamioculcas", q:"Hai solo un corridoio con la luce di una finestra lontana. Quale di queste ci sopravvive?", o:["La zamioculcas","Il basilico","La lavanda"], a:0, why:"Tra queste, solo la zamioculcas tollera la poca luce. Le altre due lì dentro si spengono." },
+    { t:"mc", plant:"spatifillo", q:"Spatifillo sano, foglie belle, ma non fiorisce da un anno. Cosa provi?", o:["Più luce, sempre indiretta","Meno acqua possibile","Tagliare tutte le foglie"], a:0, why:"Fiorisce anche in mezz’ombra, ma con troppo poca luce smette. Un posto più luminoso di solito basta." },
+    { t:"tf", plant:"orchidea", q:"Foglie dell’orchidea verde scuro e lucidissime sono sempre il segno di una luce perfetta.", a:false, why:"Un verde molto scuro spesso vuol dire poca luce. Un verde più chiaro, quasi oliva, è più vicino all’ideale." }
+  ])},
+  { id:"d4", zone:"z6", title:"Coinquilini indesiderati", icon:"pot", items:lv(3, [
+    { t:"card", title:"I piccoli coinquilini", body:"Prima o poi arrivano: ragnetti rossi, cocciniglie, moscerini. Riconoscerli in fretta fa la differenza tra un pomeriggio di pulizie e un funerale." },
+    { t:"mc", plant:"calathea", q:"Sotto le foglie della calathea vedi ragnatele sottilissime e puntini che si muovono. Chi è?", o:["Il ragnetto rosso: ama l’aria secca","La cocciniglia","Il moscerino della frutta"], a:0, why:"Il ragnetto rosso adora l’aria secca. Si lavano le foglie e si alza l’umidità." },
+    { t:"mc", plant:"pothos", q:"Batuffoli bianchi e cotonosi all’attaccatura delle foglie del pothos. Cosa sono?", o:["Cocciniglia cotonosa","Muffa buona","Semi"], a:0, why:"Si tolgono con un cotton fioc imbevuto di alcol e si controlla spesso, anche le piante vicine." },
+    { t:"mc", plant:"spatifillo", q:"Moscerini neri che volano intorno al vaso dello spatifillo. Cosa li attira?", o:["La terra sempre bagnata in superficie","La luce","Le foglie lucide"], a:0, why:"Sono moscerini del terriccio: depongono nella terra umida. Lasciare asciugare la superficie li scoraggia." },
+    { t:"tf", plant:"basilico", q:"Gli afidi sul basilico si tolgono bene con un getto d’acqua e un po’ di sapone molle.", a:true, why:"Sapone molle e acqua, ripetuti per qualche giorno. Poi si lava bene prima di mangiarlo." },
+    { t:"mc", plant:"felce", q:"Squame marroni sotto le fronde della felce, sparse e NON in file: si staccano con l’unghia. Cosa sono?", o:["Cocciniglie","Spore","Sporco"], a:0, why:"Le spore stanno in file ordinate. Sparse e staccabili con l’unghia: cocciniglie." }
+  ])},
+  { id:"d5", zone:"z6", title:"Ripasso", icon:"star", items:lv(3, [
+    { t:"mc", plant:"alocasia", q:"Alocasia con gocce sulle punte, foglie basse gialle e terra sempre bagnata. Diagnosi?", o:["Troppa acqua","Troppa luce","Troppo freddo secco"], a:0, why:"Gocce sulle punte e terra fradicia: le sta arrivando più acqua di quanta ne usi." },
+    { t:"mc", plant:"fittonia", q:"Fittonia e spatifillo hanno in comune che...", o:["Crollano quando hanno sete e si rialzano dopo l’acqua","Vogliono il sole pieno","Sono carnivori"], a:0, why:"Due drammatici dello stesso livello. Si riprendono, ma ogni crollo li stressa." },
+    { t:"tf", plant:"maranta", q:"Una maranta che alza le foglie la sera ha qualcosa che non va.", a:false, why:"È il suo movimento naturale: la sera “prega”, al mattino si riapre." },
+    { t:"mc", plant:"begonia", q:"Begonia con macchie bianche polverose sulle foglie. Cosa è, e perché?", o:["Oidio, un fungo: aria ferma e foglie bagnate","Pois nuovi","Sale"], a:0, why:"Si tolgono le foglie colpite, più aria intorno e niente acqua sulle foglie." },
+    { t:"match", q:"Abbina diva e capriccio", pairs:[["Alocasia","Odia l’acqua in eccesso"],["Fittonia","Crolla se ha sete"],["Maranta","Prega la sera"],["Begonia","Niente acqua sulle foglie"]] }
+  ])},
+  { id:"g1", zone:"z7", title:"Il sole degli estremi", icon:"sun", items:lv(3, [
+    { t:"card", plant:"ficodindia", title:"Benvenuti tra le grasse vere", body:"Le succulente accumulano acqua in foglie, fusti o radici. Sono facili, dicono. Poi muoiono. Quasi sempre per lo stesso motivo: troppo amore, troppa acqua, troppo poco sole." },
+    { t:"mc", plant:"lavanda", q:"Lavanda in vaso su un balcone a est: fiorisce poco e si allunga. Cosa le manca?", o:["Ore di sole: a est ne prende troppo poche","Acqua","Concime con tanto azoto"], a:0, why:"Il sole del mattino non basta: vuole pieno sole per gran parte del giorno." },
+    { t:"mc", plant:"olivo", q:"Olivo in vaso: a fine inverno perde foglie dopo mesi in casa vicino al termosifone. Causa probabile?", o:["Caldo secco e poca luce in casa","Troppo freddo","Troppa potatura"], a:0, why:"D’inverno vuole fresco e luce, non il salotto riscaldato." },
+    { t:"tf", plant:"rosmarino", q:"Rosmarino che ingiallisce dal basso, in un vaso senza foro e con la terra che puzza: basta annaffiarlo meno da oggi.", a:false, why:"Le radici sono già marce: serve un vaso col foro e terra drenante, togliendo le radici molli. Meno acqua da sola non basta." },
+    { t:"mc", plant:"geranio", q:"Geranio con i bordi delle foglie rossi a fine autunno. Cosa sta succedendo?", o:["Reagisce al freddo: è ora di metterlo al riparo","Ha troppa acqua","Sta per fiorire"], a:0, why:"Il freddo colora le foglie di rosso: è il segnale che serve un riparo." },
+    { t:"mc", plant:"bouganville", q:"Bouganville piena di foglie e rami lunghi, ma nessuna brattea colorata. Concime giusto?", o:["Meno azoto, più potassio, e più sole","Più azoto per spingere la crescita","Nessun cambio, aspetti"], a:0, why:"L’azoto spinge le foglie, il potassio i fiori. E senza sole pieno niente colore." }
+  ])},
+  { id:"g2", zone:"z7", title:"Bere poco, ma bene", icon:"drop", items:lv(3, [
+    { t:"card", title:"Il metodo “bagna e asciuga”", body:"Per le piante che temono i ristagni la regola non è “poca acqua”: è “acqua a fondo, poi aspetti che asciughi tutto”. Una spruzzatina al giorno è il modo migliore per far marcire le radici e seccare la pianta, insieme." },
+    { t:"tf", plant:"sansevieria", q:"Per la sansevieria è meglio un goccio d’acqua ogni giorno che un’annaffiatura abbondante ogni tre settimane.", a:false, why:"Il goccio quotidiano bagna solo la superficie: radici deboli e marciume. Meglio a fondo e di rado." },
+    { t:"mc", plant:"ficodindia", q:"Fico d’India con una pala molle e giallastra alla base, dopo un autunno piovoso all’aperto. Cosa fai?", o:["Togli la pala marcia, lo ripari dalla pioggia e niente acqua per un po’","Lo annaffi per tirarlo su","Lo poti tutto"], a:0, why:"Freddo e pioggia insieme: marciume. Via la parte molle, riparo e asciutto." },
+    { t:"mc", plant:"salvia", q:"Salvia in vaso con le foglie che anneriscono dal basso dopo settimane di pioggia. Cosa fai?", o:["La metti al riparo dalla pioggia e controlli il drenaggio","La annaffi di più","La concimi"], a:0, why:"Troppa acqua, non troppo poca: riparo e terra che drena." },
+    { t:"mc", plant:"limone", q:"Limone in vaso che perde foglie verdi all’improvviso: terra bagnata da giorni e sottovaso pieno. Cosa fai?", o:["Svuoti il sottovaso e aspetti che la superficie asciughi","Concimi con il ferro","Lo sposti al buio"], a:0, why:"Le radici soffocano nell’acqua ferma: il limone risponde lasciando cadere le foglie." },
+    { t:"mc", plant:"zamioculcas", q:"Zamioculcas con foglioline gialle una dopo l’altra, ma i rizomi sono sodi e la terra è asciutta da più di un mese. Cosa le manca?", o:["Acqua: anche lei ha un limite","Meno acqua","Un vaso senza foro"], a:0, why:"Rizomi sodi: niente marciume. Più di un mese di secco è tanto anche per lei: una bella annaffiatura, poi di nuovo asciutto." }
+  ])},
+  { id:"g3", zone:"z7", title:"Spine e funghi", icon:"leaf", items:lv(3, [
+    { t:"card", title:"Spine, ma con cervello", body:"Le piante mediterranee e le grasse sono dure. Ma hanno nemici precisi: l’aria ferma, l’umidità che non va via, i parassiti venuti da lontano. E, nel caso del fico d’India, le tue dita." },
+    { t:"mc", plant:"ficodindia", q:"Hai toccato il fico d’India e hai le dita piene di spine invisibili. Cosa usi?", o:["Nastro adesivo, da attaccare e staccare","Strofinare forte con le mani","Acqua calda e sapone"], a:0, why:"I glochidi si incastrano nella pelle: il nastro adesivo li porta via. Strofinare li spinge dentro." },
+    { t:"tf", plant:"lavanda", q:"D’inverno la lavanda in vaso soffre più per l’umidità che per il freddo.", a:true, why:"Il freddo lo regge. Terra fredda e bagnata per settimane, no." },
+    { t:"mc", plant:"olivo", q:"Vuoi ridurre l’altezza del tuo olivo in vaso. Quando lo poti?", o:["A fine inverno, quando il gelo è passato","In pieno agosto","Durante una gelata"], a:0, why:"A fine inverno la pianta sta per ripartire e il rischio di gelo è passato." },
+    { t:"mc", plant:"rosmarino", q:"Rosmarino con una polvere bianca sulle foglie, stretto tra altri vasi senza aria. Cosa fai?", o:["Più spazio e aria tra i vasi, e togli le parti colpite","Più acqua","Lo copri con un sacchetto"], a:0, why:"È oidio, un fungo che ama l’aria ferma. Serve circolazione d’aria." },
+    { t:"mc", plant:"geranio", q:"Geranio con boccioli bucati e una larvetta dentro. Chi è il colpevole più probabile?", o:["La farfalla del geranio, arrivata dal Sud Africa","Un afide","Una cocciniglia"], a:0, why:"Le sue larve scavano boccioli e steli. Si tolgono le parti colpite e si controlla spesso: sui balconi italiani è comunissima." }
+  ])},
+  { id:"g4", zone:"z7", title:"Radici e rinvasi", icon:"pot", items:lv(3, [
+    { t:"card", title:"Errori da esperti", body:"Questi sono gli errori che fa chi le piante le conosce già: terra troppo buona, vaso troppo grande, cure troppo attente. Il troppo, anche qui, stroppia." },
+    { t:"mc", plant:"limone", q:"Limone con foglie accartocciate e appiccicose, e formiche che salgono sul tronco. Chi c’è?", o:["Afidi o cocciniglie: le formiche raccolgono la loro melata","Le formiche mangiano le foglie","È normale in estate"], a:0, why:"Le formiche “allevano” afidi e cocciniglie per la melata. Elimini i parassiti e le formiche se ne vanno." },
+    { t:"mc", plant:"salvia", q:"Salvia dopo tre anni: tutta legno, foglie solo in punta. Come la ringiovanisci?", o:["Fai talee dalle punte e riparti con piante giovani","La tagli a raso sul legno","Impossibile, si butta"], a:0, why:"Dal legno vecchio ributta poco: le talee sono il modo più sicuro per ripartire." },
+    { t:"tf", plant:"bouganville", q:"Rinvasare spesso la bouganville in vasi sempre più grandi la fa fiorire di più.", a:false, why:"Con le radici un po’ strette fiorisce meglio: si rinvasa solo quando serve davvero." },
+    { t:"mc", plant:"sansevieria", q:"Sansevieria con foglie che si piegano e si afflosciano a metà. Le due cause più probabili?", o:["Poca luce, o radici marce per troppa acqua","Troppo sole e troppo concime","Freddo e vento"], a:0, why:"Al buio le foglie crescono deboli; con le radici marce non stanno più su. Si controllano luce e radici." },
+    { t:"mc", plant:"lavanda", q:"Lavanda rinvasata in terriccio universale ricco: dopo un mese ingiallisce. Perché?", o:["Terra troppo ricca e che trattiene acqua: vuole terra povera e drenante","Le manca il concime","Vuole terriccio acido"], a:0, why:"La lavanda vive in terre povere e sassose: il terriccio ricco e umido la fa soffrire." }
+  ])},
+  { id:"g5", zone:"z7", title:"Ripasso", icon:"star", items:lv(3, [
+    { t:"mc", plant:"echeveria", q:"Echeveria: foglie basse molli e traslucide, terra bagnata. Cosa fai?", o:["Togli le foglie molli, lasci asciugare e annaffi molto meno","Annaffi di più","La concimi"], a:0, why:"Foglie traslucide e molli sono il primo segno di marciume da acqua." },
+    { t:"tf", plant:"haworthia", q:"Haworthia ed echeveria si trattano esattamente allo stesso modo.", a:false, why:"L’acqua sì, la luce no: l’haworthia preferisce luce indiretta, l’echeveria vuole sole." },
+    { t:"mc", plant:"lithops", q:"Qual è l’errore più comune con i lithops?", o:["Annaffiarli troppo","Dargli troppo sole","Parlargli"], a:0, why:"Sopravvivono a quasi tutto, tranne all’affetto liquido." },
+    { t:"mc", plant:"mammillaria", q:"Una mammillaria tenuta al caldo e annaffiata tutto l’inverno...", o:["Difficilmente fiorirà, e rischia di marcire","Fiorirà il doppio","Diventerà un fico d’India"], a:0, why:"Per fiorire le serve il riposo: fresco e asciutto." },
+    { t:"match", q:"Abbina grassa e segreto", pairs:[["Echeveria","La pruina non si tocca"],["Haworthia","Preferisce luce indiretta"],["Mammillaria","Inverno fresco e asciutto"],["Lithops","Spesso non annaffiare"]] }
+  ])},
+  { id:"h1", zone:"z8", title:"Acidofile e capricci", icon:"drop", items:lv(3, [
+    { t:"card", plant:"ortensia", title:"L’ultima zona", body:"Collezione rara: piante esigenti, per chi ormai sa il fatto suo. Le domande mescolano tutto quello che hai imparato. Se arrivi in fondo, sei ufficialmente una minaccia per i vivai." },
+    { t:"mc", plant:"ortensia", q:"Ortensia blu che dopo un anno di acqua molto calcarea diventa viola-rosa. Se la vuoi blu, cosa fai?", o:["Acqua meno calcarea e terriccio per acidofile, con un prodotto per ortensie blu","Più sole","Concime per cactus"], a:0, why:"Serve terra acida con alluminio disponibile: i prodotti per “azzurrare” le ortensie servono a questo." },
+    { t:"mc", plant:"petunia", q:"Petunia con foglie giallastre e venature verdi a metà estate, annaffiata con acqua dura. Cosa le manca?", o:["Ferro: il calcare lo blocca, come per il limone","Sole","Azoto"], a:0, why:"È clorosi ferrica, frequente nelle petunie. Concime con ferro e acqua meno dura." },
+    { t:"tf", plant:"ortensia", q:"L’ortensia si affloscia alle tre del pomeriggio ma la sera è dritta, con la terra umida: ha bisogno di più acqua.", a:false, why:"Se la terra è umida è il caldo: si chiude per risparmiare acqua. Serve ombra nel pomeriggio, non altra acqua." },
+    { t:"mc", plant:"bouganville", q:"Bouganville che al primo freddo perde tutte le foglie. È morta?", o:["Probabilmente no: conta che i rami siano verdi sotto la corteccia","Sì, si butta","Sì, colpa del sole"], a:0, why:"Gratta leggermente un ramo: se sotto è verde è viva. Riparo dal gelo e poca acqua." },
+    { t:"mc", plant:"geranio", q:"Vuoi i gerani anche l’anno prossimo senza ricomprarli. Il metodo più semplice?", o:["Talee a fine estate, tenute al riparo d’inverno","I semi dei fiori secchi","Lasciarli fuori a gelare"], a:0, why:"Le talee radicano facilmente e passano l’inverno al riparo, pronte per la primavera." }
+  ])},
+  { id:"h2", zone:"z8", title:"Agrumi e funghi", icon:"sun", items:lv(3, [
+    { t:"card", plant:"limone", title:"Esperienza da vendere", body:"Fiori senza frutti, macchie tonde, concime al momento sbagliato: i problemi da secondo anno, quando la pianta è sopravvissuta al primo e tu ti sei rilassato troppo." },
+    { t:"mc", plant:"limone", q:"Limone tenuto sempre in casa: tanti fiori ma pochissimi limoni. Cosa manca?", o:["Impollinatori e aria: in primavera all’aperto va meglio","Acqua del rubinetto","Ombra"], a:0, why:"Fuori, insetti e vento aiutano l’impollinazione. In casa si può aiutare con un pennellino." },
+    { t:"mc", plant:"olivo", q:"Olivo con macchie tonde scure, con un alone giallo, dopo una primavera piovosa. Cosa può essere?", o:["L’occhio di pavone, un fungo","Scottature da sole","Fame di concime"], a:0, why:"È un fungo che ama l’umido: si tolgono le foglie colpite e si tratta con prodotti a base di rame." },
+    { t:"tf", plant:"limone", q:"Gli agrumi in vaso si concimano soprattutto nella stagione di crescita, non in pieno inverno.", a:true, why:"D’inverno crescono poco: il concime resta nella terra e non serve." },
+    { t:"mc", plant:"petunia", q:"Petunie a fine estate: fiori sempre più piccoli e fusti lunghi. Cosa fai?", o:["Spunti i fusti e dai concime per fioriture","Le sposti all’ombra","Aspetti l’anno prossimo"], a:0, why:"Una spuntatina e un po’ di potassio: ripartono per il finale di stagione." },
+    { t:"mc", plant:"rosmarino", q:"Rosmarino in un vaso piccolo che deve passare l’inverno al Nord. Cosa fai?", o:["Lo avvicini al muro al riparo, con la terra più asciutta che bagnata","Lo porti in salotto al caldo","Lo annaffi ogni giorno"], a:0, why:"Il muro ripara dal gelo; terra asciutta d’inverno perché il freddo umido è il vero nemico." }
+  ])},
+  { id:"h3", zone:"z8", title:"Carnivore per esperti", icon:"leaf", items:lv(3, [
+    { t:"card", plant:"dionea", title:"Le hai capite davvero?", body:"Acqua, luce, riposo, terra: con le carnivore ogni errore si vede. Qui i casi sono misti, e a volte l’errore è più d’uno." },
+    { t:"mc", plant:"dionea", q:"Dionea tenuta in salotto tutto l’anno e annaffiata con acqua del rubinetto. Quali sono gli errori?", o:["Poca luce, niente riposo invernale e acqua con sali","Nessuno, è perfetta","Solo l’acqua"], a:0, why:"Tre errori in uno: le serve sole pieno, un inverno fresco e acqua senza sali." },
+    { t:"mc", plant:"sarracenia", q:"In primavera la sarracenia fa trombe nuove piatte e storte. Cosa le manca?", o:["Sole pieno","Acqua del rubinetto","Concime"], a:0, why:"Senza sole pieno le trombe crescono deboli e non si colorano." },
+    { t:"tf", plant:"drosera", q:"Se la drosera smette di fare goccioline d’inverno in casa, è sicuramente morta.", a:false, why:"Spesso è poca luce o aria secca: con più luce torna a farle." },
+    { t:"mc", plant:"nepenthes", q:"Nepenthes: le anfore vecchie seccano una dopo l’altra. Cosa fai?", o:["Le tagli quando sono secche: è normale, ogni anfora vive qualche mese","La butti","La annaffi dentro le anfore con acqua del rubinetto"], a:0, why:"Le anfore hanno una vita limitata: conta che ne faccia di nuove." },
+    { t:"mc", plant:"dionea", q:"Dionea a febbraio, dopo il riposo invernale: tante foglie nere. Cosa fai?", o:["Togli le foglie nere: in primavera ripartirà dal centro","La butti","La porti al caldo e la concimi"], a:0, why:"Il riposo lascia foglie nere: il centro è vivo e ripartirà." }
+  ])},
+  { id:"h4", zone:"z8", title:"Orchidee difficili", icon:"pot", items:lv(3, [
+    { t:"card", plant:"orchidea", title:"Stesso sintomo, due cause", body:"Foglie molli e raggrinzite possono voler dire sete o radici marce: l’esatto opposto. La differenza la fanno le radici. Guardale, sempre." },
+    { t:"mc", plant:"orchidea", q:"Phalaenopsis con foglie molli e raggrinzite, radici argentate e secche. Cosa fai?", o:["Immersioni più frequenti: ha sete","Meno acqua","Più sole diretto"], a:0, why:"Radici secche e argentate: le serve acqua." },
+    { t:"mc", plant:"orchidea", q:"Phalaenopsis con foglie molli e raggrinzite, ma radici marroni e molli. Causa?", o:["Radici marce: non riesce a bere nemmeno con l’acqua","Sete","Troppa luce"], a:0, why:"Stesso sintomo dell’altra domanda, causa opposta. Via le radici marce, corteccia nuova, meno acqua." },
+    { t:"tf", plant:"orchidea", q:"Dopo la fioritura si può tagliare lo stelo sopra un nodo: a volte rifiorisce da lì.", a:true, why:"Dal nodo può nascere un nuovo ramo di fiori. Se lo stelo secca, si taglia alla base." },
+    { t:"mc", plant:"tillandsia", q:"Tillandsia con le punte delle foglie secche e marroni, il resto bene. Cosa le serve?", o:["Bagni un po’ più frequenti o aria meno secca","Terriccio","Il buio"], a:0, why:"Punte secche: sta bevendo troppo poco." },
+    { t:"mc", plant:"monstera", q:"Monstera con radici aeree lunghissime che vagano per il salotto. Puoi...", o:["Guidarle nel vaso o su un tutore, o accorciarle se danno fastidio","Non toccarle mai, o muore","Annaffiarle ogni giorno"], a:0, why:"Non sono indispensabili: si guidano o si accorciano senza drammi." }
+  ])},
+  { id:"h5", zone:"z8", title:"Ripasso finale", icon:"star", items:lv(3, [
+    { t:"mc", plant:"gardenia", q:"Gardenia con i boccioli che cadono dopo essere stata spostata dal balcone al salotto. Cosa è successo?", o:["Lo sbalzo di posto e di temperatura","Troppi complimenti","Il ferro"], a:0, why:"Odia i cambiamenti: un posto fisso, senza sbalzi." },
+    { t:"tf", plant:"kumquat", q:"Il kumquat va potato a fondo ogni anno per fare frutti.", a:false, why:"Come il limone: potatura leggera. Troppi tagli, meno fiori e meno frutti." },
+    { t:"mc", plant:"cephalotus", q:"Cephalotus con anfore verdi e piccole. Cosa provi?", o:["Più luce","Più acqua del rubinetto","Concime"], a:0, why:"Con più luce le anfore crescono e diventano rosso scuro." },
+    { t:"mc", plant:"vanda", q:"Vanda con radici argentate e foglie raggrinzite, d’estate. Cosa fai?", o:["Bagni più frequenti","Meno luce","La pianti nel terriccio"], a:0, why:"D’estate beve tanto: immersioni anche ogni giorno." },
+    { t:"match", q:"Abbina rara e mania", pairs:[["Gardenia","Terra acida e niente sbalzi"],["Kumquat","Si mangia con la buccia"],["Cephalotus","Anfore pelose in miniatura"],["Vanda","Radici nude e tanta luce"]] }
+  ])}
+);
+Object.assign(EXTRA, {
+  d1:[{ title:"L’alocasia", items:lv(2, [
+    { t:"card", plant:"alocasia", title:"La diva per eccellenza", body:"L’alocasia è cugina della monstera: foglie enormi a freccia o a orecchio d’elefante, venature chiare, portamento da copertina. E un carattere da diva: troppa acqua, poca luce o uno spiffero, e si offende." },
+    { t:"id", plant:"alocasia", q:"Quale è l’alocasia?", o:["alocasia","monstera","maranta","fittonia"], a:"alocasia", why:"Foglie a freccia, lucide, con venature chiarissime. La monstera ha i buchi, lei no." },
+    { t:"mc", plant:"alocasia", q:"Cosa vuole l’alocasia?", o:["Luce indiretta intensa, terra che drena, aria umida","Sole pieno e terra sempre zuppa","Buio e freddo"], a:0, why:"Luce sì ma filtrata, acqua sì ma senza ristagni, aria umida. Diva, appunto." },
+    { t:"tf", plant:"alocasia", q:"D’inverno l’alocasia può perdere foglie e quasi “sparire”: spesso è riposo, non morte.", a:true, why:"Al fresco rallenta: il rizoma sotto terra è vivo. Meno acqua e pazienza." },
+    { t:"mc", plant:"alocasia", q:"Al mattino ci sono gocce d’acqua sulla punta delle foglie dell’alocasia. Cosa sono?", o:["Guttazione: la pianta espelle acqua in eccesso","Lacrime di gioia","Un parassita"], a:0, why:"Succede quando la terra è molto umida. Utile come segnale: forse stai annaffiando un po’ troppo." },
+    { t:"tf", plant:"alocasia", q:"L’alocasia è innocua per cani e gatti.", a:false, why:"Come la monstera, è irritante se masticata." }
+  ])}],
+  d2:[{ title:"La fittonia", items:lv(2, [
+    { t:"card", plant:"fittonia", title:"La regina del dramma", body:"La fittonia ha foglie piccole con venature bianche o rosa, come un mosaico. Se ha sete crolla tutta, sdraiata sul vaso come in un film muto. Poi beve e in un’ora si rialza. Ti ricorda qualcuno?" },
+    { t:"id", plant:"fittonia", q:"Quale è la fittonia?", o:["fittonia","maranta","alocasia","begonia"], a:"fittonia", why:"Foglioline basse con una rete di venature chiare, come un mosaico." },
+    { t:"tf", plant:"fittonia", q:"La fittonia ama la terra sempre leggermente umida e l’aria umida.", a:true, why:"Viene dal sottobosco tropicale: umido sopra e sotto." },
+    { t:"mc", plant:"fittonia", q:"Perché la fittonia sta benissimo in un terrario chiuso?", o:["Perché lì l’aria resta umida","Perché le piace il buio","Perché odia l’ossigeno"], a:0, why:"Nel terrario l’umidità resta alta: il suo ambiente ideale, in miniatura." },
+    { t:"mc", plant:"fittonia", q:"La fittonia è crollata, foglie sdraiate. Cosa fai?", o:["La annaffi: si rialza presto, ma non farla crollare spesso","La butti","La metti al sole"], a:0, why:"Si riprende, ma ogni crollo la stressa: meglio non arrivarci." },
+    { t:"tf", plant:"fittonia", q:"La fittonia vuole sole diretto per avere venature più chiare.", a:false, why:"Il sole diretto le brucia le foglie: luce indiretta." }
+  ])}],
+  d3:[{ title:"La maranta", items:lv(2, [
+    { t:"card", plant:"maranta", title:"La vera pianta della preghiera", body:"La maranta è cugina della calathea, e il soprannome “pianta della preghiera” in origine è suo: la sera alza le foglie come mani giunte. Stessa famiglia, stesse esigenze, stessa permalosità." },
+    { t:"id", plant:"maranta", q:"Quale è la maranta?", o:["calathea","maranta","fittonia","alocasia"], a:"maranta", why:"Foglie ovali con macchie scure a spina di pesce e venature rosse." },
+    { t:"tf", plant:"maranta", q:"Maranta e calathea appartengono alla stessa famiglia.", a:true, why:"Sono entrambe Marantacee: stesse manie per umidità e acqua." },
+    { t:"mc", plant:"maranta", q:"La maranta ha punte secche e foglie arricciate. Cosa le manca più spesso?", o:["Umidità nell’aria e acqua poco calcarea","Sole diretto","Concime per cactus"], a:0, why:"Come la calathea: aria secca e calcare sono i suoi nemici." },
+    { t:"mc", plant:"maranta", q:"Che terra vuole la maranta?", o:["Sempre leggermente umida, mai zuppa né secca","Secca per settimane","Allagata"], a:0, why:"La via di mezzo, sempre: la parte difficile è proprio quella." }
+  ])}],
+  d4:[{ title:"La begonia a pois", items:lv(2, [
+    { t:"card", plant:"begonia", title:"La begonia a pois", body:"La begonia maculata ha foglie verde scuro con pois argentati e il retro rosso: sembra disegnata da qualcuno con troppo caffè in corpo. È bellissima, ed è anche delicata." },
+    { t:"id", plant:"begonia", q:"Quale è la begonia maculata?", o:["fittonia","begonia","maranta","alocasia"], a:"begonia", why:"Foglie lunghe e appuntite, a pois argentati, rosse sotto." },
+    { t:"tf", plant:"begonia", q:"La begonia maculata va spruzzata spesso sulle foglie per darle umidità.", a:false, why:"Le foglie bagnate rischiano l’oidio. Umidità sì, ma intorno: altre piante vicine o argilla espansa bagnata." },
+    { t:"mc", plant:"begonia", q:"Come annaffi la begonia maculata?", o:["Quando i primi centimetri sono asciutti, senza bagnare le foglie","Ogni giorno, abbondante","Una volta al mese"], a:0, why:"Terra appena asciutta in superficie, acqua alla base." },
+    { t:"mc", plant:"begonia", q:"Come ottieni una begonia nuova gratis?", o:["Talea di fusto con un nodo, in acqua o in terra","Seminando i pois","Comprandola"], a:0, why:"Radica facilmente: un pezzo di fusto con un nodo e un po’ di pazienza." }
+  ])}],
+  g1:[{ title:"L’echeveria", items:lv(2, [
+    { t:"card", plant:"echeveria", title:"La rosa di pietra", body:"L’echeveria è una rosetta perfetta e carnosa, spesso coperta da una polverina chiara. Viene dalle zone aride del Messico. Sembra finta, ma è sensibilissima a due cose: poco sole e troppa acqua." },
+    { t:"id", plant:"echeveria", q:"Quale è l’echeveria?", o:["echeveria","haworthia","lithops","mammillaria"], a:"echeveria", why:"Una rosa fatta di foglie carnose, azzurrine o rosate." },
+    { t:"mc", plant:"echeveria", q:"L’echeveria in casa si allunga, la rosetta si apre e il fusto si piega verso la finestra. Cosa le manca?", o:["Sole: si sta “filando” per cercare luce","Acqua","Un vaso più grande"], a:0, why:"Si chiama filatura: in casa la luce non basta. Sul balcone al sole torna compatta (le parti già allungate restano)." },
+    { t:"tf", plant:"echeveria", q:"La polverina chiara sulle foglie dell’echeveria va pulita via con un panno.", a:false, why:"È pruina, una protezione naturale dal sole. Toccandola si toglie, e sulle foglie vecchie non ricresce." },
+    { t:"mc", plant:"echeveria", q:"Come si annaffia un’echeveria?", o:["A fondo, solo quando la terra è asciutta del tutto, senza bagnare la rosetta","Un goccio ogni giorno","Spruzzando le foglie"], a:0, why:"Bagna e asciuga. L’acqua ferma nella rosetta la fa marcire dal centro." }
+  ])}],
+  g2:[{ title:"L’haworthia", items:lv(2, [
+    { t:"card", plant:"haworthia", title:"La piccola zebra", body:"L’haworthia è una piccola succulenta a rosetta, spesso con strisce bianche in rilievo, come una zebra. A differenza di molte grasse non ama il sole cocente: è perfetta per un davanzale luminoso in casa." },
+    { t:"id", plant:"haworthia", q:"Riconosci l’haworthia?", o:["mammillaria","echeveria","haworthia","lithops"], a:"haworthia", why:"Rosetta di foglie appuntite con strisce bianche in rilievo." },
+    { t:"tf", plant:"haworthia", q:"L’haworthia sopporta la luce indiretta di casa meglio dell’echeveria.", a:true, why:"In natura cresce all’ombra di rocce e cespugli. Al sole cocente diventa rossiccia e soffre." },
+    { t:"mc", plant:"haworthia", q:"L’haworthia è diventata rossastra con le punte secche, dopo un’estate sul balcone a sud. Cosa è successo?", o:["Troppo sole diretto","Troppo poca luce","Freddo"], a:0, why:"Si è scottata: torna alla luce indiretta e recupera il verde." },
+    { t:"mc", plant:"haworthia", q:"Come fai una nuova haworthia?", o:["Stacchi i figli che crescono alla base, con un po’ di radici","Metti una foglia intera in acqua","La tagli a metà"], a:0, why:"I figli alla base sono piante pronte: si staccano e si rinvasano." }
+  ])}],
+  g3:[{ title:"La mammillaria", items:lv(2, [
+    { t:"card", plant:"mammillaria", title:"Il cactus a cuscino", body:"La mammillaria è un piccolo cactus tondo, coperto di spine sottili, che in primavera si fa una corona di fiorellini. È tra i cactus più facili da far fiorire: basta un trucco, un inverno fresco e asciutto." },
+    { t:"id", plant:"mammillaria", q:"Quale è la mammillaria?", o:["lithops","mammillaria","haworthia","echeveria"], a:"mammillaria", why:"Un cuscino tondo di spine, con la corona di fiori in cima." },
+    { t:"mc", plant:"mammillaria", q:"Cosa aiuta la mammillaria a fiorire in primavera?", o:["Un inverno fresco e quasi senz’acqua","Annaffiarla molto d’inverno","Tenerla al buio"], a:0, why:"Il riposo invernale prepara i fiori. Caldo e acqua d’inverno, niente corona." },
+    { t:"tf", plant:"mammillaria", q:"I cactus hanno bisogno di acqua anche d’estate, quando crescono.", a:true, why:"D’estate crescono: acqua a fondo quando il terriccio è asciutto. È d’inverno che si sospende quasi del tutto." },
+    { t:"mc", plant:"mammillaria", q:"Che terriccio vuole la mammillaria?", o:["Specifico per cactacee, molto drenante, con sabbia o pomice","Torba pura sempre umida","Terra del giardino"], a:0, why:"Deve asciugare in fretta: niente terra che trattiene acqua." }
+  ])}],
+  g4:[{ title:"I lithops", items:lv(2, [
+    { t:"card", plant:"lithops", title:"I sassi viventi", body:"I lithops sembrano sassolini: due foglie carnose unite, colorate come le pietre del deserto in cui vivono. Il mimetismo li protegge dagli animali assetati. Coltivarli è un esame di autocontrollo: la regola principale è non fare niente, quasi sempre." },
+    { t:"id", plant:"lithops", q:"Quale è il lithops?", o:["haworthia","echeveria","lithops","mammillaria"], a:"lithops", why:"Due “sassi” uniti con una fessura in mezzo. Se non lo sapessi, lo calpesteresti." },
+    { t:"tf", plant:"lithops", q:"Quando il lithops fa una nuova coppia di foglie, va annaffiato di più per aiutarlo.", a:false, why:"Le foglie nuove si nutrono delle vecchie, che si svuotano. Annaffiare in quel momento è il modo classico di ucciderlo." },
+    { t:"mc", plant:"lithops", q:"Quanto annaffi un lithops?", o:["Pochissimo e solo in certi periodi: spesso il segreto è non annaffiare","Ogni settimana","Ogni giorno, è piccolo"], a:0, why:"Vive dove piove quasi mai. Il suo nemico numero uno è l’annaffiatoio." },
+    { t:"mc", plant:"lithops", q:"Il lithops si gonfia e la pelle si spacca. Cosa è successo?", o:["Ha ricevuto troppa acqua","Ha sete","Sta per fiorire"], a:0, why:"Ha bevuto più di quanto riesce a contenere. Niente acqua per un bel po’." },
+    { t:"tf", plant:"lithops", q:"I lithops vogliono molta luce, anche sole diretto.", a:true, why:"Con poca luce si allungano e perdono la forma da sasso." }
+  ])}],
+  h1:[{ title:"La gardenia", items:lv(2, [
+    { t:"card", plant:"gardenia", title:"La diva profumata", body:"La gardenia ha fiori bianchi dal profumo fortissimo e un carattere difficile: terra acida, acqua non calcarea, luce senza sole cocente, temperature regolari. Basta uno sbalzo e lascia cadere i boccioli, offesa." },
+    { t:"id", plant:"gardenia", q:"Quale è la gardenia?", o:["gardenia","kumquat","vanda","cephalotus"], a:"gardenia", why:"Foglie lucide verde scuro e fiori bianchi a rosa, profumatissimi." },
+    { t:"mc", plant:"gardenia", q:"Che terriccio vuole la gardenia?", o:["Per acidofile, come le ortensie blu","Per cactacee","Terra di giardino calcarea"], a:0, why:"Terra acida: con il calcare le foglie ingialliscono." },
+    { t:"mc", plant:"gardenia", q:"La gardenia lascia cadere i boccioli prima che si aprano. Cause tipiche?", o:["Sbalzi di temperatura, spostamenti, aria troppo secca","Troppi complimenti","Acqua poco calcarea"], a:0, why:"Odia i cambiamenti: un posto fisso e condizioni stabili." },
+    { t:"tf", plant:"gardenia", q:"Foglie gialle con le venature verdi possono indicare che alla gardenia manca ferro.", a:true, why:"Clorosi ferrica, come per limone e petunia: terra acida e concime con ferro." }
+  ])}],
+  h2:[{ title:"Il kumquat", items:lv(2, [
+    { t:"card", plant:"kumquat", title:"Il mandarino cinese", body:"Il kumquat è un agrume piccolo, con frutti che si mangiano con tutta la buccia: dolce fuori, aspro dentro. Regge il freddo meglio del limone, ma ha le stesse manie: sole, acqua non calcarea, niente ristagni." },
+    { t:"id", plant:"kumquat", q:"Quale è il kumquat?", o:["kumquat","gardenia","vanda","cephalotus"], a:"kumquat", why:"Un alberello pieno di piccoli frutti arancioni ovali." },
+    { t:"tf", plant:"kumquat", q:"Il kumquat sopporta il freddo meglio del limone.", a:true, why:"È tra gli agrumi più resistenti al freddo, ma le gelate forti restano un problema." },
+    { t:"mc", plant:"kumquat", q:"Come si mangia il frutto del kumquat?", o:["Intero, con la buccia","Solo il succo","Solo la buccia, il resto si butta"], a:0, why:"La buccia è la parte dolce. Il dentro è aspro: è il bello del contrasto." },
+    { t:"mc", plant:"kumquat", q:"Il kumquat ha foglie gialle con le venature verdi. Cosa gli dai?", o:["Concime con ferro per agrumi","Più ombra","Acqua del rubinetto molto calcarea"], a:0, why:"Stessa clorosi del limone: ferro e acqua meno dura." }
+  ])}],
+  h3:[{ title:"Il cephalotus", items:lv(2, [
+    { t:"card", plant:"cephalotus", title:"La carnivora australiana", body:"Il cephalotus viene da un angolo minuscolo dell’Australia occidentale. Fa piccole anfore pelose con il coperchio, come una nepenthes in miniatura. È raro, lento e un po’ permaloso." },
+    { t:"id", plant:"cephalotus", q:"Quale è il cephalotus?", o:["nepenthes","cephalotus","sarracenia","drosera"], a:"cephalotus", why:"Tante piccole anfore tozze e pelose, a terra, con il coperchio. Nepenthes in versione tascabile." },
+    { t:"tf", plant:"cephalotus", q:"Il cephalotus vuole la torba umida, ma senza stare sempre a bagno come la dionea.", a:true, why:"Umido sì, allagato per settimane no: poca acqua nel sottovaso." },
+    { t:"mc", plant:"cephalotus", q:"Che acqua vuole il cephalotus?", o:["Piovana o demineralizzata, come le altre carnivore","Del rubinetto","Frizzante"], a:0, why:"Niente sali: stessa regola di tutte le carnivore." },
+    { t:"mc", plant:"cephalotus", q:"Più luce riceve il cephalotus, più le sue anfore...", o:["Si colorano di rosso scuro","Diventano trasparenti","Spariscono"], a:0, why:"Con tanta luce diventano rosso scuro, quasi nere." }
+  ])}],
+  h4:[{ title:"La vanda", items:lv(2, [
+    { t:"card", plant:"vanda", title:"L’orchidea senza vaso", body:"La vanda è un’orchidea dai fiori enormi, spesso blu-viola. Si coltiva a radice nuda, in un cesto o in un vaso di vetro vuoto. Bellissima, affamata di luce e d’acqua: per molti è l’orchidea più difficile da tenere in casa." },
+    { t:"id", plant:"vanda", q:"Quale è la vanda?", o:["orchidea","vanda","gardenia","cephalotus"], a:"vanda", why:"Radici lunghe e nude che pendono, foglie a ventaglio e fiori viola enormi." },
+    { t:"mc", plant:"vanda", q:"Come si annaffia una vanda a radice nuda?", o:["Immergendo le radici spesso, d’estate anche ogni giorno","Una volta al mese","Mai, vive d’aria"], a:0, why:"Le radici nude asciugano in fretta: bagni frequenti, poi all’aria." },
+    { t:"tf", plant:"vanda", q:"La vanda vuole più luce della phalaenopsis.", a:true, why:"Molta più luce: è uno dei motivi per cui in casa è difficile." },
+    { t:"mc", plant:"vanda", q:"Perché la vanda spesso sta senza terra né corteccia?", o:["Le radici vogliono aria e devono asciugarsi in fretta tra un bagno e l’altro","Perché costa meno","Perché odia i vasi"], a:0, why:"In natura pende dagli alberi: le radici vivono all’aria aperta." }
+  ])}]
+});
+
 const ZONES = [
   { id:"z1", color:"#d9692a", shade:"#a84f1c", title:"Casa tua", desc:"Il davanzale, dove tutto ha inizio. E dove tutto, finora, è morto." },
   { id:"z2", color:"#2284cf", shade:"#1764a0", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." },
   { id:"z3", color:"#1f9a55", shade:"#157240", title:"Giungla in salotto", desc:"Luce filtrata, aria umida, piante che vogliono attenzioni. Tutte da casa, nessuna al sole." },
   { id:"z4", color:"#d6488d", shade:"#a8306b", title:"Fiori da balcone", desc:"Gerani, petunie, ortensie, bouganville. Il balcone della nonna, ma stavolta sopravvive (forse)." },
-  { id:"z5", color:"#8e44ad", shade:"#6c3483", title:"Piante carnivore", desc:"Mangiano insetti, bevono solo acqua piovana e ti giudicano. Il gran finale." }
+  { id:"z5", color:"#8e44ad", shade:"#6c3483", title:"Piante carnivore", desc:"Mangiano insetti, bevono solo acqua piovana e ti giudicano. Il gran finale (per ora)." },
+  { id:"z6", color:"#3f51b5", shade:"#2c3a8c", title:"Le dive di casa", desc:"Domande difficili sulle piante di casa che conosci, e nuove dive capricciose. Da qui si fa sul serio." },
+  { id:"z7", color:"#9c6b2f", shade:"#744f20", title:"Sassi viventi e grasse rare", desc:"Casi difficili su sole e acqua, e succulente che muoiono d’affetto. Mani lontane dall’annaffiatoio." },
+  { id:"z8", color:"#00796b", shade:"#00564c", title:"Collezione rara", desc:"Il misto finale: diagnosi su tutto e piante rare per chi ormai sa il fatto suo." }
 ];
 
 // ---------- Emergenze: problemi reali, si curano sapendo la risposta ----------
@@ -950,17 +1273,43 @@ Object.assign(EMERG, {
   nep_anfore:{ plant:"nepenthes", step:"c3", lesson:1, title:"Non fa più anfore, solo foglie", q:"Cosa fai?", o:["Le dai più luce e più umidità nell’aria","Le dai carne macinata","La concimi il doppio"], a:0, why:"Le anfore arrivano con luce e aria umida. Il resto non serve." },
   nep_sottovaso:{ plant:"nepenthes", step:"c2", lesson:1, title:"Il sottovaso è pieno da giorni e le foglie ingialliscono", q:"Cosa fai?", o:["Svuoti il sottovaso: lei non è di palude","Lo riempi ancora di più","Aggiungi acqua del rubinetto"], a:0, why:"La nepenthes non vuole i piedi nell’acqua: terriccio umido ma drenante." }
 });
+Object.assign(EMERG, {
+  alo_gocce:{ plant:"alocasia", step:"d1", lesson:1, title:"Gocce sulle punte e foglie basse che ingialliscono", q:"Cosa fai?", o:["Annaffi meno e lasci asciugare i primi centimetri","Annaffi di più","La metti al sole"], a:0, why:"Guttazione e foglie gialle in basso: le arriva più acqua di quanta ne usi." },
+  alo_spiffero:{ plant:"alocasia", step:"d1", lesson:1, title:"Vicino alla porta del balcone, d’inverno, perde foglie", q:"Cosa fai?", o:["La sposti lontano dagli spifferi, in luce indiretta","La annaffi con acqua calda","La copri con un sacchetto"], a:0, why:"Le dive odiano gli spifferi freddi: posto riparato e luminoso." },
+  fit_crollo:{ plant:"fittonia", step:"d2", lesson:1, title:"Crollata, foglie sdraiate sul vaso", q:"Cosa fai?", o:["La annaffi: si rialza in poco tempo","La butti","La metti al sole per tirarla su"], a:0, why:"Scena madre da sete. Acqua, e torna in piedi. Ma non farglielo fare troppo spesso." },
+  fit_sole:{ plant:"fittonia", step:"d2", lesson:1, title:"Foglie bruciate dopo una giornata sul davanzale al sole", q:"Cosa fai?", o:["La sposti in luce indiretta","La annaffi di più","Le togli tutte le foglie"], a:0, why:"Il sole diretto le brucia: viene dal sottobosco." },
+  mar_punte:{ plant:"maranta", step:"d3", lesson:1, title:"Punte secche e foglie arricciate", q:"Cosa fai?", o:["Più umidità intorno e acqua poco calcarea","Più sole","Concime per cactus"], a:0, why:"Come la calathea: aria secca e calcare sono i suoi nemici." },
+  mar_secca:{ plant:"maranta", step:"d3", lesson:1, title:"Terra secca da giorni e foglie arrotolate", q:"Cosa fai?", o:["La annaffi e da ora tieni la terra leggermente umida","La lasci asciugare ancora","La metti in pieno sole"], a:0, why:"Vuole la terra sempre appena umida: secca, arrotola le foglie." },
+  beg_oidio:{ plant:"begonia", step:"d5", lesson:0, title:"Macchie bianche polverose sulle foglie", q:"Cosa fai?", o:["Togli le foglie colpite, più aria intorno, niente acqua sulle foglie","La spruzzi di più","La chiudi in una scatola"], a:0, why:"È oidio, un fungo: ama l’aria ferma e le foglie bagnate." },
+  beg_spruzzi:{ plant:"begonia", step:"d4", lesson:1, title:"Qualcuno la spruzza ogni giorno e compaiono macchie", q:"Cosa fai?", o:["Smetti di bagnare le foglie e dai umidità intorno","La spruzzi due volte al giorno","La metti sotto la doccia"], a:0, why:"Foglie bagnate e ferme: muffe in arrivo. Umidità sì, ma non sulle foglie." },
+  ech_filata:{ plant:"echeveria", step:"g1", lesson:1, title:"Si allunga verso la finestra e la rosetta si apre", q:"Cosa fai?", o:["La sposti sul balcone al sole","La annaffi di più","La metti in bagno"], a:0, why:"Si sta filando per cercare luce: le serve sole vero." },
+  ech_marcia:{ plant:"echeveria", step:"g1", lesson:1, title:"Foglie basse molli e traslucide", q:"Cosa fai?", o:["Togli le foglie molli e lasci asciugare a lungo","Annaffi di più","La concimi"], a:0, why:"Primo segno di marciume da acqua: asciutto, e annaffiature molto più rare." },
+  haw_rossa:{ plant:"haworthia", step:"g2", lesson:1, title:"Rossastra e con le punte secche dopo l’estate al sole", q:"Cosa fai?", o:["La riporti alla luce indiretta","La annaffi ogni giorno","La metti al buio"], a:0, why:"Si è scottata: in natura vive all’ombra di rocce e cespugli." },
+  haw_figli:{ plant:"haworthia", step:"g2", lesson:1, title:"Il vaso è pieno di figli che spingono", q:"Cosa fai?", o:["Stacchi i figli con le loro radici e li rinvasi","Li tagli e li butti","Niente, si arrangiano"], a:0, why:"Ogni figlio è una pianta nuova gratis." },
+  mam_fiori:{ plant:"mammillaria", step:"g3", lesson:1, title:"Non fiorisce mai: sta al caldo e la annaffi anche d’inverno", q:"Cosa cambi?", o:["D’inverno al fresco e quasi senz’acqua","Più acqua d’inverno","Più concime d’inverno"], a:0, why:"Senza riposo invernale niente corona di fiori." },
+  mam_marcia:{ plant:"mammillaria", step:"g3", lesson:1, title:"Base scura e molle, in terra sempre umida", q:"Cosa fai?", o:["Togli la parte marcia e la rinvasi in terriccio per cactacee asciutto","Annaffi di più","La metti in torba"], a:0, why:"Marciume: nei cactus l’acqua in più non perdona. Terra drenante e asciutta." },
+  lit_spacca:{ plant:"lithops", step:"g4", lesson:1, title:"Si è gonfiato e la pelle si spacca", q:"Cosa fai?", o:["Smetti di annaffiare per un bel po’","Annaffi ancora","Lo copri con la colla"], a:0, why:"Ha bevuto più di quanto riesce a contenere." },
+  lit_cambio:{ plant:"lithops", step:"g4", lesson:1, title:"Fa foglie nuove e quelle vecchie si raggrinziscono", q:"Cosa fai?", o:["Niente acqua: le nuove si nutrono delle vecchie","Annaffi per aiutarlo","Togli subito le foglie vecchie"], a:0, why:"È il cambio di foglie: le vecchie si svuotano da sole. L’acqua adesso lo uccide." },
+  gar_boccioli:{ plant:"gardenia", step:"h1", lesson:1, title:"Lascia cadere i boccioli dopo lo spostamento", q:"Cosa fai?", o:["Le trovi un posto fisso, senza sbalzi, e non la sposti più","La sposti di nuovo","La concimi tanto"], a:0, why:"Odia i cambiamenti di posto e di temperatura." },
+  gar_gialla:{ plant:"gardenia", step:"h1", lesson:1, title:"Foglie gialle con le venature verdi", q:"Cosa fai?", o:["Concime con ferro, terra acida e acqua non calcarea","Più sole","Acqua del rubinetto"], a:0, why:"Clorosi ferrica: il calcare blocca il ferro." },
+  kum_gelo:{ plant:"kumquat", step:"h2", lesson:1, title:"Prevista una gelata forte", q:"Cosa fai?", o:["Lo porti al riparo, anche se regge più del limone","Lo lasci fuori, è robusto","Lo annaffi per scaldarlo"], a:0, why:"Regge il freddo meglio del limone, ma le gelate forti no." },
+  kum_ferro:{ plant:"kumquat", step:"h2", lesson:1, title:"Foglie gialle con le venature verdi", q:"Cosa fai?", o:["Concime con ferro per agrumi","Più ombra","Acqua più calcarea"], a:0, why:"Stessa clorosi del limone." },
+  cep_verde:{ plant:"cephalotus", step:"h3", lesson:1, title:"Anfore piccole e tutte verdi", q:"Cosa fai?", o:["Gli dai più luce","Acqua del rubinetto","Concime"], a:0, why:"Con più luce le anfore crescono e si colorano di rosso scuro." },
+  cep_rubinetto:{ plant:"cephalotus", step:"h3", lesson:1, title:"Crosticine bianche sulla torba dopo l’acqua del rubinetto", q:"Cosa fai?", o:["Passi all’acqua piovana e sciacqui la torba","Aggiungi concime","Continui così"], a:0, why:"Sono sali: per una carnivora sono veleno." },
+  van_sete:{ plant:"vanda", step:"h4", lesson:1, title:"Radici argentate e foglie raggrinzite, d’estate", q:"Cosa fai?", o:["Bagni più frequenti, anche ogni giorno","Meno luce","La pianti nel terriccio"], a:0, why:"D’estate beve tantissimo: le radici nude asciugano in fretta." },
+  van_terra:{ plant:"vanda", step:"h4", lesson:1, title:"Qualcuno l’ha messa nel terriccio: radici molli", q:"Cosa fai?", o:["Togli le radici marce e la rimetti a radice nuda","Annaffi di più","Aggiungi altro terriccio"], a:0, why:"Le sue radici vogliono aria: nel terriccio soffocano." }
+});
 
 /* =========================================================
    Stato salvato sul dispositivo
    ========================================================= */
 const KEY = "vasanicola.v1";
 // Versione di questa pagina: va cambiata a ogni pubblicazione. L'app confronta la sua con quella online.
-const VERSION = "2026-11-25.1";
+const VERSION = "2026-11-25.3";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
-const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
+const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
 S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -983,14 +1332,29 @@ const ICON = {
   serra:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M4 12L14 4l10 8v12H4z"/><path d="M14 24v-7M14 17c0-3 2.5-4.5 5-4.5-.3 3-2.3 4.5-5 4.5zM14 19c0-2.4-2-3.6-4.2-3.6.3 2.4 2 3.6 4.2 3.6z"/></svg>',
   alert:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5L23 21.5H1z"/><path d="M12 9v6M12 17.6v.4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>',
   pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>',
+  shop:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 10h18l-1.6 13H6.6z"/><path d="M10 10V8a4 4 0 0 1 8 0v2" stroke-linecap="round"/></svg>',
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
-const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644", dionea:"#6d597a", sarracenia:"#355070", drosera:"#b56576", nepenthes:"#e9c46a" };
-function plantSVG(id, size = 120, state = "sana", stage = "adulta"){
+const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644", dionea:"#6d597a", sarracenia:"#355070", drosera:"#b56576", nepenthes:"#e9c46a", alocasia:"#264653", fittonia:"#f28482", maranta:"#84a59d", begonia:"#2b2d42", echeveria:"#e5989b", haworthia:"#6d6875", mammillaria:"#d4a373", lithops:"#bc6c25", gardenia:"#457b9d", kumquat:"#2a9d8f", cephalotus:"#7b2cbf", vanda:"#a47148" };
+// Disegno del vaso: "back" va dietro alla pianta (corde del vaso appeso), "front" davanti
+function potDrawing(id, model, color, wet){
+  const soilC = wet ? "#33200f" : "#5a3b22";
+  const soil = (rx = 30) => `<ellipse cx="60" cy="86" rx="${rx}" ry="3.5" fill="${soilC}" opacity=".9"/>${wet ? '<ellipse cx="66" cy="85.5" rx="13" ry="1.8" fill="#8fcaff" opacity=".85"/>' : ""}`;
+  const body = c => `<path d="M30 92h60l-6 36H36z" fill="${c}"/><rect x="26" y="84" width="68" height="12" rx="4" fill="${c}"/><rect x="26" y="84" width="68" height="5" rx="2.5" fill="#000" opacity=".12"/>`;
+  if (id === "tillandsia") return { back:"", front:`<path d="M22 98c10-7 64-9 76-2c5 3 5 11 0 13c-15 6-64 6-76 0c-5-3-5-8 0-11z" fill="#a47148"/><path d="M34 103c14 2 36 2 52-1M44 98c8-1 20-1 28 0" stroke="#7a5230" stroke-width="2" fill="none" stroke-linecap="round"/>` };
+  if (id === "vanda") return { back:'<path d="M36 84L60 6M84 84L60 6" stroke="#9c7a5a" stroke-width="1.4"/>', front:`<rect x="34" y="82" width="52" height="20" rx="3" fill="none" stroke="#8b5a32" stroke-width="3"/><path d="M34 92h52M47 82v20M60 82v20M73 82v20" stroke="#8b5a32" stroke-width="2"/>` };
+  if (model === "terracotta") return { back:"", front: body("#c8693a") + `<path d="M33 106h54M35 116h50" stroke="#a9532c" stroke-width="1.6"/>` + soil() };
+  if (model === "autoirrigante") return { back:"", front: body("#e8eef2") + `<rect x="42" y="112" width="36" height="10" rx="3" fill="#8fcaff"/><rect x="80" y="98" width="4" height="18" rx="2" fill="#5aa9e6"/>` + soil() };
+  if (model === "appeso") return { back:'<path d="M30 86L60 2M90 86L60 2" stroke="#b08968" stroke-width="1.6"/>', front:`<path d="M26 88h68c0 22-15 38-34 38S26 110 26 88z" fill="#efe6d8"/><rect x="24" y="82" width="72" height="9" rx="4" fill="#e0d2bd"/>` + soil(32) };
+  if (model === "balconiera") return { back:"", front:`<rect x="12" y="86" width="96" height="40" rx="4" fill="#b07a4a"/><path d="M12 99h96M12 112h96" stroke="#8b5a32" stroke-width="2"/><rect x="10" y="82" width="100" height="8" rx="3" fill="#9c6a3e"/>` + soil(46) };
+  if (model === "coprivaso") return { back:"", front: body("#f7f4ee") + `<rect x="26" y="88" width="68" height="3" fill="#3b6ea5"/>` +
+    [[46,108],[60,112],[74,108]].map(([x, y]) => [0,72,144,216,288].map(r => `<ellipse cx="${x}" cy="${y - 3}" rx="1.8" ry="3" transform="rotate(${r} ${x} ${y})" fill="#3b6ea5"/>`).join("") + `<circle cx="${x}" cy="${y}" r="1.4" fill="#f2c230"/>`).join("") + soil() };
+  return { back:"", front: body(color) + soil() };
+}
+function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
-  const wood = `<path d="M22 98c10-7 64-9 76-2c5 3 5 11 0 13c-15 6-64 6-76 0c-5-3-5-8 0-11z" fill="#a47148"/><path d="M34 103c14 2 36 2 52-1M44 98c8-1 20-1 28 0" stroke="#7a5230" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  const potSvg = id === "tillandsia" ? wood : `<path d="M30 92h60l-6 36H36z" fill="${pot}"/><rect x="26" y="84" width="68" height="12" rx="4" fill="${pot}"/><rect x="26" y="84" width="68" height="5" rx="2.5" fill="#000" opacity=".12"/><ellipse cx="60" cy="86" rx="30" ry="3.5" fill="${wet ? "#33200f" : "#5a3b22"}" opacity=".9"/>${wet ? '<ellipse cx="66" cy="85.5" rx="13" ry="1.8" fill="#8fcaff" opacity=".85"/>' : ""}`;
+  const pd = potDrawing(id, model, pot, wet), potSvg = pd.front;
   if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
   if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
   // Seme e germoglio sono uguali per tutte le piante; la piantina è la pianta adulta in piccolo
@@ -1144,12 +1508,69 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta"){
     leaves = `<path d="M60 86V44" stroke="#3f7d3a" stroke-width="3" stroke-linecap="round"/>` + lf(46, 60, -50) + lf(74, 58, 50) + lf(52, 44, -20) + lf(68, 42, 20) +
       `<path d="M34 68c-6 6-8 14-6 22M86 66c6 6 8 14 6 22" stroke="#6aa84f" stroke-width="1.6" fill="none"/>`;
     over = pitcher(28, 100) + pitcher(92, 98);
+  } else if (id === "alocasia") {
+    // foglie a freccia scure con venature chiarissime, su piccioli lunghi
+    const lf = (x, y, r, s) => `<path d="M60 86Q${(60 + x) / 2} ${y + 20} ${x} ${y + 10}" stroke="#3f6b4f" stroke-width="2.6" fill="none"/><g transform="translate(${x} ${y}) rotate(${r}) scale(${s})"><path d="M0-24C10-14 16 0 14 10L4 4 0 14-4 4-14 10C-16 0-10-14 0-24z" fill="#1f4d3a"/><path d="M0-22V12M0-8l9 6M0-8l-9 6M0 2l10 5M0 2l-10 5" stroke="#dfeee4" stroke-width="1.3" fill="none"/></g>`;
+    leaves = lf(38, 50, -30, .9) + lf(82, 48, 30, .9) + lf(60, 32, 0, 1.05);
+  } else if (id === "fittonia") {
+    // cuscino basso di foglioline con la rete di venature chiare
+    const lf = (x, y, r) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="7" ry="5" fill="#3a7d44"/><path d="M${x - 6} ${y}h12M${x - 2} ${y - 4}v8M${x + 2} ${y - 4}v8" stroke="#f1f7ee" stroke-width="1"/></g>`;
+    leaves = [[40,80,-20],[52,76,10],[64,77,-10],[76,80,20],[46,70,30],[58,67,-5],[70,70,15],[52,60,-25],[64,60,20],[58,54,0]].map(a => lf(...a)).join("");
+  } else if (id === "maranta") {
+    // foglie ovali con macchie scure a spina di pesce e venature rosse
+    const lf = (x, y, r) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="6.5" ry="12" fill="#7fae5e"/>` + [-6,0,6].map(k => `<ellipse cx="${x - 3}" cy="${y + k}" rx="1.8" ry="2.4" fill="#2f3e1f"/><ellipse cx="${x + 3}" cy="${y + k}" rx="1.8" ry="2.4" fill="#2f3e1f"/>`).join("") +
+      `<path d="M${x} ${y - 11}v22M${x} ${y - 4}l-5 -3M${x} ${y - 4}l5 -3M${x} ${y + 3}l-5 -3M${x} ${y + 3}l5 -3" stroke="#c1121f" stroke-width="1"/></g>`;
+    leaves = `<path d="M60 86C56 74 46 66 40 62M60 86C64 74 74 66 80 62M60 86V50" stroke="#6b8f4e" stroke-width="2" fill="none"/>` + lf(38, 58, -55) + lf(82, 58, 55) + lf(48, 46, -25) + lf(72, 46, 25) + lf(60, 38, 0);
+  } else if (id === "begonia") {
+    // foglie ad ala d'angelo con i pois argentati e il bordo rosso, fusti a canna
+    const lf = (x, y, r) => `<g transform="rotate(${r} ${x} ${y})"><ellipse cx="${x + 1}" cy="${y + 1.5}" rx="6" ry="14" fill="#a4161a"/><ellipse cx="${x}" cy="${y}" rx="6" ry="14" fill="#2f4f3a"/>` + [[-2,-8],[2,-3],[-2,2],[2,7],[0,-12]].map(([a, b]) => `<circle cx="${x + a}" cy="${y + b}" r="1.3" fill="#e9ecef"/>`).join("") + `</g>`;
+    leaves = `<path d="M54 86V40M66 86V48" stroke="#6b4f3a" stroke-width="3"/><path d="M52 66h4M52 52h4M64 70h4M64 58h4" stroke="#4a3527" stroke-width="2"/>` + lf(42, 56, -60) + lf(42, 40, -45) + lf(78, 62, 60) + lf(78, 48, 45) + lf(58, 30, -10);
+  } else if (id === "echeveria") {
+    // rosetta di foglie carnose azzurrine con la punta rosa
+    const ring = (n, r, rx, ry, c) => Array.from({ length: n }, (_, k) => { const a = k * 360 / n + (n % 2 ? 0 : 15); return `<g transform="rotate(${a} 60 76)"><ellipse cx="60" cy="${76 - r}" rx="${rx}" ry="${ry}" fill="${c}"/><circle cx="60" cy="${76 - r - ry + 2}" r="1.6" fill="#e5989b"/></g>`; }).join("");
+    leaves = ring(9, 13, 6, 9, "#9cc5b8") + ring(7, 7, 5, 7, "#b5d6cb") + `<ellipse cx="60" cy="76" rx="4" ry="4" fill="#cfe6dd"/>`;
+  } else if (id === "haworthia") {
+    // rosetta di foglie a punta, scure, con strisce bianche in rilievo
+    const lf = (r, h) => `<g transform="rotate(${r} 60 86)"><path d="M53 86Q54 ${86 - h * .6} 60 ${86 - h}Q66 ${86 - h * .6} 67 86z" fill="#2d6a4f"/>` + Array.from({ length: Math.floor(h / 6) - 1 }, (_, k) => `<path d="M56 ${81 - k * 6}h8" stroke="#f1f7ee" stroke-width="1.8" stroke-linecap="round"/>`).join("") + `</g>`;
+    leaves = [-62,62,-44,44,-24,24,-8,8].map(r => lf(r, 46 - Math.abs(r) / 3)).join("") + lf(0, 50);
+  } else if (id === "mammillaria") {
+    // cactus a palla con le spine bianche e la corona di fiori rosa
+    leaves = `<circle cx="60" cy="68" r="19" fill="#5c8a4a"/><ellipse cx="54" cy="62" rx="6" ry="9" fill="#6f9e5b"/>` +
+      Array.from({ length: 22 }, (_, k) => { const a = k * 2.4, d = 4 + (k % 4) * 4; return `<circle cx="${(60 + Math.cos(a) * d).toFixed(1)}" cy="${(68 + Math.sin(a) * d).toFixed(1)}" r="1.1" fill="#f8f9fa"/>`; }).join("") +
+      Array.from({ length: 8 }, (_, k) => { const a = Math.PI + k * Math.PI / 7; return `<circle cx="${(60 + Math.cos(a) * 15).toFixed(1)}" cy="${(64 + Math.sin(a) * 12).toFixed(1)}" r="3" fill="#ff70a6"/>`; }).join("");
+  } else if (id === "lithops") {
+    // due coppie di "sassi": due mezze cupole unite, con una fessura in mezzo
+    const pair = (x, y, c) => `<path d="M${x - 11} ${y + 8}c0-12 5-16 10-16v16z" fill="${c}"/><path d="M${x + 11} ${y + 8}c0-12-5-16-10-16v16z" fill="${c}"/><path d="M${x - 8} ${y - 3}c2-2 4-3 6-3M${x + 3} ${y - 4}c2 0 4 1 6 3" stroke="#7a6a4f" stroke-width="1.6" fill="none"/>`;
+    leaves = pair(48, 78, "#c2ab84") + pair(73, 77, "#b39c7a") + `<circle cx="34" cy="85" r="2" fill="#9a8f80"/><circle cx="88" cy="85" r="2.4" fill="#a89c8c"/>`;
+  } else if (id === "gardenia") {
+    // cespuglio di foglie lucide scure e fiori bianchi a rosa
+    const lf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="9" transform="rotate(${r} ${x} ${y})" fill="#1b4332"/>`;
+    const fl = (x, y) => [0,72,144,216,288].map(r => `<ellipse cx="${x}" cy="${y - 5}" rx="5" ry="6.5" transform="rotate(${r} ${x} ${y})" fill="#fffdf7" stroke="#d9d2bf" stroke-width=".8"/>`).join("") + `<circle cx="${x}" cy="${y}" r="3.4" fill="#ffe9a8"/>`;
+    leaves = `<path d="M60 86V54M60 70l-12-10M60 66l12-10" stroke="#5a4630" stroke-width="2.6"/>` +
+      [[44,62,-40],[52,52,-15],[68,52,15],[76,62,40],[40,74,-70],[80,74,70],[56,66,-5],[64,64,10],[60,44,0]].map(a => lf(...a)).join("") + fl(48, 50) + fl(72, 46) + fl(60, 34);
+  } else if (id === "kumquat") {
+    // alberello come il limone, con tanti piccoli frutti arancioni ovali
+    const lf = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="7.5" transform="rotate(${r} ${x} ${y})" fill="#2f8a4a"/>`;
+    leaves = `<path d="M60 86V56M60 66l-10-8M60 62l10-8" stroke="#7a5a3a" stroke-width="3.6" fill="none" stroke-linecap="round"/>` +
+      [[44,46,-40],[52,36,-20],[60,30,0],[68,36,20],[76,46,40],[40,58,-70],[80,58,70],[52,50,-10],[68,50,10],[60,44,0]].map(a => lf(...a)).join("") +
+      [[46,54],[72,48],[58,26],[66,58],[40,44],[80,40]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="4.2" fill="#f4a261"/>`).join("");
+  } else if (id === "cephalotus") {
+    // piccole anfore tozze e pelose a terra, con il coperchio
+    const pit = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-6-8c-4 6-4 14 6 16 10-2 10-10 6-16z" fill="#7f9c3f"/><path d="M-5 0c2 3 8 3 10 0" stroke="#8b1e3f" stroke-width="2" fill="none"/><ellipse cx="0" cy="-8" rx="6.5" ry="2.4" fill="#8b1e3f"/><ellipse cx="2" cy="-12" rx="6" ry="2.6" fill="#6b8f2e"/><path d="M-6-6l-2-2M6-6l2-2M-7 0l-2 0M7 0l2 0" stroke="#e9f5db" stroke-width=".9"/></g>`;
+    leaves = `<ellipse cx="60" cy="80" rx="9" ry="4" fill="#4f7a32"/>` + pit(42, 74, .95) + pit(58, 70, 1.1) + pit(76, 74, .95) + pit(50, 80, .8) + pit(68, 81, .8);
+  } else if (id === "vanda") {
+    // foglie a ventaglio, stelo con fiori viola; le radici pendono sotto il cestino
+    const lf = (r, l) => `<ellipse cx="60" cy="${80 - l}" rx="3.6" ry="${l}" transform="rotate(${r} 60 80)" fill="#4f7a32"/>`;
+    const fl = (x, y) => [0,72,144,216,288].map(r => `<ellipse cx="${x}" cy="${y - 4}" rx="3.6" ry="5" transform="rotate(${r} ${x} ${y})" fill="#7b4bd1"/>`).join("") + `<circle cx="${x}" cy="${y}" r="2" fill="#f1e3ff"/>`;
+    leaves = lf(-55, 16) + lf(55, 16) + lf(-35, 18) + lf(35, 18) + lf(-15, 19) + lf(15, 19) +
+      `<path d="M66 70C74 56 84 44 92 34" stroke="#6a8f3a" stroke-width="2" fill="none"/>` + fl(76, 52) + fl(86, 40) + fl(96, 30);
+    over = `<path d="M44 102c-2 10 2 18-2 26M52 102c2 10-2 16 0 24M62 102c-2 8 2 14 0 22M72 102c3 8-1 16 3 22M80 102c-2 8 1 12-2 18" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round"/>`;
   }
   // Le piante di palude stanno in un sottovaso pieno d’acqua (stavolta è giusto così)
   const tray = PLANTS[id]?.care?.bog ? `<path d="M22 124h76l-3 8H25z" fill="#8fcaff" opacity=".9"/><path d="M28 126h64" stroke="#ffffff" stroke-width="1.5" opacity=".7"/>` : "";
   // L’orchidea ha il vaso trasparente: si vedono le radici argentate dentro
   const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
-  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g>${tray}</svg>`;
+  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${pd.back}<g class="leaves">${stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g>${tray}</svg>`;
 }
 const mascot = (size = 150, mood = "happy") => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';
@@ -1167,7 +1588,43 @@ const daysSince = t => Math.floor((now() - t) / DAY);
 // wet = quante volte di fila è stata annaffiata con la terra ancora umida.
 // Si asciuga di un livello ogni "soak" giorni senza acqua.
 // "soak" = per quanti giorni la terra resta bagnata dopo un'annaffiatura (dipende dalla pianta).
-const care = g => PLANTS[g.plant].care;
+// Catalogo del negozio. "fits" = piante adatte, con informazioni vere; "why" = perché non va bene per le altre.
+const POT_SHOP = {
+  coprivaso:{ name:"Coprivaso della nonna", cost:80, show:"spatifillo", effect:"Solo estetico.",
+    desc:"Ceramica bianca a fiorellini blu. Dentro resta il vaso di plastica con il foro: fa scena, e la nonna approva.",
+    fits: id => PLANTS[id].indoor, why:"È un vaso da interno: fuori si riempie di pioggia e diventa una piscina." },
+  appeso:{ name:"Vaso appeso", cost:110, show:"pothos", effect:"Solo estetico.",
+    desc:"Sospeso con le corde, per le piante che ricadono: foglie e anfore pendono libere.",
+    fits: id => ["pothos","petunia","felce","nepenthes"].includes(id), why:"È per le piante ricadenti: questa cresce dritta, o è troppo pesante per stare appesa." },
+  balconiera:{ name:"Balconiera di legno", cost:120, show:"geranio", effect:"Solo estetico.",
+    desc:"Cassetta lunga di legno, da ringhiera: tanto spazio per radici di fiori e aromatiche.",
+    fits: id => ["geranio","petunia","basilico","menta","salvia","lavanda","rosmarino"].includes(id), why:"È da balcone, per fiori e aromatiche: questa sta meglio in un vaso suo." },
+  terracotta:{ name:"Vaso di terracotta", cost:150, show:"lavanda", effect:"Asciuga prima: la terra resta bagnata meno a lungo e un’annaffiatura di troppo fa meno danni. In cambio, ha sete un po’ prima.",
+    desc:"La terracotta è porosa: l’acqua in più evapora attraverso le pareti. Il vaso di chi teme i piedi bagnati.",
+    fits: id => ["olivo","rosmarino","lavanda","ficodindia","salvia","limone","kumquat","sansevieria","zamioculcas","geranio","bouganville","echeveria","haworthia","mammillaria","lithops"].includes(id),
+    why:"Asciuga in fretta: per una pianta che vuole la terra sempre umida è un piccolo deserto." },
+  autoirrigante:{ name:"Vaso autoirrigante", cost:180, show:"basilico", effect:"Riserva d’acqua sul fondo: la pianta resta senza sete molto più a lungo.",
+    desc:"Ha una riserva d’acqua sotto la terra e un indicatore del livello. La pianta beve quando le serve.",
+    fits: id => ["basilico","menta","felce","spatifillo","ortensia","calathea","maranta","fittonia","petunia"].includes(id),
+    why:"Tiene la terra sempre umida: per una pianta che teme i ristagni è una condanna." }
+};
+// Piante che non cambiano mai vaso, con il motivo (vale per qualsiasi modello)
+function potBlock(id){
+  if (id === "tillandsia") return "Vive senza terra: niente vaso, solo un pezzo di legno.";
+  if (id === "vanda") return "Vive a radice nuda, in un cestino: nella terra soffoca.";
+  if (id === "orchidea") return "Ha bisogno del vaso trasparente: le sue radici fanno la fotosintesi.";
+  if (PLANTS[id].care.bog || id === "cephalotus") return "Le carnivore vogliono plastica e torba: la ceramica e la terracotta rilasciano minerali che le avvelenano.";
+  return "";
+}
+const potFits = (model, id) => !potBlock(id) && POT_SHOP[model].fits(id);
+// Effetto del vaso sui tempi dell'acqua (solo dove è vero): terracotta asciuga prima, autoirrigante fa durare l'acqua
+function potCare(c, model){
+  if (model === "terracotta") { const soak = Math.max(1, Math.round(c.soak * .7)), thirsty = Math.max(soak + 1, Math.round(c.thirsty * .8)), wilt = Math.max(thirsty + 1, Math.round(c.wilt * .85));
+    return { ...c, soak, thirsty, wilt, dead: Math.max(wilt + 1, Math.round(c.dead * .9)), rot: c.rot + 1 }; }
+  if (model === "autoirrigante") return { ...c, thirsty: Math.round(c.thirsty * 1.5), wilt: Math.round(c.wilt * 1.4), dead: Math.round(c.dead * 1.3) };
+  return c;
+}
+const care = g => potCare(PLANTS[g.plant].care, g.pot);
 const wetLevel = g => Math.max(0, (g.wet || 0) - Math.floor(daysSince(g.wateredAt) / care(g).soak));
 const nameOf = g => g.nick || PLANTS[g.plant].name;
 // Accordo maschile/femminile in base alla pianta (il basilico, la menta...)
@@ -1200,7 +1657,8 @@ function settleMilestones(){
 }
 // Dopo la risemina la pianta ricresce: giorni di gioco per tornare adulta, in proporzione alla realtà
 const GROW_DAYS = { basilico:6, menta:6, petunia:8, felce:12, spatifillo:10, calathea:12, salvia:10, geranio:10, rosmarino:14, lavanda:14,
-  pothos:10, ortensia:14, zamioculcas:20, sansevieria:21, ficus:18, monstera:18, bouganville:25, ficodindia:25, tillandsia:25, orchidea:30, limone:35, olivo:40, drosera:14, dionea:30, sarracenia:30, nepenthes:30 };
+  pothos:10, ortensia:14, zamioculcas:20, sansevieria:21, ficus:18, monstera:18, bouganville:25, ficodindia:25, tillandsia:25, orchidea:30, limone:35, olivo:40, drosera:14, dionea:30, sarracenia:30, nepenthes:30,
+  alocasia:20, fittonia:10, maranta:14, begonia:14, echeveria:20, haworthia:22, mammillaria:30, lithops:40, gardenia:30, kumquat:35, cephalotus:40, vanda:40 };
 const STAGES = [[.15, "seme", "Seme"], [.45, "germoglio", "Germoglio"], [1, "piantina", "Piantina"]];
 const growDays = g => GROW_DAYS[g.plant] || 10;
 const growFrac = g => g.growAt ? (now() - g.growAt) / (growDays(g) * DAY) : 1;
@@ -1274,14 +1732,14 @@ function topbar(){
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
-  return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}</nav>`;
+  return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}${t("negozio","Negozio",ICON.shop)}</nav>`;
 }
 function render(){
   settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); save();
   if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
   if (!S.onboarded) return renderOnboarding(0);
   if (!welcomed) { welcomed = true; return renderWelcome(); }
-  const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : renderErbario();
+  const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
   app.innerHTML = topbar() + `<main>${body}</main>` + tabbar();
   const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", bar.offsetHeight + "px");
 }
@@ -1405,7 +1863,7 @@ function showItem(){
   if (it.t === "match") { kind = "Abbina le coppie"; const L1 = shuffle(it.pairs.map(p => p[0])), R1 = shuffle(it.pairs.map(p => p[1]));
     inner = `<div class="q">${esc(it.q)}</div><div class="match">${L1.map((l, k) => `<button class="opt" data-side="l" data-v="${esc(l)}">${esc(l)}</button><button class="opt" data-side="r" data-v="${esc(R1[k])}">${esc(R1[k])}</button>`).join("")}</div>`; }
   app.innerHTML = `<section class="lesson"><div class="lhead"><button id="quit" aria-label="Esci dalla lezione">${ICON.x}</button><div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
-    <div class="qbody"><div class="kind">${kind}</div>${inner}</div>
+    <div class="qbody"><div class="kind">${kind}${it.lv === 3 ? '<span class="lvtag">Difficile</span>' : ""}</div>${inner}</div>
     <div class="lfoot"><button class="btn" id="check" ${it.t === "card" ? "" : "disabled"}>${it.t === "card" ? "Ho capito" : "Controlla"}</button></div></section>
     <div class="sheet" id="sheet" role="status" aria-live="polite"></div>`;
   requestAnimationFrame(() => { const bar = app.querySelector(".prog i"); if (bar) bar.style.width = pct + "%"; });
@@ -1420,7 +1878,7 @@ function showItem(){
     app.querySelectorAll(".qbody .opt").forEach(x => { x.disabled = true; const k = x.dataset.k;
       const right = it.t === "mc" ? +k === it.a : it.t === "tf" ? (k === "true") === it.a : k === it.a;
       if (right) x.classList.add("ok"); else if (k === sel) x.classList.add("ko"); });
-    feedback(ok, it.why, it.plant);
+    feedback(ok, it.why, it.plant, it.lv || 1);
   };
 }
 function setupMatch(it, check){
@@ -1437,9 +1895,23 @@ function setupMatch(it, check){
 }
 // Livelli di scoperta di una pianta: si sale di uno a ogni risposta giusta su quella pianta
 const DISCOVERY = ["Mai vista", "Ti ricordi la faccia", "Sai come si chiama", "La conosci davvero: puoi piantarla"];
+// Titoli di esperto: dopo "La conosci davvero" (3/3) si sale di grado rispondendo giusto a domande di livello 2-3
+// su quella pianta. Al massimo un grado al giorno per pianta: la padronanza si costruisce su giorni diversi.
+const EXPERT = ["", "Custode", "Guru", "Leggenda"];
+const expertOf = id => (S.expert[id] || {}).g || 0;
+const todayN = () => Math.floor(now() / DAY);
+// Articolo giusto davanti al nome: del Basilico, dello Spatifillo, dell’Olivo, della Menta, dell’Orchidea
+function delOf(id){ const n = PLANTS[id].name, v = /^[aeiouAEIOU]/.test(n);
+  if (PLANTS[id].g === "f") return (v ? "dell’" : "della ") + n;
+  return v ? "dell’" + n : /^(s[^aeiou]|z|gn|ps|x|y)/i.test(n) ? "dello " + n : "del " + n; }
+const titleOf = id => expertOf(id) ? `${EXPERT[expertOf(id)]} ${delOf(id)}` : "";
+// Piante rare: per piantarle serve un titolo sulla "cugina facile"
+const gateOk = id => !PLANTS[id].gate || expertOf(PLANTS[id].gate.plant) >= PLANTS[id].gate.grade;
+const gateText = id => { const gt = PLANTS[id].gate; return `Serve: ${EXPERT[gt.grade]} ${delOf(gt.plant)}`; };
+const canPlant = id => isReady(id) && gateOk(id);
 const OK_TITLES = ["Giusto!","Esatto. Chi ti ha insegnato?","Pollice verde (in prova).","Corretto. Vasanicola annuisce."];
 const KO_TITLES = ["Ehm, no.","Quasi. (Non proprio.)","La pianta ha visto tutto.","No, ma con convinzione."];
-function feedback(ok, why, plant){
+function feedback(ok, why, plant, lvl = 1){
   if (!ok) L.mistakes++;
   // Conoscenza: subito, e solo se la risposta è giusta e la domanda è su una pianta
   let discovery = "";
@@ -1452,6 +1924,12 @@ function feedback(ok, why, plant){
     // pianta già scoperta del tutto: niente riquadro, sarebbe solo rumore
     if (up) discovery = `<div class="disc">${plantSVG(plant, 40)}<div class="t"><b>${PLANTS[plant].name}: scoperta ${k}/${max}</b><small>${DISCOVERY[k]}</small>
       <div class="bar ${k >= max ? "full" : ""}"><i style="width:${k0 / max * 100}%" data-to="${k / max * 100}"></i></div></div></div>`;
+    // Titolo di esperto: pianta già conosciuta del tutto, domanda medio-difficile, un grado al giorno
+    const e = S.expert[plant] || { g:0, day:-1 };
+    if (k0 >= max && lvl >= 2 && e.g < 3 && e.day !== todayN()) {
+      S.expert[plant] = { g: e.g + 1, day: todayN() }; save();
+      discovery = `<div class="disc xp-up">${plantSVG(plant, 40)}<div class="t"><b>Nuovo titolo: ${titleOf(plant)}</b><small>${["", "Il primo gradino da esperto.", "Ormai ti chiedono consigli.", "Grado massimo. Le piante parlano di te."][S.expert[plant].g]}</small><div class="dots">${[1,2,3].map(n => `<i class="${n <= S.expert[plant].g ? "on" : ""}"></i>`).join("")}</div></div></div>`;
+    }
   }
   // La pianta incontrata si segna solo per questa lezione: diventa "scoperta" a lezione finita
   if (plant && !L.seen.includes(plant)) L.seen.push(plant);
@@ -1467,8 +1945,10 @@ function feedback(ok, why, plant){
 function next(){ L.idx++; if (L.idx >= L.items.length) finishLesson(); else showItem(); }
 function finishLesson(){
   const perfect = L.mistakes === 0;
-  const g = L.replay ? RULES.replayGocce : RULES.stepGocce + (perfect ? RULES.perfectBonusGocce : 0);
-  const x = L.replay ? RULES.replayXp : RULES.stepXp + (perfect ? RULES.perfectBonusXp : 0);
+  // Ricompense: l'Allenamento (domande già viste) vale metà esperienza; le zone difficili (dalla 6) valgono di più
+  const practice = !L.replay && L.step.items && L.li >= authored(L.step).length, hardZone = ZONES.findIndex(z => z.id === L.step.zone) >= 5;
+  const g = L.replay ? RULES.replayGocce : RULES.stepGocce + (perfect ? RULES.perfectBonusGocce : 0) + (hardZone ? 2 : 0);
+  const x = L.replay ? RULES.replayXp : Math.round((RULES.stepXp + (perfect ? RULES.perfectBonusXp : 0)) / (practice ? 2 : 1)) + (hardZone ? 5 : 0);
   S.gocce += g; S.xp += x;
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
@@ -1480,7 +1960,7 @@ function finishLesson(){
   save();
   const rows = Object.keys(L.gained).map(p => { const k = kOf(p), full = k >= RULES.knowledgeMax;
     return `<div class="krow">${plantSVG(p, 46)}<div class="t"><b>${PLANTS[p].name}</b><div class="bar ${full ? "full" : ""}"><i data-to="${k / RULES.knowledgeMax * 100}" style="width:${before[p] / RULES.knowledgeMax * 100}%"></i></div></div>${full ? (inGarden(p) ? '<span class="tag planted">In serra</span>' : '<span class="tag ready">Pronta!</span>') : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</div>`; }).join("");
-  const readyNow = Object.keys(L.gained).some(p => isReady(p) && !inGarden(p));
+  const readyNow = Object.keys(L.gained).some(p => canPlant(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
   app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
     <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div><div class="reward sun"><b>+${x}</b><span>Esperienza</span></div></div>
@@ -1490,7 +1970,8 @@ function finishLesson(){
       ${unblocked.length ? `<p class="sub" style="margin:0">Ora sai cosa fare: puoi riprovare a curare ${unblocked.map(x => esc(nameOf(x))).join(" e ")}.</p><button class="btn bad" id="toSerra">Torna a curarla</button>` : readyNow ? `<button class="btn sun" id="toSerra">Vai a piantarla</button>` : ""}
       <button class="btn ${readyNow || unblocked.length ? "ghost" : ""}" id="toPath">Continua</button></div></section>`;
   setTimeout(() => app.querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.to + "%"), 250);
-  document.getElementById("toPath").onclick = () => { L = null; tab = "path"; render(); };
+  const back = L.from || "path";
+  document.getElementById("toPath").onclick = () => { L = null; tab = back; render(); };
   const ts = document.getElementById("toSerra"); if (ts) ts.onclick = () => { L = null; tab = "serra"; render(); };
 }
 
@@ -1508,14 +1989,14 @@ function slotCard(g, i){
   const growing = !g.dead && g.growAt, day = growing ? Math.min(growDays(g), Math.floor(growFrac(g) * growDays(g)) + 1) : 0;
   const grow = growing ? `<div class="grow"><b>${stageLabel(g)}</b>: giorno ${day} di ${growDays(g)}<div class="bar"><i style="width:${Math.round(growFrac(g) * 100)}%"></i></div></div>` : "";
   return `<div class="slot plant${em ? " alarm" : ""}">
-    <div class="sart">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g))}</div>
+    <div class="sart">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}<button class="potbtn gift" data-gift="${i}">${g.dead ? "Libera il posto" : "Regala"}</button></div>
     <div class="sinfo">
       <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>
       ${g.nick ? `<span class="species">${p.name}</span>` : ""}
       <div class="badges"><span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}</div>
       ${grow}<div class="line" id="line-${i}">${line}</div>
     </div>
-    <div class="sfull">${em}<div class="care">${ICON.drop}<span>${c.rule}</span></div>${action}</div>
+    <div class="sfull">${em}<div class="care">${ICON.drop}<span>${c.rule}${g.pot === "terracotta" ? " (in terracotta asciuga prima)" : g.pot === "autoirrigante" ? " (con la riserva d’acqua dura di più)" : ""}</span></div>${action}</div>
   </div>`;
 }
 function renderArea(a){
@@ -1549,10 +2030,21 @@ function unlockZone(zid){
       if (!S.discovered.includes(it.plant)) S.discovered.push(it.plant); } });
   });
 }
+function renderNegozio(){
+  const cards = Object.entries(POT_SHOP).map(([mo, P]) => {
+    const owned = S.pots.includes(mo);
+    const ok = Object.keys(PLANTS).filter(id => potFits(mo, id)), known = ok.filter(id => S.discovered.includes(id));
+    const names = known.length ? known.map(id => PLANTS[id].name).join(", ") + (ok.length > known.length ? ` e altre ${ok.length - known.length} da scoprire` : "") : `${ok.length} piante, da scoprire nel percorso`;
+    return `<div class="shopcard${owned ? " owned" : ""}"><div class="sart">${plantSVG(P.show, 96, "sana", "adulta", mo)}</div><div class="t"><h3>${P.name}</h3><p>${P.desc}</p>
+      <p class="pnote"><b>Effetto:</b> ${P.effect}</p><p class="pnote"><b>Per:</b> ${names}</p>
+      ${owned ? '<span class="tag planted">Tuo: lo cambi in serra, toccando “Cambia vaso”</span>' : `<button class="btn small sun" style="width:auto" data-buypot="${mo}" ${S.xp < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+  }).join("");
+  return `<section class="sec"><h1>Negozio</h1><p class="lead">Vasi nuovi per le piante che hai già. Si comprano una volta sola e valgono per sempre, su tutte le piante adatte. Non tutti i vasi vanno bene per tutte: qui si studia anche questo.</p><div class="shop">${cards}</div></section>`;
+}
 function renderSerra(){
   const empty = !S.garden.length;
   // Piante pronte che non hanno un posto libero dove possono stare: lo diciamo chiaro
-  const waiting = Object.keys(PLANTS).filter(id => isReady(id) && !inGarden(id)
+  const waiting = Object.keys(PLANTS).filter(id => canPlant(id) && !inGarden(id)
     && !(fitsIn(id, "casa") && freeSlots("casa") > 0) && !(balconyOpen() && freeSlots("balcone") > 0));
   const hint = waiting.length
     ? `<p class="lead" style="color:var(--leaf-dark)">${waiting.length === 1 ? `${PLANTS[waiting[0]].name} è ${gen(waiting[0], "pronto", "pronta")}` : `${waiting.length} piante sono pronte`}, ma non c’è un posto libero adatto. Sblocca un posto con l’esperienza.</p>` : "";
@@ -1565,6 +2057,7 @@ function openPicker(a){
   const list = Object.keys(PLANTS).filter(id => S.discovered.includes(id) && !inGarden(id));
   const rows = list.map(id => { const k = kOf(id), ready = k >= RULES.knowledgeMax, cost = (id === "basilico" && !S.tutorialPlanted) ? 0 : PLANTS[id].cost;
     if (!fitsIn(id, a)) return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><span style="font-size:13px;color:var(--ink-2)">Vuole pieno sole: in casa non ce la fa.</span></div><span class="tag study">Solo balcone</span></div>`;
+    if (ready && !gateOk(id)) return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><span style="font-size:13px;color:var(--ink-2)">Pianta rara: prima diventa esperto della sua cugina facile.</span></div><span class="tag study">${gateText(id)}</span></div>`;
     return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><div class="bar ${ready ? "full" : ""}"><i style="width:${k / RULES.knowledgeMax * 100}%"></i></div></div>
     ${ready ? `<button class="btn small sun" style="width:auto" data-sow="${id}" ${S.xp < cost ? "disabled" : ""}>${cost ? `Pianta ${cost}` : "Gratis"}</button>` : `<span class="tag study">Studiala ancora</span>`}</div>`; }).join("");
   modal(`<h2>Cosa piantiamo ${a === "casa" ? "in casa" : "sul balcone"}?</h2><p class="lead" style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Puoi piantare solo le piante con la barra della conoscenza piena. Niente scorciatoie: qui si studia.</p>
@@ -1586,14 +2079,34 @@ function modal(html){ const m = document.createElement("div"); m.className = "mo
 function renderErbario(){
   const rows = Object.keys(PLANTS).map(id => { const known = S.discovered.includes(id), k = kOf(id), full = k >= RULES.knowledgeMax;
     if (!known) return `<div class="krow unknown"><div class="sil">${plantSVG(id, 46)}</div><div class="t"><b>Pianta misteriosa</b><span style="font-size:13px;color:var(--ink-2)">La scopri andando avanti nel percorso.</span></div></div>`;
-    return `<button class="krow" data-card="${id}">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><div class="bar ${full ? "full" : ""}"><i style="width:${k / RULES.knowledgeMax * 100}%"></i></div></div>${inGarden(id) ? '<span class="tag planted">In serra</span>' : full ? '<span class="tag ready">Pronta</span>' : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</button>`; }).join("");
+    const tl = titleOf(id);
+    return `<button class="krow" data-card="${id}">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b>${tl ? `<small class="xtitle">${tl}</small>` : ""}<div class="bar ${full ? "full" : ""}"><i style="width:${k / RULES.knowledgeMax * 100}%"></i></div></div>${inGarden(id) ? '<span class="tag planted">In serra</span>' : full && !gateOk(id) ? '<span class="tag study">Rara</span>' : full ? '<span class="tag ready">Pronta</span>' : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</button>`; }).join("");
   return `<section class="sec"><h1>Erbario</h1><p class="lead">Tutto quello che sai sulle piante che hai incontrato. (Per ora è poco.) La barra si riempie rispondendo bene alle domande su di loro.</p><div class="herb">${rows}</div></section>`;
 }
 function openCard(id){
-  const p = PLANTS[id], k = kOf(id);
+  const p = PLANTS[id], k = kOf(id); let m;
   const shown = Math.max(1, Math.round(k / RULES.knowledgeMax * p.facts.length));
-  modal(`<div style="display:flex;gap:14px;align-items:center">${plantSVG(id, 90)}<div><h2>${p.name}</h2><div style="color:var(--ink-2);font-size:14px;font-style:italic">${p.sci}</div><span class="tag ${p.indoor ? "planted" : "study"}" style="display:inline-block;margin-top:6px">${p.indoor ? "Casa o balcone" : "Solo balcone"}</span></div></div>
-    <ul class="facts">${p.facts.map((f, i) => i < shown ? `<li>${esc(f)}</li>` : `<li class="lock">Da scoprire nelle prossime lezioni.</li>`).join("")}</ul><button class="btn ghost" data-close="1">Chiudi</button>`);
+  m = modal(`<div style="display:flex;gap:14px;align-items:center">${plantSVG(id, 90)}<div><h2>${p.name}</h2><div style="color:var(--ink-2);font-size:14px;font-style:italic">${p.sci}</div><span class="tag ${p.indoor ? "planted" : "study"}" style="display:inline-block;margin-top:6px">${p.indoor ? "Casa o balcone" : "Solo balcone"}</span></div></div>
+    ${expertBox(id)}
+    <ul class="facts">${p.facts.map((f, i) => i < shown ? `<li>${esc(f)}</li>` : `<li class="lock">Da scoprire nelle prossime lezioni.</li>`).join("")}</ul>
+    <div style="display:flex;flex-direction:column;gap:12px">${k >= RULES.knowledgeMax ? `<button class="btn" id="practice">Allenati su questa pianta</button>` : ""}<button class="btn ghost" data-close="1">Chiudi</button></div>`);
+  m.querySelector("#practice")?.addEventListener("click", () => { m.remove(); startPlantPractice(id); });
+}
+// Riquadro del titolo nella scheda: grado attuale, prossimo passo, eventuale sblocco di una rara
+function expertBox(id){
+  const k = kOf(id), g = expertOf(id), e = S.expert[id] || {};
+  const gate = PLANTS[id].gate ? `<p class="xnote">${gateOk(id) ? "Pianta rara: sbloccata." : `Pianta rara. ${gateText(id)}.`}</p>` : "";
+  if (k < RULES.knowledgeMax) return `<div class="xbox"><b>Titolo</b><p class="xnote">Prima scoprila del tutto (3/3). Poi si diventa esperti.</p>${gate}</div>`;
+  const next = g >= 3 ? "Grado massimo raggiunto." : e.day === todayN() ? "Oggi hai già fatto un passo avanti: torna domani." : "Prossimo grado: rispondi giusto a una domanda media o difficile su questa pianta.";
+  return `<div class="xbox"><b>${g ? titleOf(id) : "Nessun titolo, per ora"}</b><div class="dots">${[1,2,3].map(n => `<i class="${n <= g ? "on" : ""}"></i>`).join("")}</div><p class="xnote">${next}</p>${gate}</div>`;
+}
+// Allenamento su una sola pianta: prima le domande medie e difficili (quelle che fanno salire il titolo)
+function startPlantPractice(id){
+  const all = STEPS.flatMap(st => authored(st).flatMap(l => l.items)).filter(it => it.plant === id && it.t !== "card");
+  const hard = shuffle(all.filter(it => (it.lv || 1) >= 2)), easy = shuffle(all.filter(it => (it.lv || 1) < 2));
+  L = { i:-1, li:0, step:{ id:"pp-" + id, title: PLANTS[id].name, zone:null, items:[] }, items: hard.concat(easy).slice(0, 6), idx:0, mistakes:0,
+    gained:{}, before:{}, seen:[], replay:true, title:"Allenamento", from:"erbario" };
+  showItem();
 }
 
 /* =========================================================
@@ -1611,6 +2124,12 @@ app.addEventListener("click", e => {
     return water(g, level);
   }
   if (t.dataset.nick !== undefined) return openNick(S.garden[+t.dataset.nick]);
+  if (t.dataset.pot !== undefined) return openPotPicker(+t.dataset.pot);
+  if (t.dataset.gift !== undefined) { const g = S.garden[+t.dataset.gift];
+    return ask(g.dead ? "Liberare il posto?" : `Regalare ${esc(nameOf(g))}?`, g.dead ? "Il seme va nel compost e il posto torna libero." : "Va a vivere da qualcun altro (si spera con più attenzioni). Il posto torna libero; soprannome e giorni di vita se ne vanno con lei.", g.dead ? "Libera il posto" : "Regala", () => {
+      S.garden.splice(S.garden.indexOf(g), 1); render(); toast(g.dead ? "Posto libero. Si ricomincia." : "Regalata. Chi l’ha ricevuta non sa cosa l’aspetta."); }, "Tienila"); }
+  if (t.dataset.buypot) { const mo = t.dataset.buypot, c = POT_SHOP[mo].cost; if (S.xp < c || S.pots.includes(mo)) return;
+    S.xp -= c; S.pots.push(mo); render(); bump("#pXp"); toast(`${POT_SHOP[mo].name}: tuo. Ora vai in serra a sfoggiarlo.`); return; }
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
   if (t.dataset.unlock) { unlockZone(t.dataset.unlock); tab = "path"; render(); window.scrollTo(0, 0); toast(t.dataset.unlock === "all" ? "Percorso finito. Tutte le piante sono piantabili." : "Zone precedenti completate: si parte da qui."); return; }
   if (t.id === "addRes") { S.gocce += 200; S.xp += 200; render(); bump("#pGocce"); bump("#pXp"); return; }
@@ -1666,6 +2185,17 @@ function openEmergency(g){
     m.addEventListener("click", ev => { if (ev.target.closest("[data-close]") || ev.target === m) render(); });
   });
 }
+function openPotPicker(i){
+  const g = S.garden[i], models = [null, ...Object.keys(POT_SHOP)];
+  const rows = models.map(mo => {
+    const name = mo ? POT_SHOP[mo].name : "Vaso di base", using = (g.pot || null) === mo, owned = !mo || S.pots.includes(mo), fits = !mo || potFits(mo, g.plant);
+    const right = using ? '<span class="tag planted">In uso</span>' : !owned ? `<span class="tag study">Nel negozio: ${POT_SHOP[mo].cost}</span>` : fits ? `<button class="btn small" style="width:auto" data-usepot="${mo || ""}">Usa</button>` : "";
+    const note = mo && owned && !fits && !using ? `<span class="pnote">${POT_SHOP[mo].why}</span>` : mo ? `<span class="pnote">${POT_SHOP[mo].effect}</span>` : '<span class="pnote">Plastica con il foro. Non sbaglia mai.</span>';
+    return `<div class="krow${owned && !fits && !using ? " unknown" : ""}">${plantSVG(g.plant, 54, "sana", "adulta", mo)}<div class="t"><b>${name}</b>${note}</div>${right}</div>`;
+  }).join("");
+  const m = modal(`<h2>Che vaso le diamo?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">${esc(nameOf(g))}. Il vaso giusto dipende dalla pianta, non dal divano.</p><div class="pick">${rows}</div><button class="btn ghost" data-close="1">Chiudi</button>`);
+  m.querySelectorAll("[data-usepot]").forEach(b => b.onclick = () => { g.pot = b.dataset.usepot || null; m.remove(); render(); toast(g.pot ? `${nameOf(g)} ha un vaso nuovo: ${POT_SHOP[g.pot].name.toLowerCase()}.` : `${nameOf(g)} torna nel vaso di base.`); });
+}
 function openNick(g){
   const m = modal(`<form id="nickForm"><h2>Come ${gen(g.plant, "lo", "la")} chiami?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Un soprannome per ${gen(g.plant, "il tuo", "la tua")} ${PLANTS[g.plant].name}. Dare un nome crea un legame. E un senso di colpa: se muore, il soprannome se ne va con lei.</p>
     <label for="nickIn" class="kind" style="display:block;margin-top:16px">Soprannome</label><input id="nickIn" class="field" style="margin-top:4px" maxlength="20" autocomplete="off" value="${esc(g.nick || "")}" placeholder="${PLANTS[g.plant].name}">
@@ -1679,7 +2209,7 @@ function openNick(g){
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-sow]"); if (!t) return;
   const id = t.dataset.sow, free = id === "basilico" && !S.tutorialPlanted, cost = free ? 0 : PLANTS[id].cost;
-  if (!fitsIn(id, pickArea)) return;
+  if (!fitsIn(id, pickArea) || !canPlant(id)) return;
   if (freeSlots(pickArea) <= 0) { toast("Nessun posto libero. La serra è piena come un monolocale in sei."); return; }
   if (S.xp < cost) return;
   S.xp -= cost; if (free) S.tutorialPlanted = true;
