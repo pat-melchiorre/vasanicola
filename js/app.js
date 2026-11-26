@@ -541,7 +541,7 @@ function levelCheers(ups){
   if (!ups.length) return;
   const r = ups.map(levelReward), sum = k => r.reduce((a, x) => a + (x[k] || 0), 0), n = ups[ups.length - 1];
   const parts = [sum("casa") && `${sum("casa") === 1 ? "un posto" : sum("casa") + " posti"} in casa`, sum("balcone") && `${sum("balcone") === 1 ? "un posto" : sum("balcone") + " posti"} sul balcone`].filter(Boolean);
-  lvToast = `${lvTxt(n)}: ${esc(levelInfo(S.xp).L.name)}. ${parts.length ? "Si apre " + parts.join(" e ") + "." : ""}${sum("gocce") ? ` +${sum("gocce")} gocce.` : ""}`;
+  lvToast = `${lvTxt(n)}: ${esc(levelInfo(S.xp).L.name)}. ${parts.length ? (sum("casa") + sum("balcone") > 1 ? "Si aprono " : "Si apre ") + parts.join(" e ") + "." : ""}${sum("gocce") ? ` +${sum("gocce")} gocce.` : ""}`;
 }
 let lvToast = "";
 function openLevel(){
