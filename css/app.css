@@ -368,3 +368,22 @@ button.pill{border:0;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .fdots i.on{width:18px;border-radius:4px;background:var(--leaf)}
 .pill.streak svg{width:26px;height:31px;margin:-4px 0}
 .rewards>:only-child{grid-column:1/-1}
+/* ---- Livello col sole ---- */
+.lvsun{display:inline-flex;vertical-align:-3px;margin-left:3px;color:var(--sun-dark)}
+.lvsun svg{width:16px;height:16px}
+.pill.streak .beanicon{width:24px;height:24px;margin:0}
+/* ---- Card della pianta in serra ---- */
+.slot.plant{position:relative;grid-template-columns:104px minmax(0,1fr);gap:12px 14px;align-items:center;padding:14px 14px 16px}
+.slot.plant .sart{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;align-self:start}
+.slot.plant .sinfo{gap:5px;padding-right:34px}
+.slot.plant .age{font-size:12px;font-weight:800;color:var(--sun-dark)}
+.slot.plant .potbtn{margin:0;min-height:28px;padding:4px 10px;border-radius:999px;background:var(--water-bg)}
+.slot.plant .line{font-size:14px}
+.corner{position:absolute;top:10px;right:10px;width:36px;height:36px;display:grid;place-items:center;border-radius:12px;color:var(--ink-2);border:2px solid var(--line);background:var(--bg)}
+.corner svg{width:20px;height:20px}
+.corner:active{transform:translateY(2px)}
+/* ---- Percorso: caselle più vicine, etichette delle finite più staccate ---- */
+.path{gap:50px}
+.nodewrap:has(.bubble){margin-top:22px}
+.node.done + .nodelabel{margin-top:14px}
+.fcard.lock{display:flex;flex-direction:column;gap:6px;color:var(--ink-2)}.fcard.lock p{margin:0}

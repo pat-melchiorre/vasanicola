@@ -181,15 +181,15 @@ const thirstyCount = () => S.garden.filter(g => g.em || ["assetata","appassita",
    ========================================================= */
 const app = document.getElementById("app");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
-function toast(msg){ document.querySelector(".toast")?.remove(); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), Math.min(7000, 2000 + msg.length * 45)); }
+function toast(msg, html){ document.querySelector(".toast")?.remove(); const t = document.createElement("div"); t.className = "toast"; if (html) t.innerHTML = msg; else t.textContent = msg; msg = t.textContent; document.body.appendChild(t); setTimeout(() => t.remove(), Math.min(7000, 2000 + msg.length * 45)); }
 function bump(sel){ const el = document.querySelector(sel); if (el) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); } }
 
 function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
   return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div>
-    <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanSVG(beanStage(n), 26)}${n}</button>
+    <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
     <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ICON.drop}${S.gocce}</div>
-    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ICON.sun}<span class="lvl">Liv.</span>${lv}</button></header>`;
+    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ICON.sun}${lv}</button></header>`;
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
@@ -198,6 +198,7 @@ function tabbar(){
 function render(){
   settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); settleStreak(); levelCheers(settleLevel()); save();
   if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
+  if (lvToast && S.onboarded) { const msg = lvToast; lvToast = ""; setTimeout(() => toast(msg, true), cheers.length ? 2500 : 300); }
   if (!S.onboarded) return renderOnboarding(0);
   if (!welcomed) { welcomed = true; return renderWelcome(); }
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
@@ -516,6 +517,8 @@ function levelInfo(xp){
   const i = LEVELS.findIndex((l, k) => xp < (LEVELS[k + 1] || { xp:Infinity }).xp);
   return { n:i + 1, L:LEVELS[i], from:LEVELS[i].xp, to:LEVELS[i + 1].xp };
 }
+// "Livello 7" sempre seguito dal sole, così si capisce che viene dall’esperienza
+const lvTxt = n => `Livello ${n}<span class="lvsun">${ICON.sun}</span>`;
 const levelReward = n => n <= LEVELS.length ? LEVELS[n - 1] : { gocce:60 };
 const rewardText = r => r.casa ? "Si apre un posto in casa." : r.balcone ? "Si apre un posto sul balcone." : r.gocce ? `+${r.gocce} gocce.` : "";
 // Posti in serra dovuti al livello n (la casa ne ha 1 di partenza)
@@ -533,10 +536,17 @@ function settleLevel(){
     ups.push(S.lv); }
   return ups;
 }
-function levelCheers(ups){ ups.forEach(n => cheers.push(`Livello ${n}: ${levelInfo(LEVELS[n - 1]?.xp ?? S.xp).L.name}. ${rewardText(levelReward(n))}`)); }
+// Più livelli insieme (es. dopo "Finisci tutto"): un avviso solo, riassunto
+function levelCheers(ups){
+  if (!ups.length) return;
+  const r = ups.map(levelReward), sum = k => r.reduce((a, x) => a + (x[k] || 0), 0), n = ups[ups.length - 1];
+  const parts = [sum("casa") && `${sum("casa") === 1 ? "un posto" : sum("casa") + " posti"} in casa`, sum("balcone") && `${sum("balcone") === 1 ? "un posto" : sum("balcone") + " posti"} sul balcone`].filter(Boolean);
+  lvToast = `${lvTxt(n)}: ${esc(levelInfo(S.xp).L.name)}. ${parts.length ? "Si apre " + parts.join(" e ") + "." : ""}${sum("gocce") ? ` +${sum("gocce")} gocce.` : ""}`;
+}
+let lvToast = "";
 function openLevel(){
   const { n, L, from, to } = levelInfo(S.xp), nx = levelReward(n + 1), nxName = levelInfo(to).L.name;
-  modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">Livello ${n}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
+  modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">${lvTxt(n)}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
     <div class="bar lvbar"><i style="width:${Math.round((S.xp - from) / (to - from) * 100)}%"></i></div>
     <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p>
     <p class="pnote" style="margin:12px 0 0">L’esperienza non si spende: misura quanto hai imparato. Si paga tutto in gocce.</p></div><button class="btn" data-close="1">Ok</button>`);
@@ -637,7 +647,7 @@ function finishLesson(){
   const xpBefore = S.xp - x, day = bumpStreak(), ups = settleLevel();
   // Esperienza: niente numeri, solo la barra del livello che avanza (i punti sono nella finestra del livello)
   const lb = levelInfo(xpBefore), la = levelInfo(S.xp), frac = (v, l) => Math.round((v - l.from) / (l.to - l.from) * 100);
-  const lvBar = `<div class="lvres"><div class="lvhead"><b>Livello ${la.n}</b><span>${esc(la.L.name)}</span></div><div class="bar"><i data-to="${frac(S.xp, la)}" style="width:${la.n > lb.n ? 0 : frac(xpBefore, lb)}%"></i></div></div>`;
+  const lvBar = `<div class="lvres"><div class="lvhead"><b>${lvTxt(la.n)}</b><span>${esc(la.L.name)}</span></div><div class="bar"><i data-to="${frac(S.xp, la)}" style="width:${la.n > lb.n ? 0 : frac(xpBefore, lb)}%"></i></div></div>`;
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
   if (!L.replay) S.prog[L.step.id] = L.li + 1;
@@ -654,7 +664,7 @@ function finishLesson(){
     <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div></div>
     ${lvBar}
     ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
-    ${ups.map(n => `<div class="lvup"><b>Livello ${n}: ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
+    ${ups.map(n => `<div class="lvup"><b>${lvTxt(n)} ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
     <div style="width:100%;margin-top:auto;display:flex;flex-direction:column;gap:12px">
       ${unblocked.length ? `<p class="sub" style="margin:0">Ora sai cosa fare: puoi riprovare a curare ${unblocked.map(x => esc(nameOf(x))).join(" e ")}.</p><button class="btn bad" id="toSerra">Torna a curarla</button>` : readyNow ? `<button class="btn sun" id="toSerra">Vai a piantarla</button>` : ""}
@@ -680,13 +690,17 @@ function slotCard(g, i){
     : `<div class="acts"><button class="btn small ghost" data-feel="${i}">Dito nella terra</button><button class="btn small water" data-water="${i}" ${S.gocce < RULES.waterCost ? "disabled" : ""}>Annaffia ${RULES.waterCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button></div>`;
   const growing = !g.dead && g.growAt;
   const grow = growing ? `<span class="tag study">${stageLabel(g)}</span>` : "";
+  // Layout: in alto a destra l'icona per regalare/liberare; a sinistra disegno + vaso; a destra nome, stato, frase;
+  // sotto, a tutta larghezza: emergenza, regola d'acqua, azioni
   return `<div class="slot plant${em ? " alarm" : ""}">
-    <div class="sart">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}<button class="potbtn gift" data-gift="${i}">${g.dead ? "Libera il posto" : "Regala"}</button></div>
+    <button class="corner" data-gift="${i}" aria-label="${g.dead ? "Libera il posto" : `Regala ${esc(nameOf(g))}`}">${g.dead ? ICON.trash : ICON.gift}</button>
+    <div class="sart">${plantSVG(g.plant, 92, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}</div>
     <div class="sinfo">
       <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>
       ${g.nick ? `<span class="species">${p.name}</span>` : ""}
-      <div class="badges"><span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}</div>
-      ${grow}<div class="line" id="line-${i}">${line}</div>
+      <div class="badges"><span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${grow}</div>
+      ${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}
+      <div class="line" id="line-${i}">${line}</div>
     </div>
     <div class="sfull">${em}<div class="care">${ICON.drop}<span>${c.rule}${g.pot === "terracotta" ? " (in terracotta asciuga prima)" : g.pot === "autoirrigante" ? " (con la riserva d’acqua dura di più)" : ""}</span></div>${action}</div>
   </div>`;
@@ -698,7 +712,7 @@ function renderArea(a){
   S.garden.forEach((g, i) => { if (g.area === a) slots.push(slotCard(g, i)); });
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
   const nx = nextSlotLevel(a);
-  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}, ${esc(nx.L.name)}.</span></div>`);
+  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<span class="lvsun">${ICON.sun}</span>, ${esc(nx.L.name)}.</span></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
@@ -792,8 +806,8 @@ function openCard(id){
   const shown = Math.max(1, Math.round(k / RULES.knowledgeMax * p.facts.length));
   m = modal(`<div style="display:flex;gap:14px;align-items:center">${plantSVG(id, 90)}<div><h2>${p.name}</h2><div style="color:var(--ink-2);font-size:14px;font-style:italic">${p.sci}</div><span class="tag ${p.indoor ? "planted" : "study"}" style="display:inline-block;margin-top:6px">${p.indoor ? "Casa o balcone" : "Solo balcone"}</span></div></div>
     ${expertBox(id)}
-    <div class="kind" style="margin:16px 0 8px">Curiosità ${shown}/${p.facts.length}</div>
-    <div class="fcar" role="list" aria-label="Curiosità">${p.facts.map((f, i) => i < shown ? `<div class="fcard" role="listitem"><small>${i + 1}</small><p>${esc(f)}</p></div>` : `<div class="fcard lock" role="listitem"><small>${i + 1}</small><p>Da scoprire nelle prossime lezioni.</p></div>`).join("")}</div>
+    <div class="kind" style="margin:16px 0 8px">Curiosità</div>
+    <div class="fcar" role="list" aria-label="Curiosità">${p.facts.map((f, i) => i < shown ? `<div class="fcard" role="listitem"><p>${esc(f)}</p></div>` : `<div class="fcard lock" role="listitem">${ICON.lock.replace("<svg", '<svg width="22" height="22"')}<p>Da scoprire nelle prossime lezioni.</p></div>`).join("")}</div>
     <div class="fdots" aria-hidden="true">${p.facts.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>
     <div style="display:flex;flex-direction:column;gap:12px">${k >= RULES.knowledgeMax ? `<button class="btn" id="practice">Allenati su questa pianta</button>` : ""}<button class="btn ghost" data-close="1">Chiudi</button></div>`);
   m.querySelector("#practice")?.addEventListener("click", () => { m.remove(); startPlantPractice(id); });

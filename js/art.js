@@ -293,3 +293,9 @@ function beanSVG(stage = 0, size = 120, dry = false){
 }
 // Lo spruzzino: tiene umido il cotone per un giorno saltato
 const sprayerSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><path d="M36 40h28v46a6 6 0 0 1-6 6H42a6 6 0 0 1-6-6z" fill="#3da5ec" stroke="#2a6fa8" stroke-width="4"/><rect x="40" y="28" width="20" height="12" rx="2" fill="#f2c230" stroke="#b8860b" stroke-width="3"/><path d="M44 28V16h22l6 6h-12v6" fill="#f2c230" stroke="#b8860b" stroke-width="3" stroke-linejoin="round"/><path d="M60 34l10 8" stroke="#b8860b" stroke-width="4" stroke-linecap="round"/><g fill="#7cc6f6"><circle cx="82" cy="16" r="3"/><circle cx="88" cy="24" r="2.5"/><circle cx="80" cy="28" r="2"/></g><rect x="40" y="56" width="20" height="16" rx="3" fill="#fff" opacity=".4"/></svg>`;
+// Icone aggiunte: regalo, fagiolo fisso per la barra in alto
+Object.assign(ICON, {
+  gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v7.5h14V13M12 9v11.5"/><path d="M12 9c-1.5-3.5-6-4.5-6-1.6C6 9 9 9 12 9zM12 9c1.5-3.5 6-4.5 6-1.6C18 9 15 9 12 9z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>'
+});
+const beanIcon = (size = 26) => `<svg class="beanicon" width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15C16 11 15 8 12 6" fill="none" stroke="#3f9d52" stroke-width="2.4" stroke-linecap="round"/><path d="M16 11c1-4 5-6 9-5c-1 4-5 6-9 5z" fill="#43b05c" stroke="#2e8b48" stroke-width="1.4"/><path d="M7 20c0-4 4-6 8-5s4 2 7 1 4 2 3 5-5 6-10 5-8-2-8-6z" fill="#a8743f" stroke="#7a4f24" stroke-width="2"/><ellipse cx="11" cy="20" rx="2.6" ry="1.4" fill="#fff" opacity=".35"/></svg>`;
