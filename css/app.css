@@ -398,3 +398,21 @@ button.pill{border:0;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .dbt span{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
 .dbparts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--ink-2);font-weight:700}
 .dbparts li{display:flex;gap:4px}.dbparts b{color:var(--water-dark)}
+/* ---- Fine lezione compatta: tutto in una schermata ---- */
+i.lvsun{font-style:normal;color:inherit}
+.dbicon{width:auto;height:auto;border-radius:0;background:none;box-shadow:none;color:var(--water)}
+.dbicon svg{width:46px;height:46px}
+.corner{border-color:transparent;background:var(--bad-bg)}
+.lvhead em{font-style:normal;font-size:14px;color:var(--ink-2);font-weight:800}
+.lvnew{margin:8px 0 0;font-size:14px;color:var(--ink-2)}.lvnew b{color:var(--sun-dark)}
+.result.lres{padding:20px 16px 20px;gap:12px}
+.result.lres h1{font-size:28px}
+.result.lres .sub{margin:-4px 0 0}
+.result.lres .kl{gap:8px}
+.kcar{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 6px;scroll-padding:0 16px;scrollbar-width:none}
+.kcar::-webkit-scrollbar{display:none}
+.kcard{flex:0 0 150px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 10px 12px;border:2px solid var(--line);border-radius:16px;background:var(--surface);text-align:center}
+.kcard .t{width:100%}.kcard .t b{display:block;font-size:15px;margin-bottom:6px}
+.kcard .bar{height:10px}
+.kcard .tag{font-size:12px}
+.kcar:has(.kcard:only-child) .kcard{flex-basis:100%;flex-direction:row;text-align:left}

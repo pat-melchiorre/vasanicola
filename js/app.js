@@ -519,7 +519,7 @@ function levelInfo(xp){
   return { n:i + 1, L:LEVELS[i], from:LEVELS[i].xp, to:LEVELS[i + 1].xp };
 }
 // "Livello 7" sempre seguito dal sole, così si capisce che viene dall’esperienza
-const lvTxt = n => `Livello ${n}<span class="lvsun">${ICON.sun}</span>`;
+const lvTxt = n => `Livello ${n}<i class="lvsun">${ICON.sun}</i>`;
 const levelReward = n => n <= LEVELS.length ? LEVELS[n - 1] : { gocce:60 };
 const rewardText = r => r.casa ? "Si apre un posto in casa." : r.balcone ? "Si apre un posto sul balcone." : r.gocce ? `+${r.gocce} gocce.` : "";
 // Posti in serra dovuti al livello n (la casa ne ha 1 di partenza)
@@ -650,7 +650,8 @@ function finishLesson(){
   const xpBefore = S.xp - x, day = bumpStreak(), ups = settleLevel();
   // Esperienza: niente numeri, solo la barra del livello che avanza (i punti sono nella finestra del livello)
   const lb = levelInfo(xpBefore), la = levelInfo(S.xp), frac = (v, l) => Math.round((v - l.from) / (l.to - l.from) * 100);
-  const lvBar = `<div class="lvres"><div class="lvhead"><b>${lvTxt(la.n)}</b><span>${esc(la.L.name)}</span></div><div class="bar"><i data-to="${frac(S.xp, la)}" style="width:${la.n > lb.n ? 0 : frac(xpBefore, lb)}%"></i></div></div>`;
+  const up = ups.length ? ups.map(levelReward).map(rewardText).filter(Boolean).join(" ") : "";
+  const lvBar = `<div class="lvres${up ? " up" : ""}"><div class="lvhead"><b>${lvTxt(la.n)}</b><em>${esc(la.L.name)}</em></div><div class="bar"><i data-to="${frac(S.xp, la)}" style="width:${la.n > lb.n ? 0 : frac(xpBefore, lb)}%"></i></div>${up ? `<p class="lvnew"><b>Livello nuovo!</b> ${up}</p>` : ""}</div>`;
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
   if (!L.replay) S.prog[L.step.id] = L.li + 1;
@@ -660,14 +661,13 @@ function finishLesson(){
   unblocked.forEach(x => x.em.retryAt = 0);
   save();
   const rows = Object.keys(L.gained).map(p => { const k = kOf(p), full = k >= RULES.knowledgeMax;
-    return `<div class="krow">${plantSVG(p, 46)}<div class="t"><b>${PLANTS[p].name}</b><div class="bar ${full ? "full" : ""}"><i data-to="${k / RULES.knowledgeMax * 100}" style="width:${before[p] / RULES.knowledgeMax * 100}%"></i></div></div>${full ? (inGarden(p) ? '<span class="tag planted">In serra</span>' : '<span class="tag ready">Pronta!</span>') : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</div>`; }).join("");
+    return `<div class="kcard">${plantSVG(p, 46)}<div class="t"><b>${PLANTS[p].name}</b><div class="bar ${full ? "full" : ""}"><i data-to="${k / RULES.knowledgeMax * 100}" style="width:${before[p] / RULES.knowledgeMax * 100}%"></i></div></div>${full ? (inGarden(p) ? '<span class="tag planted">In serra</span>' : '<span class="tag ready">Pronta!</span>') : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</div>`; }).join("");
   const readyNow = Object.keys(L.gained).some(p => canPlant(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
-  app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
+  app.innerHTML = `<section class="result lres">${mascot(96)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
     ${dropBox(g, L.replay ? [["Ripasso", g]] : [["Lezione", RULES.stepGocce], perfect && ["Zero errori", RULES.perfectBonusGocce], hardZone && ["Zona difficile", 2]].filter(Boolean))}
     ${lvBar}
-    ${ups.map(n => `<div class="lvup"><b>${lvTxt(n)} ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
-    ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
+    ${rows ? `<div class="kl"><div class="kind" style="margin:0">Conoscenza</div><div class="kcar">${rows}</div></div>` : ""}
     <div style="width:100%;margin-top:auto;display:flex;flex-direction:column;gap:12px">
       ${unblocked.length ? `<p class="sub" style="margin:0">Ora sai cosa fare: puoi riprovare a curare ${unblocked.map(x => esc(nameOf(x))).join(" e ")}.</p><button class="btn bad" id="toSerra">Torna a curarla</button>` : readyNow ? `<button class="btn sun" id="toSerra">Vai a piantarla</button>` : ""}
       <button class="btn ${readyNow || unblocked.length ? "ghost" : ""}" id="toPath">Continua</button></div></section>`;
@@ -714,7 +714,7 @@ function renderArea(a){
   S.garden.forEach((g, i) => { if (g.area === a) slots.push(slotCard(g, i)); });
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
   const nx = nextSlotLevel(a);
-  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<span class="lvsun">${ICON.sun}</span>, ${esc(nx.L.name)}.</span></div>`);
+  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<i class="lvsun">${ICON.sun}</i>, ${esc(nx.L.name)}.</span></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
