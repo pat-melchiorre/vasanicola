@@ -205,7 +205,7 @@ function render(){
   // La barra in alto (fagiolo, gocce, livello) c'è solo nel Percorso, attaccata all'intestazione della zona
   app.innerHTML = (tab === "path" ? topbar() : "") + `<main class="${tab === "path" ? "" : "notop"}">${body}</main>` + tabbar();
   streakNotice();
-  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", (bar.offsetHeight + 8) + "px");   // +8: lo spazio sopra la barra
+  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", bar.offsetHeight + "px");
 }
 
 /* --- Bentornato: si vede una volta a ogni apertura, dopo l’onboarding --- */
@@ -706,8 +706,9 @@ function slotCard(g, i){
   // Layout: in alto a destra l'icona per regalare/liberare; a sinistra disegno + vaso; a destra nome, stato, frase;
   // sotto, a tutta larghezza: emergenza, regola d'acqua, azioni
   return `<div class="slot plant${em ? " alarm" : ""}">
+    ${!g.dead && !potBlock(g.plant) ? `<button class="corner left" data-pot="${i}" aria-label="Cambia vaso">${IC("pot")}</button>` : ""}
     <button class="corner" data-gift="${i}" aria-label="${g.dead ? "Libera il posto" : `Regala ${esc(nameOf(g))}`}">${g.dead ? IC("trash") : IC("gift")}</button>
-    <div class="sart">${plantSVG(g.plant, 92, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}</div>
+    <div class="sart">${plantSVG(g.plant, 92, st, g.dead ? "adulta" : stageOf(g), g.pot)}</div>
     <div class="sinfo">
       <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${IC("pencil")}</button>`}</div>
       ${g.nick ? `<span class="species">${p.name}</span>` : ""}
@@ -754,14 +755,12 @@ function renderNegozio(){
     const owned = S.pots.includes(mo);
     const ok = Object.keys(PLANTS).filter(id => potFits(mo, id)), known = ok.filter(id => S.discovered.includes(id));
     // Solo i nomi delle piante già incontrate (massimo 3), il resto è un numero: niente liste chilometriche
-    const names = known.length ? known.slice(0, 3).map(id => PLANTS[id].name).join(", ") + (ok.length > 3 && known.length ? ` e altre ${ok.length - Math.min(3, known.length)}` : "") : `${ok.length} piante da scoprire`;
     return `<div class="shopcard${owned ? " owned" : ""}"><div class="sart">${plantSVG(P.show, 96, "sana", "adulta", mo)}</div><div class="t"><h3>${P.name}</h3><span class="tag ptag ${P.tag === "Solo bellezza" ? "study" : "planted"}">${P.tag}</span><p>${P.desc}</p>
-      <p class="pnote">Per: ${names}</p>
-      ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small water" style="width:auto" data-buypot="${mo}" ${S.gocce < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+      ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : ""}</div>${owned ? "" : `<button class="btn water buy" data-buypot="${mo}" ${S.gocce < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.drop.replace("<svg", '<svg width="18" height="18"')}</button>`}</div>`;
   }).join("");
   const lids = S.streak.lids, full = lids >= SPRAY.max;
   const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${sprayerSVG(80)}</div><div class="t"><h3>Spruzzino</h3><span class="tag ptag study">Salva il fagiolo</span><p>Se salti un giorno, tiene umido il cotone e i giorni di fila non si perdono. Si usa da solo.</p>
-    <p class="pnote">Ne hai ${lids} su ${SPRAY.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : `<button class="btn small water" style="width:auto" data-buylid="1" ${S.gocce < SPRAY.cost ? "disabled" : ""}>Compra ${SPRAY.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+    <p class="pnote">Ne hai ${lids} su ${SPRAY.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : ""}</div>${full ? "" : `<button class="btn water buy" data-buylid="1" ${S.gocce < SPRAY.cost ? "disabled" : ""}>Compra ${SPRAY.cost}${ICON.drop.replace("<svg", '<svg width="18" height="18"')}</button>`}</div>`;
   return `<section class="sec"><div class="sechead"><h1>Negozio</h1><div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div></div><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
     <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
     <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
@@ -834,11 +833,13 @@ function openCard(id){
 }
 // Riquadro del titolo nella scheda: grado attuale, prossimo passo, eventuale sblocco di una rara
 function expertBox(id){
-  const k = kOf(id), g = expertOf(id), e = S.expert[id] || {};
+  const k = kOf(id), g = k < RULES.knowledgeMax ? 0 : expertOf(id), e = S.expert[id] || {};
   const gate = PLANTS[id].gate ? `<p class="xnote">${gateOk(id) ? "Pianta rara: sbloccata." : `Pianta rara. ${gateText(id)}.`}</p>` : "";
-  if (k < RULES.knowledgeMax) return `<div class="xbox"><b>Titolo</b><p class="xnote">Prima scoprila del tutto (3/3). Poi si diventa esperti.</p>${gate}</div>`;
-  const next = g >= 3 ? "Grado massimo raggiunto." : e.day === todayN() ? "Oggi hai già fatto un passo avanti: torna domani." : "Prossimo grado: rispondi giusto a una domanda media o difficile su questa pianta.";
-  return `<div class="xbox"><b>${g ? titleOf(id) : "Nessun titolo, per ora"}</b><div class="dots">${[1,2,3].map(n => `<i class="${n <= g ? "on" : ""}"></i>`).join("")}</div><p class="xnote">${next}</p>${gate}</div>`;
+  const next = k < RULES.knowledgeMax ? "Prima scoprila del tutto. Poi si diventa esperti."
+    : g >= 3 ? "Grado massimo. Oltre c’è solo la pensione."
+    : e.day === todayN() ? "Oggi hai già fatto un passo avanti: torna domani."
+    : "Rispondi giusto a una domanda media o difficile per salire di grado.";
+  return `<div class="xrow">${expertBadge(g, 64)}<div><b>${g ? titleOf(id) : "Nessun titolo, per ora"}</b><p class="xnote">${next}</p>${gate}</div></div>`;
 }
 // Allenamento su una sola pianta: prima le domande medie e difficili (quelle che fanno salire il titolo)
 function startPlantPractice(id){
@@ -966,9 +967,9 @@ function openPotPicker(i){
   m.querySelector("[data-gotab]")?.addEventListener("click", () => { m.remove(); tab = "negozio"; render(); window.scrollTo(0, 0); });
 }
 function openNick(g){
-  const m = modal(`<form id="nickForm"><h2>Come ${gen(g.plant, "lo", "la")} chiami?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Un soprannome per ${gen(g.plant, "il tuo", "la tua")} ${PLANTS[g.plant].name}. Dare un nome crea un legame. E un senso di colpa: se muore, il soprannome se ne va con lei.</p>
+  const m = modal(`<form id="nickForm"><h2>Come ${gen(g.plant, "lo", "la")} chiami?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Che nome diamo al tuo futuro figlioccio?</p>
     <label for="nickIn" class="kind" style="display:block;margin-top:16px">Soprannome</label><input id="nickIn" class="field" style="margin-top:4px" maxlength="20" autocomplete="off" value="${esc(g.nick || "")}" placeholder="${PLANTS[g.plant].name}">
-    <div style="display:flex;flex-direction:column;gap:12px"><button class="btn" type="submit">Salva</button>${g.nick ? '<button class="btn ghost" type="button" id="nickOff">Togli il soprannome</button>' : ""}<button class="btn ghost" type="button" data-close="1">Annulla</button></div></form>`);
+    <div style="display:flex;flex-direction:column;gap:12px"><button class="btn" type="submit">Salva</button>${g.nick ? '<button class="btn ghost" type="button" id="nickOff">Togli il soprannome</button>' : ""}</div></form>`);
   const input = m.querySelector("#nickIn"); input.focus();
   const done = v => { g.nick = v || undefined; m.remove(); render();
     toast(v ? `Da oggi si chiama ${v}. Se muore adesso è un lutto vero.` : `Torna a chiamarsi ${PLANTS[g.plant].name}. Come un estraneo.`); };

@@ -291,8 +291,17 @@ function beanSVG(stage = 0, size = 120, dry = false){
   <ellipse cx="50" cy="73" rx="9" ry="6" fill="${dry ? "#8a6a45" : "#a8743f"}" stroke="#7a4f24" stroke-width="2"/><ellipse cx="47" cy="71" rx="3" ry="1.6" fill="#fff" opacity=".35"/>
   </svg>`;
 }
-// Lo spruzzino: tiene umido il cotone per un giorno saltato
-const sprayerSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><path d="M36 40h28v46a6 6 0 0 1-6 6H42a6 6 0 0 1-6-6z" fill="#3da5ec" stroke="#2a6fa8" stroke-width="4"/><rect x="40" y="28" width="20" height="12" rx="2" fill="#f2c230" stroke="#b8860b" stroke-width="3"/><path d="M44 28V16h22l6 6h-12v6" fill="#f2c230" stroke="#b8860b" stroke-width="3" stroke-linejoin="round"/><path d="M60 34l10 8" stroke="#b8860b" stroke-width="4" stroke-linecap="round"/><g fill="#7cc6f6"><circle cx="82" cy="16" r="3"/><circle cx="88" cy="24" r="2.5"/><circle cx="80" cy="28" r="2"/></g><rect x="40" y="56" width="20" height="16" rx="3" fill="#fff" opacity=".4"/></svg>`;
+// Lo spruzzino: tiene umido il cotone per un giorno saltato. Stile icone navbar: forme piene, lato in ombra, riflesso.
+// Con la faccia di chi sa che ti sta salvando la serie (e te lo farà pesare).
+const sprayerSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
+  <g fill="#9ED8FA"><circle cx="86" cy="18" r="5"/><circle cx="94" cy="28" r="3.6"/><circle cx="84" cy="32" r="3"/><circle cx="92" cy="10" r="2.6"/></g>
+  <path d="M38 18h26l12 7-3 6H62v8H40v-8z" fill="#FF9F2E"/><path d="M62 31h11l3-6-2-1-3 4H62z" fill="#E8851A"/><rect x="73" y="22" width="8" height="6" rx="3" fill="#E8851A"/>
+  <path d="M42 34h18l5 10H37z" fill="#FFB44D"/><path d="M38 43h26c4 0 7 3 7 7v36a8 8 0 0 1-8 8H39a8 8 0 0 1-8-8V50c0-4 3-7 7-7z" fill="#4AB0F5"/>
+  <path d="M60 43h4c4 0 7 3 7 7v36a8 8 0 0 1-8 8h-3z" fill="#2589D6"/><rect x="36" y="50" width="6" height="28" rx="3" fill="#fff" opacity=".55"/>
+  <path d="M31 72h40v14a8 8 0 0 1-8 8H39a8 8 0 0 1-8-8z" fill="#3A9BE3" opacity=".6"/>
+  <ellipse cx="45" cy="62" rx="5" ry="5.6" fill="#fff"/><ellipse cx="58" cy="62" rx="5" ry="5.6" fill="#fff"/><circle cx="47" cy="63" r="2.6" fill="#173B26"/><circle cx="60" cy="63" r="2.6" fill="#173B26"/>
+  <path d="M40.5 55.5l8-1.5M53.5 54l8 1.8" stroke="#173B26" stroke-width="2.4" stroke-linecap="round"/><path d="M46 73c4 3 9 2 12-2" stroke="#173B26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+</svg>`;
 // Icone aggiunte: regalo, fagiolo fisso per la barra in alto
 Object.assign(ICON, {
   gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v7.5h14V13M12 9v11.5"/><path d="M12 9c-1.5-3.5-6-4.5-6-1.6C6 9 9 9 12 9zM12 9c1.5-3.5 6-4.5 6-1.6C18 9 15 9 12 9z"/></svg>',
@@ -322,8 +331,8 @@ const DUO = {
   drop:D2('<path d="M12 2.5c3.6 4.5 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10.5 8.4 7 12 2.5z"/>', '<path d="M5.6 15a6.5 6.5 0 0 0 12.8 0c-.8 2.6-3.4 4.4-6.4 4.4S6.4 17.6 5.6 15z"/>'),
   sun:D2('<path d="M11 1.5h2v4h-2zM11 18.5h2v4h-2zM1.5 11h4v2h-4zM18.5 11h4v2h-4zM4.2 5.6l1.4-1.4 2.8 2.8L7 8.4zM16.4 17.6l1.4-1.4 2.8 2.8-1.4 1.4zM4.2 18.4l2.8-2.8 1.4 1.4-2.8 2.8zM16.4 6.4l2.8-2.8 1.4 1.4-2.8 2.8z"/>', '<circle cx="12" cy="12" r="5"/>'),
   lock:D2('<path d="M5 10h14v11H5z"/>', '<path d="M7 10V8a5 5 0 0 1 10 0v2h-2V8a3 3 0 0 0-6 0v2zM10.5 14.5a1.5 1.5 0 1 1 2 1.4V18h-1v-2.1a1.5 1.5 0 0 1-1-1.4z"/>'),
-  pencil:D2('<path d="M4 20l1-4L16 5l3 3L8 19z"/>', '<path d="M14.5 6.5L16 5l3 3-1.5 1.5zM4 20l1-4 3 3z"/>'),
-  gift:D2('<path d="M4 11h16v10H4z"/>', '<path d="M3 8h18v3.5H3zM10.7 8h2.6v13h-2.6zM12 8C10.6 4.8 6.6 4 6.6 6.6 6.6 8 9 8 12 8zM12 8c1.4-3.2 5.4-4 5.4-1.4C17.4 8 15 8 12 8z"/>'),
+  pencil:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.2-4.4L16 4.8l3.2 3.2L8.4 18.8z"/><path d="M14 6.8l3.2 3.2"/></svg>`,
+  gift:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M3 10h18M12 10v10M12 10c-1-3.4-5.2-4.2-5.2-1.6 0 1.2 1.6 1.6 5.2 1.6zM12 10c1-3.4 5.2-4.2 5.2-1.6 0 1.2-1.6 1.6-5.2 1.6z"/></svg>`,
   trash:D2('<path d="M6 8h12l-1 13H7z"/>', '<path d="M4 5h16v2.6H4zM9.5 3h5v2h-5zM9.5 11h1.6v7H9.5zM12.9 11h1.6v7h-1.6z"/>'),
   alert:D2('<path d="M10.3 3.6a2 2 0 0 1 3.4 0l8 13.8a2 2 0 0 1-1.7 3H4a2 2 0 0 1-1.7-3z"/>', '<path d="M10.8 8.5h2.4v5.5h-2.4zM12 15.4a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8z"/>')
 };
@@ -339,4 +348,15 @@ function levelBadge(n, size = 120){
   return `<svg class="lvbadge" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true">${rays}${shape(s ? R : 40, cy + 4, "#E39A14")}${shape(s ? R : 40, cy, "#FFC83D")}${shape(s ? R - 12 : 30, cy, "#FFD96B")}
   <ellipse cx="${s ? 46 : 46}" cy="${cy - (s === 3 ? 8 : 16)}" rx="7" ry="4" transform="rotate(-35 46 ${cy - 12})" fill="#fff" opacity=".6"/>
   <text x="60" y="${cy + 11}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="${n > 9 ? 30 : 34}" fill="#9A5B00">${n}</text></svg>`;
+}
+
+// Distintivo del titolo di esperto della pianta: 0 nessuno (seme), 1 Custode (scudo), 2 Guru (loto), 3 Leggenda (corona)
+function expertBadge(g, size = 64){
+  const body = [
+    `<circle cx="32" cy="32" r="26" fill="none" stroke="#C9D8BF" stroke-width="3" stroke-dasharray="6 6"/><ellipse cx="32" cy="36" rx="8" ry="6" fill="#C9B79A"/><path d="M32 30c0-6 4-9 9-9-.5 5-4 8-9 9z" fill="#B7CDA8"/>`,
+    `<path d="M32 6l22 8v16c0 14-10 23-22 28C20 53 10 44 10 30V14z" fill="#43B05C"/><path d="M32 6l22 8v16c0 14-10 23-22 28z" fill="#2E9448"/><path d="M15 17l17-6v8l-17 5z" fill="#fff" opacity=".35"/><path d="M41 22c-10 0-15 5-15 11 0 1.6.4 3 1.1 3.9 1.7-4.8 5-7.8 9.6-9.5-4 2.4-6.6 5.8-7.8 10.6.8.4 1.7.6 2.6.6 6 0 9.5-6 9.5-16.6z" fill="#fff"/>`,
+    `<circle cx="32" cy="32" r="26" fill="#8D6CF0"/><path d="M58 32a26 26 0 0 1-52 0c4 12 14 20 26 20s22-8 26-20z" fill="#6E4FD6"/><path d="M32 16c5 6 6 13 0 22-6-9-5-16 0-22z" fill="#FFD3E6"/><path d="M32 38c-8-1-14-6-16-14 7 0 13 4 16 14zM32 38c8-1 14-6 16-14-7 0-13 4-16 14z" fill="#F7A8C8"/><path d="M18 42h28" stroke="#FFD3E6" stroke-width="3" stroke-linecap="round"/><ellipse cx="22" cy="18" rx="5" ry="2.6" transform="rotate(-35 22 18)" fill="#fff" opacity=".4"/>`,
+    `<circle cx="32" cy="32" r="26" fill="#FFD43B"/><path d="M58 32a26 26 0 0 1-52 0c4 12 14 20 26 20s22-8 26-20z" fill="#F5B400"/><path d="M15 40l-3-18 11 8 9-14 9 14 11-8-3 18z" fill="#FFAA1D"/><path d="M15 40h34v5H15z" fill="#E08A00"/><circle cx="32" cy="15" r="3" fill="#FF5A5F"/><circle cx="12" cy="21" r="2.6" fill="#4AB0F5"/><circle cx="52" cy="21" r="2.6" fill="#4AB0F5"/><ellipse cx="21" cy="17" rx="5" ry="2.6" transform="rotate(-35 21 17)" fill="#fff" opacity=".5"/>`
+  ][g] || "";
+  return `<svg class="xbadge" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`;
 }
