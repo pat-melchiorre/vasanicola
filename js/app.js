@@ -269,7 +269,7 @@ function renderPath(){
       const done = S.done.includes(s.id), current = i === cur, locked = cur !== -1 && i > cur;
       const pr = progOf(s), n = lessonCount(s), partial = !done && pr > 0;
       const cls = (done ? "done" : current ? "current" : locked ? "locked" : "") + ((current || partial) ? " ringed" : "");
-      const ico = done ? ICON.check : locked ? ICON.lock : ICON[s.icon];
+      const ico = done ? NODE_IC("check") : locked ? NODE_IC("lock") : NODE_IC(s.icon);
       // Lo stepper si vede sulla casella in corso: un segmento per lezione, pieni quelli fatti
       const ring = (current || partial) ? stepperRing(pr, n) : "";
       return `<div class="nodewrap" style="transform:translateX(${offsets[k % offsets.length]}px)">
@@ -549,7 +549,10 @@ function openLevel(){
   const { n, L, from, to } = levelInfo(S.xp), nx = levelReward(n + 1), nxName = levelInfo(to).L.name;
   modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">${lvTxt(n)}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
     <div class="bar lvbar"><i style="width:${Math.round((S.xp - from) / (to - from) * 100)}%"></i></div>
-    <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p></div><button class="btn" data-close="1" style="margin-top:20px">Ok</button>`);
+    <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p></div>
+    <div class="kind" style="margin:20px 0 10px">Distintivi</div>
+    <div class="badges-grid">${LEVELS.map((l, k) => `<div class="lvb${k + 1 <= n ? "" : " off"}" aria-label="Livello ${k + 1}, ${esc(l.name)}${k + 1 <= n ? "" : ", da sbloccare"}">${levelBadge(k + 1, k + 1 <= n, k + 1 === n)}<span>${k + 1 <= n ? esc(l.name) : "???"}</span></div>`).join("")}</div>
+    <button class="btn" data-close="1" style="margin-top:20px">Ok</button>`);
 }
 /* =========================================================
    Giorni di fila: il fagiolo nel cotone. Cresce a ogni giorno con almeno un quiz finito.
@@ -629,12 +632,8 @@ function openStreak(){
     <h2>${n} ${n === 1 ? "giorno" : "giorni"} di fila</h2><div class="kind" style="margin-top:2px">${n ? cur.name : "Ancora da piantare"}</div>
     <p style="color:var(--ink-2);margin:8px 0 14px">${status}</p></div>
     ${weekRow()}
-    ${nx ? `<div class="bnext"><div><b>Prossima tappa: ${nx.name}</b><span>Al giorno ${nx.n}${nx.g ? `, con ${nx.g} gocce di premio` : ""}.</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>` : ""}
-    <div class="binfo">
-      <p><b>Come funziona.</b> Ogni giorno in cui finisci almeno un quiz, il fagiolo cresce. Se salti un giorno, il cotone si secca e si ricomincia dal seme.</p>
-      <p><b>Spruzzini: ${st.lids} su ${SPRAY.max}.</b> Ognuno tiene umido il cotone per un giorno saltato, da solo. Si comprano nel Negozio.</p>
-      ${st.best > n ? `<p><b>Record:</b> ${st.best} giorni di fila.</p>` : ""}
-    </div>
+    ${nx ? `<div class="bgrow" aria-label="Crescita verso ${nx.name.toLowerCase()}">${beanSVG(beanStage(n), 30)}<div class="bar"><i style="width:${pct}%"></i></div>${beanSVG(beanStage(nx.n), 30)}</div>` : ""}
+    <div class="bspray">${sprayerSVG(44)}<p><b>Spruzzini: ${st.lids} su ${SPRAY.max}</b>Salvano un giorno saltato. Nel Negozio.</p></div>
     <button class="btn" data-close="1">Ok</button>`);
 }
 // Riquadro delle gocce guadagnate: goccia grande, totale e da dove arrivano
@@ -699,7 +698,7 @@ function slotCard(g, i){
   const st = plantState(g), p = PLANTS[g.plant], c = care(g);
   const line = g.dead ? `${g.rip ? `Addio, ${esc(g.rip)}. ` : ""}Ha vissuto ${ageOf(g)} ${ageOf(g) === 1 ? "giorno" : "giorni"}. ${g.note || (g.cause === "marcita" ? c.wetTip : c.dryTip)}`
     : feltNow(g) ? `<b class="feel">Prova del dito:</b> ${soilFeel(g)}` : restLine(g, i);
-  const em = !g.dead && g.em ? `<button class="emerg" data-em="${i}">${ICON.alert}<span><b>Emergenza</b>${esc(EMERG[g.em.id].title)}</span></button>` : "";
+  const em = !g.dead && g.em ? `<button class="emerg" data-em="${i}">${IC("alert")}<span><b>Emergenza</b>${esc(EMERG[g.em.id].title)}</span></button>` : "";
   const action = g.dead
     ? `<button class="btn small" data-replant="${i}" ${S.gocce < RULES.replantCost ? "disabled" : ""}>Ripianta il seme ${RULES.replantCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`
     : `<div class="acts"><button class="btn small ghost" data-feel="${i}">Dito nella terra</button><button class="btn small water" data-water="${i}" ${S.gocce < RULES.waterCost ? "disabled" : ""}>Annaffia ${RULES.waterCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button></div>`;
@@ -708,10 +707,10 @@ function slotCard(g, i){
   // Layout: in alto a destra l'icona per regalare/liberare; a sinistra disegno + vaso; a destra nome, stato, frase;
   // sotto, a tutta larghezza: emergenza, regola d'acqua, azioni
   return `<div class="slot plant${em ? " alarm" : ""}">
-    <button class="corner" data-gift="${i}" aria-label="${g.dead ? "Libera il posto" : `Regala ${esc(nameOf(g))}`}">${g.dead ? ICON.trash : ICON.gift}</button>
+    <button class="corner" data-gift="${i}" aria-label="${g.dead ? "Libera il posto" : `Regala ${esc(nameOf(g))}`}">${g.dead ? IC("trash") : IC("gift")}</button>
     <div class="sart">${plantSVG(g.plant, 92, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}</div>
     <div class="sinfo">
-      <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${ICON.pencil}</button>`}</div>
+      <div class="namerow"><h3>${esc(nameOf(g))}</h3>${g.dead ? "" : `<button class="nick" data-nick="${i}" aria-label="Dai un soprannome a ${esc(nameOf(g))}">${IC("pencil")}</button>`}</div>
       ${g.nick ? `<span class="species">${p.name}</span>` : ""}
       <div class="badges"><span class="state st-${st}">${st[0].toUpperCase() + st.slice(1)}</span>${grow}</div>
       ${g.dead ? "" : `<span class="age">${ageText(g)}</span>`}
@@ -722,12 +721,12 @@ function slotCard(g, i){
 }
 function renderArea(a){
   const A = AREAS[a];
-  if (a === "balcone" && !balconyOpen()) return `<div class="area"><h2>${A.title}</h2><div class="slot locked wide">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Balcone chiuso</b><span class="line">Si apre finendo la zona Casa tua, insieme al Mediterraneo.</span></div></div>`;
+  if (a === "balcone" && !balconyOpen()) return `<div class="area"><h2>${A.title}</h2><div class="slot locked wide">${IC("lock").replace("<svg", '<svg width="34" height="34"')}<b>Balcone chiuso</b><span class="line">Si apre finendo la zona Casa tua, insieme al Mediterraneo.</span></div></div>`;
   const slots = [];
   S.garden.forEach((g, i) => { if (g.area === a) slots.push(slotCard(g, i)); });
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
   const nx = nextSlotLevel(a);
-  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<i class="lvsun">${ICON.sun}</i>, ${esc(nx.L.name)}.</span></div>`);
+  if (nx) slots.push(`<div class="slot locked">${IC("lock").replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<i class="lvsun">${ICON.sun}</i>, ${esc(nx.L.name)}.</span></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
@@ -822,7 +821,7 @@ function openCard(id){
   m = modal(`<div style="display:flex;gap:14px;align-items:center">${plantSVG(id, 90)}<div><h2>${p.name}</h2><div style="color:var(--ink-2);font-size:14px;font-style:italic">${p.sci}</div><span class="tag ${p.indoor ? "planted" : "study"}" style="display:inline-block;margin-top:6px">${p.indoor ? "Casa o balcone" : "Solo balcone"}</span></div></div>
     ${expertBox(id)}
     <div class="kind" style="margin:16px 0 8px">Curiosità</div>
-    <div class="fcar" role="list" aria-label="Curiosità">${p.facts.map((f, i) => i < shown ? `<div class="fcard" role="listitem"><p>${esc(f)}</p></div>` : `<div class="fcard lock" role="listitem">${ICON.lock.replace("<svg", '<svg width="22" height="22"')}<p>Da scoprire nelle prossime lezioni.</p></div>`).join("")}</div>
+    <div class="fcar" role="list" aria-label="Curiosità">${p.facts.map((f, i) => i < shown ? `<div class="fcard" role="listitem"><p>${esc(f)}</p></div>` : `<div class="fcard lock" role="listitem">${IC("lock").replace("<svg", '<svg width="22" height="22"')}<p>Da scoprire nelle prossime lezioni.</p></div>`).join("")}</div>
     <div class="fdots" aria-hidden="true">${p.facts.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>
     <div style="display:flex;flex-direction:column;gap:12px">${k >= RULES.knowledgeMax ? `<button class="btn" id="practice">Allenati su questa pianta</button>` : ""}<button class="btn ghost" data-close="1">Chiudi</button></div>`);
   m.querySelector("#practice")?.addEventListener("click", () => { m.remove(); startPlantPractice(id); });
