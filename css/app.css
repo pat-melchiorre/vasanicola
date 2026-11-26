@@ -461,3 +461,4 @@ i.lvsun{font-style:normal;color:inherit}
   .splash .mascot{transform-origin:50% 90%;animation:hello 1.1s .3s ease-in-out}
   @keyframes hello{20%{transform:rotate(-8deg)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}}
 }
+.zhead .zone{cursor:pointer}

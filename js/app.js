@@ -277,7 +277,7 @@ function renderPath(){
         <div class="nodelabel">${esc(s.title)}</div></div>`;
     }).join("");
     return `<section class="zsec" style="--z:${z.color};--zs:${z.shade}">
-      <div class="zhead"><div class="zone ${open ? "" : "locked"}"><div><small>Zona ${zi + 1}</small><h2>${z.title}</h2><p>${open ? z.desc : `Si apre finendo ${ZONES[zi - 1].title}.`}</p></div></div></div>
+      <div class="zhead"><div class="zone ${open ? "" : "locked"}" data-ztop="${zi}" role="button" tabindex="0" aria-label="Torna all’inizio di ${esc(z.title)}"><div><small>Zona ${zi + 1}</small><h2>${z.title}</h2><p>${open ? z.desc : `Si apre finendo ${ZONES[zi - 1].title}.`}</p></div></div></div>
       <div class="path">${nodes}</div></section>`;
   }).join("") + testTools() + `<div class="teaser">${cur === -1 ? "Hai finito tutte le zone. La prossima è in arrivo: intanto, le tue piante hanno bisogno di te." : "Altre zone del pianeta in arrivo nelle prossime versioni."}</div>`;
 }
@@ -851,7 +851,7 @@ function startPlantPractice(id){
    Eventi
    ========================================================= */
 app.addEventListener("click", e => {
-  const t = e.target.closest("button"); if (!t) return;
+  const t = e.target.closest("button, [data-ztop]"); if (!t) return;
   if (t.dataset.tab) { if (tab === t.dataset.tab) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
   if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } openNode(+t.dataset.step); return; }
   if (t.dataset.water !== undefined) {
@@ -883,6 +883,7 @@ app.addEventListener("click", e => {
     return;
   }
   if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
+  if (t.dataset.ztop !== undefined) return zoneTop(t);
   if (t.dataset.level) return openLevel();
   if (t.dataset.streak) return openStreak();
   if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
@@ -900,6 +901,13 @@ function splashWater(i, perk){
   box.innerHTML = Array.from({ length:7 }, (_, k) => `<i style="left:${18 + k * 10 + Math.random() * 6}%;animation-delay:${(k % 4) * .08 + Math.random() * .1}s">${ICON.drop}</i>`).join("");
   art.appendChild(box); setTimeout(() => box.remove(), 1200);
 }
+// Tocco sull'intestazione della zona: torna all'inizio di quella zona; se ci sei già, all'inizio del percorso
+function zoneTop(el){
+  const sec = el.closest(".zsec"), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--toph")) || 62;
+  const y = sec.getBoundingClientRect().top + scrollY - bar, smooth = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  scrollTo({ top: Math.abs(scrollY - y) < 8 ? 0 : Math.max(0, y), behavior: smooth });
+}
+document.addEventListener("keydown", e => { const z = e.target.closest?.("[data-ztop]"); if (z && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); zoneTop(z); } });
 function water(g, level){
   S.gocce -= RULES.waterCost; g.wateredAt = now(); g.wet = level; felt.delete(g);
   const c = care(g), dead = level >= c.rot, n = nameOf(g);
