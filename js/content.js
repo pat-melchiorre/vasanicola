@@ -34,14 +34,12 @@ const PLANTS = {
 };
 const STEPS = [
   { id:"s1", zone:"z1", title:"Il basilico", icon:"leaf", items:[
-    { t:"card", plant:"basilico", title:"Partiamo dalla vittima più famosa", body:"Il basilico del supermercato muore quasi sempre. Non per sfortuna: dentro quel vasetto ci sono decine di piantine che si rubano luce, acqua e spazio. Tipo un monolocale da fuorisede in sei." },
     { t:"mc", plant:"basilico", q:"Quante ore di luce al giorno vuole il basilico, almeno?", o:["Un paio, è timido","Almeno 6","Zero, vive di affetto"], a:1, why:"Almeno 6 ore, meglio se di sole diretto. Sul davanzale buio fa la fine che sai." },
     { t:"tf", plant:"basilico", q:"Se togli le punte del basilico sopra una coppia di foglie, la pianta diventa più folta.", a:true, why:"Si chiama cimatura: la pianta risponde facendo due rametti dove prima ce n’era uno." },
     { t:"mc", plant:"basilico", q:"Cosa conviene fare appena porti a casa il vasetto del supermercato?", o:["Annaffiarlo tantissimo per sicurezza","Dividere le piantine in gruppetti e rinvasarle","Lasciarlo nel cellophane"], a:1, why:"Separando le piantine dai a ognuna lo spazio per crescere. Il cellophane lo usiamo per il panino." },
     { t:"tf", plant:"basilico", q:"Se il basilico muore dopo un anno, hai sbagliato tutto.", a:false, why:"È una pianta annuale: chiude il suo ciclo comunque. Stavolta non è colpa tua. Stavolta." }
   ]},
   { id:"s2", zone:"z1", title:"Luce", icon:"sun", items:[
-    { t:"card", title:"Diretta o indiretta?", body:"Luce diretta: il sole che colpisce la pianta. Luce indiretta: la stanza è luminosa, ma il sole non tocca le foglie. Ogni pianta ha i suoi gusti, come per il caffè." },
     { t:"id", plant:"pothos", q:"Quale di queste è il pothos?", o:["sansevieria","pothos","menta","basilico"], a:"pothos", why:"Il pothos ha foglie a cuore e rami che ricadono. È la pianta che hai in ufficio e che nessuno annaffia." },
     { t:"tf", plant:"pothos", q:"Il pothos sopporta anche poca luce, ma le sue foglie diventano tutte verdi.", a:true, why:"Con poca luce perde le striature chiare: ha bisogno di più clorofilla per arrangiarsi." },
     { t:"mc", q:"Fusti lunghi, sottili e pallidi che si allungano verso la finestra vogliono dire...", o:["Troppa luce","Poca luce","Che la pianta vuole uscire"], a:1, why:"La pianta si allunga per cercare la luce. Si risolve spostandola, o girando il vaso ogni tanto." },
@@ -49,7 +47,6 @@ const STEPS = [
     { t:"mc", plant:"sansevieria", q:"Che luce preferisce la sansevieria?", o:["Solo buio totale","Luce indiretta e intensa, ma tollera anche poca luce","Solo sole diretto tutto il giorno"], a:1, why:"Sopravvive anche in un corridoio, ma dove c’è luce indiretta cresce davvero." }
   ]},
   { id:"s3", zone:"z1", title:"Acqua", icon:"drop", items:[
-    { t:"card", title:"Il killer numero uno", body:"La maggior parte delle piante di casa non muore di sete: muore annegata. Con la terra sempre zuppa le radici non respirano e marciscono. Amore sì, ma con moderazione." },
     { t:"mc", q:"Come capisci se è ora di annaffiare?", o:["Ogni giorno alla stessa ora, sempre","Infili un dito nella terra: se i primi centimetri sono asciutti, annaffi","Quando la pianta ti guarda male"], a:1, why:"La prova del dito vale più di qualsiasi calendario. Anche se la pianta che ti guarda male è un ottimo indizio." },
     { t:"tf", plant:"sansevieria", q:"La sansevieria va annaffiata ogni 2-3 giorni.", a:false, why:"Accumula acqua nelle foglie: ogni 2-3 settimane basta, d’inverno anche meno." },
     { t:"mc", plant:"menta", q:"E la menta, come la vuole la terra?", o:["Sempre un po’ umida","Secca come il deserto","Allagata, è una pianta acquatica"], a:0, why:"La menta ama la terra leggermente umida. Non zuppa: leggermente." },
@@ -57,7 +54,6 @@ const STEPS = [
     { t:"tf", plant:"sansevieria", q:"Troppa acqua può far marcire la base delle foglie della sansevieria.", a:true, why:"È il modo più comune di uccidere una pianta indistruttibile." }
   ]},
   { id:"s4", zone:"z1", title:"Terriccio e vaso", icon:"pot", items:[
-    { t:"card", title:"Il vaso conta", body:"Il foro sul fondo serve a far uscire l’acqua in più. Senza foro, l’acqua ristagna e le radici affogano. Il sottovaso va svuotato: non è una piscina." },
     { t:"tf", q:"Uno strato di ghiaia sul fondo del vaso migliora il drenaggio.", a:false, why:"È un mito: la ghiaia fa salire la zona di terra fradicia verso le radici. Serve il foro, non la ghiaia." },
     { t:"mc", plant:"menta", q:"Perché la menta va in un vaso tutto suo?", o:["Perché è antipatica","Le sue radici corrono sotto terra e invadono tutto","Perché profuma troppo"], a:1, why:"Si allarga con radici striscianti. Se la metti con altre piante, in un mese il vaso è suo." },
     { t:"mc", plant:"pothos", q:"Come si fa un nuovo pothos gratis?", o:["Con una talea: un pezzo di fusto con un nodo, in acqua","Seminando le foglie","Chiedendolo alla pianta per favore"], a:0, why:"Dal nodo spuntano le radici in poche settimane. Poi lo metti in terra e hai una pianta nuova." },
@@ -104,7 +100,6 @@ Object.assign(PLANTS, {
 });
 STEPS.push(
   { id:"m1", zone:"z2", title:"Pieno sole", icon:"sun", items:[
-    { t:"card", plant:"olivo", title:"Benvenuti al Sud", body:"Olivo, rosmarino, lavanda e fico d’India vengono da posti con estati lunghe, calde e secche. Hanno imparato a vivere con tanto sole e poca acqua. Dietro un vetro, in casa, si deprimono. Sul balcone rinascono." },
     { t:"mc", plant:"olivo", q:"Quanta luce vuole l’olivo?", o:["Pieno sole, più ore possibile","Luce indiretta, come il pothos","Ombra fresca, per riposare"], a:0, why:"Pieno sole. All’ombra cresce poco e non fa frutti. Le olive, s’intende." },
     { t:"tf", plant:"olivo", q:"Le foglie dell’olivo sono argentate sotto perché sono malate.", a:false, why:"Quella patina è fatta di peli microscopici che riflettono il sole e fanno perdere meno acqua. È crema solare, non una malattia." },
     { t:"id", plant:"lavanda", q:"Quale è la lavanda?", o:["rosmarino","olivo","lavanda","ficodindia"], a:"lavanda", why:"Ciuffo grigio-verde e spighe viola in cima. Il profumo dei cassetti della nonna." },
@@ -112,7 +107,6 @@ STEPS.push(
     { t:"tf", plant:"lavanda", q:"La lavanda sta bene nell’angolo più ombroso del balcone.", a:false, why:"Vuole pieno sole. All’ombra fiorisce poco e si allunga, tutta triste." }
   ]},
   { id:"m2", zone:"z2", title:"Bere poco", icon:"drop", items:[
-    { t:"card", plant:"ficodindia", title:"Il re della siccità", body:"Il fico d’India è un cactus arrivato dalle Americhe secoli fa, e oggi sembra più siciliano dei cannoli. Le sue “foglie” non sono foglie: sono fusti piatti, le pale, che fanno da serbatoio d’acqua." },
     { t:"tf", plant:"ficodindia", q:"Le spine del fico d’India sono foglie trasformate.", a:true, why:"Proprio così: foglie diventate spine, che non perdono acqua e tengono lontano chi ha fame. La fotosintesi la fanno le pale verdi." },
     { t:"mc", plant:"ficodindia", q:"Ogni quanto si annaffia un fico d’India in vaso, d’estate?", o:["Ogni giorno, fa caldo","Ogni 2-3 settimane, a terra asciutta","Mai, vive d’aria"], a:1, why:"Poca acqua e solo con la terra asciutta. D’inverno quasi niente." },
     { t:"mc", plant:"rosmarino", q:"Che terra vuole il rosmarino in vaso?", o:["Terriccio con sabbia o ghiaino mescolati, che drena","Terra argillosa che trattiene l’acqua","Solo acqua, in un vaso di vetro"], a:0, why:"Deve drenare: sabbia o ghiaino aiutano. Mescolati nel terriccio, non sul fondo: il mito della ghiaia lo conosci già." },
@@ -120,7 +114,6 @@ STEPS.push(
     { t:"tf", plant:"rosmarino", q:"Il rosmarino muore più spesso di sete che di troppa acqua.", a:false, why:"Al contrario: con i piedi bagnati le radici marciscono. Di sete è difficile, è un osso duro." }
   ]},
   { id:"m3", zone:"z2", title:"Potare e moltiplicare", icon:"leaf", items:[
-    { t:"card", plant:"lavanda", title:"Le forbici sono amiche", body:"Potare non vuol dire fare del male alla pianta: vuol dire dirle dove crescere. Le piante mediterranee però hanno un punto debole, il legno vecchio: se tagli lì, spesso non rispuntano più." },
     { t:"mc", plant:"lavanda", q:"Quando si pota la lavanda?", o:["Subito dopo la fioritura","In pieno inverno, a fondo","Mai, si offende"], a:0, why:"Dopo la fioritura, togliendo gli steli secchi e un po’ di verde. Così resta compatta e l’anno dopo rifiorisce." },
     { t:"tf", plant:"lavanda", q:"Per ringiovanire una lavanda vecchia basta tagliarla fino al legno spoglio alla base.", a:false, why:"Dal legno vecchio la lavanda raramente ributta. Si taglia sempre lasciando un po’ di verde." },
     { t:"mc", plant:"rosmarino", q:"Come ottieni un rosmarino nuovo gratis?", o:["Con una talea: un rametto di una decina di centimetri, senza le foglie in basso, nel terriccio","Piantando un ago","Comprandone due e sperando"], a:0, why:"Le talee di rosmarino attecchiscono bene. Come per il pothos, ma di solito direttamente in terra." },
@@ -128,7 +121,6 @@ STEPS.push(
     { t:"tf", plant:"olivo", q:"L’olivo si può potare per tenerlo piccolo in vaso.", a:true, why:"Sopporta bene la potatura: è così che si tiene a misura di balcone." }
   ]},
   { id:"m4", zone:"z2", title:"Vaso e inverno", icon:"pot", items:[
-    { t:"card", plant:"olivo", title:"Il nemico è l’inverno", body:"Al Sud d’inverno fa fresco, ma raramente gela a lungo. Su un balcone del Nord è un’altra storia. E un vaso è peggio della terra: le radici sono fuori, al freddo, senza coperta." },
     { t:"mc", plant:"olivo", q:"Arriva una notte di gelo forte. L’olivo in vaso sul balcone...", o:["Lo avvicini al muro di casa e copri chioma e vaso con il tessuto non tessuto","Lo annaffi tanto, così si scalda","Lo porti vicino al termosifone acceso"], a:0, why:"Il muro fa da riparo e il tessuto non tessuto lo protegge. Il termosifone no: caldo secco, e lo sveglia nel momento sbagliato." },
     { t:"tf", plant:"ficodindia", q:"Al fico d’India fanno più danno freddo e umidità insieme che il freddo da solo.", a:true, why:"Con la terra bagnata e il freddo le pale marciscono. D’inverno: riparo dalla pioggia e quasi niente acqua." },
     { t:"mc", q:"Per una pianta che odia i ristagni, meglio un vaso...", o:["Di terracotta, che respira e fa evaporare l’acqua","Di vetro, così vedi le radici","Senza foro, così non sporca"], a:0, why:"La terracotta è porosa e lascia evaporare l’acqua in più. Perfetta per chi teme i piedi bagnati. E il foro, sempre." },
@@ -178,7 +170,6 @@ Object.assign(PLANTS, {
 PLANTS.sansevieria.care.feelReady = "Asciutta anche in profondità. Adesso sì, si può annaffiare.";
 STEPS.push(
   { id:"j1", zone:"z3", title:"Luce filtrata", icon:"sun", items:[
-    { t:"card", plant:"monstera", title:"Benvenuti nella giungla", body:"Nella foresta tropicale la luce arriva filtrata dagli alberi altissimi. Le piante che vivono sotto sono abituate a tanta luce, ma mai diretta. In casa vuol dire: vicino alla finestra, ma senza il sole sulle foglie." },
     { t:"mc", plant:"monstera", q:"Dove sta meglio la monstera?", o:["Vicino a una finestra luminosa, senza sole diretto sulle foglie","Sul balcone in pieno sole","In un corridoio senza finestre"], a:0, why:"Luce indiretta e intensa. Il sole diretto le brucia le foglie, il buio la fa crescere storta e senza buchi." },
     { t:"tf", plant:"monstera", q:"Le foglie giovani della monstera sono già piene di buchi.", a:false, why:"I buchi arrivano con l’età e con la luce giusta: le prime foglie sono intere. Se continuano a uscire intere, chiede più luce." },
     { t:"id", plant:"calathea", q:"Quale è la calathea?", o:["monstera","calathea","orchidea","felce"], a:"calathea", why:"Foglie larghe e decorate, come disegnate a pennarello. Sembrano finte, ma pretendono attenzioni vere." },
@@ -186,7 +177,6 @@ STEPS.push(
     { t:"mc", plant:"calathea", q:"La sera la calathea alza le foglie. Cosa vuol dire?", o:["Niente di grave: si muove così ogni giorno, al mattino le riabbassa","Ha sete, subito","Ha freddo e va spostata"], a:0, why:"È un movimento naturale, giorno e notte. Per questo la chiamano pianta della preghiera." }
   ]},
   { id:"j2", zone:"z3", title:"Aria umida", icon:"drop", items:[
-    { t:"card", plant:"felce", title:"Il problema è l’aria", body:"Le piante tropicali vengono da posti dove l’aria è umida tutto l’anno. In casa, d’inverno, con i termosifoni accesi, l’aria è secca come in un deserto. Le prime a lamentarsi sono le punte delle foglie." },
     { t:"mc", plant:"calathea", q:"Punte delle foglie marroni e secche sulla calathea vogliono dire...", o:["Aria troppo secca, o acqua troppo calcarea","Troppa luce della luna","Che sta per fiorire"], a:0, why:"È il segnale classico. Si taglia la parte secca e si cerca di dare più umidità." },
     { t:"tf", plant:"felce", q:"Spruzzare acqua sulle foglie ogni tanto risolve il problema dell’aria secca.", a:false, why:"L’effetto dura pochi minuti. Funziona meglio raggruppare le piante, o mettere il vaso su un sottovaso con argilla espansa e acqua, senza che il fondo tocchi l’acqua." },
     { t:"mc", plant:"felce", q:"Dove sta bene una felce in casa?", o:["In un bagno luminoso, dove l’aria è più umida","Sopra il termosifone, al calduccio","Sul balcone, in pieno sole d’agosto"], a:0, why:"Il bagno, se ha una finestra, è il suo paradiso: umido e luminoso. Il termosifone è il suo inferno." },
@@ -194,7 +184,6 @@ STEPS.push(
     { t:"tf", plant:"felce", q:"Se la terra della felce si secca, perde fogliette a pioggia.", a:true, why:"Ama la terra sempre un po’ umida. Se si secca, te lo dice spargendo foglioline sul pavimento." }
   ]},
   { id:"j3", zone:"z3", title:"Radici strane", icon:"leaf", items:[
-    { t:"card", plant:"orchidea", title:"Non tutte le radici stanno sotto terra", body:"Nella foresta molte piante vivono aggrappate agli alberi. L’orchidea non tocca mai terra: le sue radici stanno all’aria, avvolte ai rami. La monstera si arrampica sui tronchi con radici che escono dal fusto." },
     { t:"tf", plant:"orchidea", q:"L’orchidea si pianta nel terriccio normale, come il basilico.", a:false, why:"Nel terriccio le radici soffocano e marciscono. Vuole corteccia, che lascia passare l’aria." },
     { t:"mc", plant:"orchidea", q:"Perché l’orchidea sta spesso in un vaso trasparente?", o:["Perché le radici fanno anche la fotosintesi","Per controllare che non ci siano pesci","Perché costa meno"], a:0, why:"Le radici verdi-argentate fanno la fotosintesi. E il vaso trasparente aiuta anche te: vedi quando hanno sete." },
     { t:"mc", plant:"orchidea", q:"Come si annaffia un’orchidea?", o:["Immergi il vaso in acqua per 10-15 minuti, poi la lasci scolare bene","Un bicchiere d’acqua sulle foglie ogni giorno","Riempi il vaso d’acqua e la lasci lì"], a:0, why:"Per immersione, quando le radici sono argentate. Poi si scola bene: l’acqua ferma la fa marcire." },
@@ -202,7 +191,6 @@ STEPS.push(
     { t:"id", plant:"monstera", q:"Quale è la monstera?", o:["felce","orchidea","monstera","calathea"], a:"monstera", why:"Foglie enormi con i buchi. La pianta più fotografata di Instagram." }
   ]},
   { id:"j4", zone:"z3", title:"Fiori e riposo", icon:"pot", items:[
-    { t:"card", plant:"orchidea", title:"Dopo i fiori", body:"L’orchidea regalata fiorisce per settimane, poi i fiori cadono. Ed è lì che quasi tutti la buttano. Peccato: non è morta, sta solo riposando. Con le cure giuste rifiorisce, anche ogni anno." },
     { t:"tf", plant:"orchidea", q:"Quando cadono i fiori, l’orchidea è morta.", a:false, why:"Sta riposando. Foglie e radici sono vive: la pianta si prepara alla prossima fioritura." },
     { t:"mc", plant:"orchidea", q:"Cosa aiuta l’orchidea a fare un nuovo stelo di fiori?", o:["Qualche settimana con le notti più fresche del giorno","Tenerla al buio totale","Annaffiarla il doppio"], a:0, why:"La differenza di temperatura tra giorno e notte le dà il segnale. In autunno, vicino a una finestra, spesso basta." },
     { t:"tf", plant:"felce", q:"La felce fa fiori piccolissimi, difficili da vedere.", a:false, why:"Le felci non fanno né fiori né semi: si riproducono con le spore, i puntini marroni sotto le fronde." },
@@ -301,14 +289,12 @@ Object.assign(PLANTS, {
 // Seconde lezioni delle caselle delle zone 1-3
 Object.assign(EXTRA, {
   s1:[{ title:"Raccolto e semina", items:[
-    { t:"card", plant:"basilico", title:"Mangiarlo senza ucciderlo", body:"Il basilico si mangia, ma c’è modo e modo. Se strappi le foglie grandi in basso, la pianta si spoglia. Se raccogli dall’alto, la spingi a ramificare. È la cimatura, ma con la mozzarella." },
     { t:"mc", plant:"basilico", q:"Come si raccoglie il basilico senza rovinarlo?", o:["Dall’alto, tagliando sopra una coppia di foglie","Strappando le foglie grandi in basso","Sradicando una piantina alla volta"], a:0, why:"Raccogliendo dall’alto fai raccolto e cimatura insieme: lui ringrazia facendo due rametti." },
     { t:"tf", plant:"basilico", q:"Il basilico soffre il freddo: sotto i 10 gradi circa inizia a stare male.", a:true, why:"È una pianta da estate. Una notte fredda sul davanzale d’autunno e le foglie anneriscono." },
     { t:"mc", plant:"basilico", q:"Il basilico si può seminare?", o:["Sì, in primavera e al caldo: germoglia in una o due settimane","No, nasce solo al supermercato","Solo in Liguria, per legge"], a:0, why:"Si semina in primavera, al caldo. Germoglia in fretta e dà soddisfazione (per una volta)." },
     { t:"tf", plant:"basilico", q:"Le foglie annerite dal freddo tornano verdi in qualche giorno.", a:false, why:"Sono danni da freddo: quelle foglie non tornano. Si tolgono e si spera nel resto della pianta." }
   ]}],
   s2:[{ title:"Poca luce, nessuna scusa", items:[
-    { t:"card", plant:"zamioculcas", title:"Le piante da corridoio", body:"Non tutte le case hanno finestre a sud. Per fortuna esistono piante che si accontentano di poca luce. Si accontentano, non la adorano: crescono piano, ma sopravvivono." },
     { t:"id", plant:"zamioculcas", q:"Quale è la zamioculcas?", o:["spatifillo","zamioculcas","pothos","sansevieria"], a:"zamioculcas", why:"Steli dritti con foglioline lucide a coppie, come plastificate. Molti la credono finta (lei se ne offende)." },
     { t:"tf", plant:"zamioculcas", q:"La zamioculcas sopravvive anche lontano dalla finestra.", a:true, why:"Tollera la poca luce meglio di quasi tutte. Cresce più lenta, ma non si lamenta." },
     { t:"mc", plant:"spatifillo", q:"Lo spatifillo fiorisce anche con poca luce?", o:["Sì, è una delle poche piante da casa che fiorisce in mezza ombra","No, solo in pieno sole","Solo se gli canti qualcosa"], a:0, why:"È il suo superpotere: fiori bianchi anche lontano dalla finestra. Basta che non sia buio pesto." },
@@ -316,21 +302,18 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"spatifillo", q:"Il “fiore” bianco dello spatifillo è in realtà una foglia trasformata.", a:true, why:"La vela bianca è una brattea: i fiori veri, minuscoli, stanno sulla spiga al centro." }
   ]}],
   s3:[{ title:"Chi parla e chi tace", items:[
-    { t:"card", plant:"spatifillo", title:"Piante drammatiche e piante stoiche", body:"Alcune piante ti avvisano quando hanno sete, con una scena madre. Altre accumulano acqua e stanno zitte per settimane. Conoscerne il carattere evita omicidi." },
     { t:"mc", plant:"spatifillo", q:"Lo spatifillo ha tutte le foglie afflosciate. Cosa fai?", o:["Lo annaffi: in poche ore si rialza","Lo butti, è morto","Lo metti al sole per tirarlo su"], a:0, why:"Quando ha sete si affloscia in modo teatrale, e dopo l’acqua si riprende. Meglio non farglielo fare spesso." },
     { t:"tf", plant:"zamioculcas", q:"La zamioculcas va annaffiata spesso, come la menta.", a:false, why:"I rizomi sotto terra le fanno da borraccia: ogni 2-3 settimane basta. Il pericolo è l’acqua in più." },
     { t:"mc", plant:"zamioculcas", q:"Cosa sono i bulbi grossi sotto terra della zamioculcas?", o:["Rizomi che accumulano acqua","Patate dimenticate","Uova di lumaca"], a:0, why:"Sono rizomi, riserve d’acqua. Per questo perdona le dimenticanze e odia l’acqua ferma." },
     { t:"tf", plant:"spatifillo", q:"Lo spatifillo è innocuo se lo morde il gatto.", a:false, why:"Come il pothos, irrita bocca e stomaco di cani e gatti. Meglio fuori portata." }
   ]}],
   s4:[{ title:"Il rinvaso", items:[
-    { t:"card", title:"Casa nuova, ma non troppo grande", body:"Prima o poi ogni pianta diventa troppo grande per il suo vaso. Il rinvaso è un trasloco: va fatto al momento giusto, e senza esagerare con lo spazio. Il monolocale in sei non va bene, ma neanche la villa con piscina." },
     { t:"mc", q:"Come capisci che una pianta va rinvasata?", o:["Le radici escono dai fori o girano attorno al vaso","Ha compiuto un anno","Ti sembra annoiata"], a:0, why:"Radici dai fori o arrotolate in cerchio: il vaso è diventato stretto." },
     { t:"mc", q:"Quanto più grande deve essere il vaso nuovo?", o:["Poco: qualche centimetro di diametro in più","Il doppio, così non ci pensi più","Uguale, ma di un altro colore"], a:0, why:"Troppa terra in più resta bagnata a lungo e rischia di far marcire le radici." },
     { t:"tf", plant:"zamioculcas", q:"I rizomi della zamioculcas possono deformare un vaso di plastica stretto.", a:true, why:"Crescono e spingono: a volte il vaso si gonfia o si spacca. È il suo modo di chiedere casa nuova." },
     { t:"mc", plant:"spatifillo", q:"Lo spatifillo è diventato un cespuglio enorme. Puoi...", o:["Dividerlo in più ciuffi, ognuno con le sue radici, e rinvasarli","Tagliarlo a metà con le forbici, foglie comprese","Lasciarlo esplodere"], a:0, why:"Si divide il cespo con le radici: da una pianta ne ottieni due o tre." }
   ]}],
   m1:[{ title:"Agrumi e salvia", items:[
-    { t:"card", plant:"limone", title:"Il limone in vaso", body:"Il limone è il sogno di ogni balcone: fiori profumati, frutti gialli, foglie lucide tutto l’anno. È mediterraneo d’adozione: viene dall’Asia, ma ormai qui è di casa." },
     { t:"mc", plant:"limone", q:"Dove sta bene il limone in vaso d’estate?", o:["In pieno sole, al riparo dal vento forte","In un angolo d’ombra fresca","In casa vicino al termosifone"], a:0, why:"Sole pieno: senza, niente fiori e niente limoni. Solo foglie e delusione." },
     { t:"id", plant:"limone", q:"Quale è il limone?", o:["salvia","olivo","limone","lavanda"], a:"limone", why:"Foglie lucide e ovali, e i limoni appesi. Con i limoni è facile, ammettiamolo." },
     { t:"id", plant:"salvia", q:"Riconosci la salvia?", o:["rosmarino","salvia","limone","lavanda"], a:"salvia", why:"Foglie ovali, grigio-verdi e vellutate. Profumo di burro e salvia." },
@@ -338,49 +321,42 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"salvia", q:"Salvia e rosmarino sono parenti stretti.", a:true, why:"Così stretti che dal 2017 il rosmarino si chiama Salvia rosmarinus. Riunione di famiglia sul balcone." }
   ]}],
   m2:[{ title:"Acqua e calcare", items:[
-    { t:"card", plant:"limone", title:"Foglie gialle, ma non per l’autunno", body:"Il limone vuole acqua regolare, ma odia i ristagni. E ha un nemico nascosto: il calcare. Con acqua e terra troppo calcaree, le foglie ingialliscono anche se le venature restano verdi." },
     { t:"mc", plant:"limone", q:"Le foglie del limone ingialliscono, ma le venature restano verdi. Cosa vuol dire?", o:["Gli manca il ferro, spesso per colpa del calcare","Ha preso troppo sole","Sta per fare i limoni"], a:0, why:"È la clorosi ferrica: con il calcare il ferro non viene assorbito. Si usa un concime con ferro per agrumi." },
     { t:"mc", plant:"limone", q:"Quando si annaffia il limone in vaso d’estate?", o:["Quando i primi centimetri di terra sono asciutti","Tutti i giorni, a prescindere","Una volta al mese"], a:0, why:"Regolare, ma a terra asciutta in superficie. I ristagni gli fanno cadere le foglie." },
     { t:"tf", plant:"salvia", q:"La salvia vuole la terra sempre bagnata.", a:false, why:"Come il rosmarino, preferisce terra drenante e poca acqua. Bagnata di continuo marcisce." },
     { t:"mc", plant:"salvia", q:"La salvia in vaso: meglio una terra...", o:["Drenante, anche con un po’ di sabbia","Argillosa e pesante","Sempre allagata"], a:0, why:"Drenante: le radici devono respirare tra un’annaffiatura e l’altra." }
   ]}],
   m3:[{ title:"Potare salvia e limone", items:[
-    { t:"card", plant:"salvia", title:"Legno, ma non troppo", body:"Come la lavanda, anche la salvia con gli anni diventa legnosa alla base. Una potatura in primavera la tiene giovane e folta. Magari funzionasse anche con noi." },
     { t:"mc", plant:"salvia", q:"Quando si pota la salvia?", o:["In primavera, quando riparte, accorciando i rami","In pieno inverno, a raso","Mai, si offende"], a:0, why:"In primavera, togliendo i rami secchi e accorciando gli altri. Senza arrivare al legno vecchio e spoglio." },
     { t:"tf", plant:"salvia", q:"Raccogliere spesso le punte della salvia la aiuta a restare compatta.", a:true, why:"Raccogliere le punte è una piccola potatura: la pianta ramifica. E tu cucini." },
     { t:"mc", plant:"limone", q:"Dalla base del limone spuntano rami dritti e velocissimi, con le spine. Cosa sono?", o:["Polloni del portainnesto, da tagliare","Rami nuovi che faranno limoni giganti","Un regalo della natura da lasciare"], a:0, why:"Spesso il limone è innestato su un’altra pianta: quei rami vengono da lì e gli rubano energie. Si tagliano." },
     { t:"tf", plant:"limone", q:"Il limone va potato a fondo ogni anno per fare frutti.", a:false, why:"Basta una potatura leggera: rami secchi, incrociati e polloni. Troppi tagli, meno fiori." }
   ]}],
   m4:[{ title:"Il limone d’inverno", items:[
-    { t:"card", plant:"limone", title:"La limonaia", body:"Sul lago di Garda, secoli fa, si costruivano le limonaie: serre di pietra e vetro per far passare l’inverno ai limoni. Sul balcone basta meno, ma il principio è lo stesso: luce e niente gelo." },
     { t:"mc", plant:"limone", q:"D’inverno, al Nord, il limone in vaso...", o:["Va in un posto riparato e luminoso, dove non gela","Resta fuori, è robusto","Va in cantina al buio fino a marzo"], a:0, why:"Teme il gelo ma vuole luce anche d’inverno: veranda, scala luminosa, o vicino al muro e coperto." },
     { t:"tf", plant:"limone", q:"D’inverno il limone va annaffiato come d’estate.", a:false, why:"Con il freddo beve molto meno: troppa acqua fredda nel vaso e le radici soffrono." },
     { t:"tf", plant:"salvia", q:"La salvia sopporta bene il freddo dell’inverno.", a:true, why:"È più rustica del limone: regge il freddo, basta che la terra non resti fradicia." },
     { t:"mc", plant:"salvia", q:"Perché salvia e limone d’inverno si trattano in modo diverso?", o:["Il limone teme il gelo, la salvia lo sopporta","La salvia costa di più","Il limone va in letargo come gli orsi"], a:0, why:"Stessa zona, caratteri diversi: il limone è freddoloso, la salvia no." }
   ]}],
   j1:[{ title:"Il ficus permaloso", items:[
-    { t:"card", plant:"ficus", title:"Il gigante di gomma", body:"Il ficus elastica ha foglie grandi, spesse e lucide, come di gomma. Un tempo dal suo lattice si ricavava proprio la gomma. In casa è facile, se rispetti una regola: non spostarlo di continuo." },
     { t:"mc", plant:"ficus", q:"Dove sta bene il ficus elastica?", o:["In un posto luminoso, senza sole diretto che scotta","Al buio, tanto è robusto","Sul balcone in pieno inverno"], a:0, why:"Luce indiretta e intensa. Al buio si allunga e perde le foglie in basso." },
     { t:"tf", plant:"ficus", q:"Se sposti spesso il ficus, può perdere le foglie per protesta.", a:true, why:"Odia i cambi di luce e di posto: trovagli un angolo buono e lascialo in pace." },
     { t:"id", plant:"ficus", q:"Quale è il ficus elastica?", o:["monstera","ficus","calathea","felce"], a:"ficus", why:"Un fusto dritto con foglie grandi, ovali e lucidissime. E una punta rossa da cui esce la foglia nuova." },
     { t:"mc", plant:"ficus", q:"Le foglie del ficus sono piene di polvere. Perché è un problema?", o:["La polvere ruba luce alla foglia","Gli viene l’allergia","Non è un problema, è vintage"], a:0, why:"La polvere fa da tenda: un panno umido sulle foglie ogni tanto e torna a respirare." }
   ]}],
   j2:[{ title:"Bere dall’aria", items:[
-    { t:"card", plant:"tillandsia", title:"La pianta senza terra", body:"La tillandsia non ha bisogno di terra: assorbe acqua e nutrienti dalle foglie, coperte di minuscole squame argentate. In natura sta appesa agli alberi e beve pioggia e umidità." },
     { t:"tf", plant:"tillandsia", q:"La tillandsia va piantata nel terriccio per sopravvivere.", a:false, why:"Vive senza terra. Nel terriccio sempre umido marcisce." },
     { t:"mc", plant:"tillandsia", q:"Come si annaffia la tillandsia?", o:["Un bagno di 20-30 minuti in acqua, poi ad asciugare capovolta","Una goccia al mese","Si interra e si annaffia la terra"], a:0, why:"Ammollo, poi asciugatura a testa in giù: l’acqua ferma al centro della rosetta la fa marcire." },
     { t:"id", plant:"tillandsia", q:"Riconosci la tillandsia?", o:["felce","orchidea","tillandsia","calathea"], a:"tillandsia", why:"Un ciuffo di foglie argentate e arricciate, senza vaso. Sembra un ragno vegetale (simpatico)." },
     { t:"tf", plant:"tillandsia", q:"Il colore argentato della tillandsia viene da minuscole squame che catturano l’acqua.", a:true, why:"Si chiamano tricomi: sono le sue cannucce. Più è argentata, più ama la luce." }
   ]}],
   j3:[{ title:"Radici che non bevono", items:[
-    { t:"card", plant:"tillandsia", title:"A cosa servono le radici?", body:"Siamo abituati a pensare che le radici servano a bere. Per alcune piante non è così: la tillandsia usa le radici solo per aggrapparsi, come ancore." },
     { t:"mc", plant:"tillandsia", q:"A cosa servono le radici della tillandsia?", o:["Solo ad aggrapparsi","A bere tantissimo","A niente, sono decorative"], a:0, why:"Per bere usa le foglie. Le radici sono ganci per restare attaccata ai rami." },
     { t:"tf", plant:"tillandsia", q:"Tillandsia e orchidea sono epifite: in natura vivono sopra gli alberi.", a:true, why:"Epifita vuol dire che vive sopra un’altra pianta senza rubarle niente: la usa solo come appoggio." },
     { t:"mc", plant:"ficus", q:"Se tagli un ramo del ficus esce un liquido bianco. Cos’è?", o:["Lattice: appiccicoso e irritante, meglio usare i guanti","Latte vegetale da bere","Il segno che è malato"], a:0, why:"È lattice: irrita pelle e occhi. Guanti, e niente esperimenti culinari." },
     { t:"tf", plant:"ficus", q:"In natura, le radici aeree del ficus elastica possono diventare nuovi tronchi.", a:true, why:"Scendono dai rami e diventano colonne. In casa succede di rado, per fortuna del soffitto." }
   ]}],
   j4:[{ title:"Figli e fioriture", items:[
-    { t:"card", plant:"tillandsia", title:"Fiorire una volta sola", body:"La tillandsia fiorisce una sola volta nella vita, con colori accesissimi. Dopo, lentamente, la pianta madre declina. Ma prima fa i figli. Un finale da film drammatico, ma con lieto fine." },
     { t:"tf", plant:"tillandsia", q:"Dopo la fioritura la tillandsia fa dei piccoli figli alla base.", a:true, why:"Crescono attaccati alla madre e diventano piante nuove." },
     { t:"mc", plant:"tillandsia", q:"Quando puoi staccare un figlio della tillandsia?", o:["Quando è grande circa un terzo della madre","Appena spunta","Mai, va lasciato attaccato per sempre"], a:0, why:"Quando è abbastanza grande si stacca con delicatezza. Oppure li lasci insieme e fai un ciuffo enorme." },
     { t:"mc", plant:"ficus", q:"Il ficus perde le foglie in basso, una dopo l’altra. Cosa controlli?", o:["Luce e acqua: spesso è poca luce o terra sempre bagnata","Se ha visto un fantasma","Niente, per lui è autunno"], a:0, why:"Poca luce o troppa acqua sono le cause più comuni. E il trasloco, se l’hai spostato da poco." }
@@ -390,7 +366,6 @@ Object.assign(EXTRA, {
 // Zona 4: Fiori da balcone
 STEPS.push(
   { id:"f1", zone:"z4", title:"Sole e fioriture", icon:"sun", items:[
-    { t:"card", plant:"geranio", title:"Il re dei balconi", body:"Il geranio dei balconi in realtà non è un geranio: è un Pelargonium. I botanici li hanno separati da secoli, ma il nome è rimasto. Un errore diventato tradizione, come la panna nella carbonara (no)." },
     { t:"mc", plant:"geranio", q:"Quanto sole vuole il geranio?", o:["Tanto: almeno mezza giornata di sole","Pochissimo, è timido","Solo luce artificiale"], a:0, why:"Più sole, più fiori. All’ombra fa foglie e basta." },
     { t:"tf", plant:"geranio", q:"Il geranio dei balconi in realtà è un Pelargonium.", a:true, why:"Il vero geranio è un’altra pianta, più da prato. Ma ormai lo chiamiamo così tutti." },
     { t:"id", plant:"petunia", q:"Quale è la petunia?", o:["geranio","petunia","ortensia","bouganville"], a:"petunia", why:"Fiori a trombetta, tantissimi, che ricadono dal vaso. E foglie un po’ appiccicose." },
@@ -398,21 +373,18 @@ STEPS.push(
     { t:"tf", plant:"ortensia", q:"L’ortensia vuole sole pieno tutto il giorno.", a:false, why:"Preferisce mezz’ombra: con il sole forte del pomeriggio si affloscia e si brucia." }
   ]},
   { id:"f2", zone:"z4", title:"Fiori a ripetizione", icon:"leaf", items:[
-    { t:"card", plant:"petunia", title:"Togli il vecchio, arriva il nuovo", body:"Quando un fiore appassisce, la pianta inizia a fare semi. E fare semi stanca: restano meno energie per i fiori nuovi. Togliendo i fiori secchi, la convinci a fiorire ancora." },
     { t:"mc", plant:"petunia", q:"Perché si tolgono i fiori appassiti della petunia?", o:["Così non fa semi e continua a fiorire","Perché sono brutti e basta","Per darli alle formiche"], a:0, why:"Senza semi da preparare, la pianta investe in fiori nuovi." },
     { t:"tf", plant:"geranio", q:"Anche il geranio fiorisce di più se togli gli steli dei fiori secchi.", a:true, why:"Si stacca tutto lo stelo del fiore appassito: così ne arrivano altri." },
     { t:"mc", q:"Che concime aiuta le piante da fiore?", o:["Uno ricco di potassio, per le fioriture","Solo azoto, per fare tante foglie","Il fondo della moka, a cucchiaiate"], a:0, why:"Il potassio aiuta i fiori, l’azoto spinge le foglie. Per i balconi fioriti c’è il concime per piante da fiore." },
     { t:"tf", plant:"petunia", q:"Le foglie della petunia sono un po’ appiccicose al tatto.", a:true, why:"Sono coperte di peli ghiandolari. Non è sporco, è lei." }
   ]},
   { id:"f3", zone:"z4", title:"Colori che cambiano", icon:"drop", items:[
-    { t:"card", plant:"ortensia", title:"Il trucco dell’ortensia", body:"Alcune ortensie cambiano colore a seconda della terra. In terra acida diventano blu, in terra calcarea rosa. È chimica, non magia. Ma sembra magia." },
     { t:"mc", plant:"ortensia", q:"In che terra un’ortensia tende a diventare blu?", o:["Acida","Calcarea","Sabbia di mare"], a:0, why:"Nella terra acida l’alluminio si scioglie e la pianta lo assorbe: i fiori diventano blu." },
     { t:"tf", plant:"ortensia", q:"Tutte le ortensie cambiano colore con la terra.", a:false, why:"Solo alcune, soprattutto quelle colorate. Le ortensie bianche restano bianche, coerenti." },
     { t:"mc", plant:"bouganville", q:"La parte colorata della bouganville è...", o:["Brattee: foglie colorate attorno ai fiori veri","Petali giganti","Frutti a forma di foglia"], a:0, why:"I fiori veri sono i tubetti bianchi al centro. Il colore lo fanno le brattee, come la vela dello spatifillo." },
     { t:"tf", plant:"bouganville", q:"I veri fiori della bouganville sono piccoli e bianchi.", a:true, why:"Piccolissimi, al centro delle brattee colorate. I veri protagonisti, e nessuno li nota." }
   ]},
   { id:"f4", zone:"z4", title:"Inverno e potatura", icon:"pot", items:[
-    { t:"card", plant:"geranio", title:"Passare l’inverno", body:"Gerani e bouganville vengono da posti caldi: il gelo li uccide. L’ortensia invece l’inverno lo regge, ma va potata con attenzione, o l’anno dopo niente fiori." },
     { t:"mc", plant:"geranio", q:"Come fai passare l’inverno al geranio, al Nord?", o:["In un posto luminoso e fresco, al riparo dal gelo, con pochissima acqua","Fuori sotto la neve, così si fortifica","Vicino al termosifone, annaffiato ogni giorno"], a:0, why:"Luminoso, fresco e riparato, con acqua quasi zero: aspetta la primavera." },
     { t:"tf", plant:"geranio", q:"Il geranio si moltiplica facilmente per talea.", a:true, why:"Un rametto di una decina di centimetri in terra: radica in poche settimane. Gerani gratis per tutti." },
     { t:"mc", plant:"ortensia", q:"Se poti l’ortensia nel momento sbagliato, rischi...", o:["Di tagliare i boccioli dei fiori dell’anno dopo","Che diventi un cactus","Niente, si può tagliare quando vuoi"], a:0, why:"Molte ortensie fioriscono sui rami dell’anno prima: tagliandoli in autunno togli i fiori futuri." },
@@ -428,7 +400,6 @@ STEPS.push(
 );
 Object.assign(EXTRA, {
   f1:[{ title:"Chi vuole il sole, chi no", items:[
-    { t:"card", plant:"ortensia", title:"Sole sì, ma con giudizio", body:"Sullo stesso balcone puoi avere il geranio che si abbronza e l’ortensia che cerca l’ombra. Il trucco è sapere chi va dove: il lato del sole del mattino per le delicate, quello del pomeriggio per le sole-dipendenti." },
     { t:"mc", plant:"ortensia", q:"Dove metti l’ortensia sul balcone?", o:["In mezz’ombra, magari con il sole solo al mattino","Nel punto più assolato","Dentro casa, al buio"], a:0, why:"Sole del mattino e ombra nel pomeriggio: il suo compromesso ideale." },
     { t:"id", plant:"ortensia", q:"Riconosci l’ortensia?", o:["bouganville","geranio","petunia","ortensia"], a:"ortensia", why:"Grandi palle di fiori, blu o rosa, e foglie larghe seghettate. La nonna ne aveva una, sicuro." },
     { t:"mc", plant:"bouganville", q:"Di cosa ha bisogno la bouganville per fiorire tanto?", o:["Sole pieno e caldo","Ombra e umidità","Musica classica"], a:0, why:"Viene da posti caldi e soleggiati: più sole prende, più si copre di colore." },
@@ -436,21 +407,18 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"geranio", q:"Il geranio teme i ristagni d’acqua.", a:true, why:"Le sue radici marciscono facilmente: meglio poca acqua che troppa, e mai sottovaso pieno." }
   ]}],
   f2:[{ title:"Tanta sete, poca sete", items:[
-    { t:"card", plant:"ortensia", title:"Il nome dice tutto", body:"Il nome scientifico dell’ortensia, Hydrangea, viene dal greco e vuol dire più o meno “vaso d’acqua”. Non è un caso: tra le piante da balcone è una delle più assetate." },
     { t:"mc", plant:"ortensia", q:"L’ortensia in vaso d’estate...", o:["Vuole terra sempre umida, a volte acqua ogni giorno","Si annaffia ogni due settimane","Si annaffia solo sulle foglie"], a:0, why:"Assetatissima: con la terra secca si affloscia in poche ore." },
     { t:"tf", plant:"ortensia", q:"Se l’ortensia è afflosciata nel pomeriggio d’estate, è morta.", a:false, why:"Spesso si affloscia per il caldo e si riprende la sera. Controlla la terra: se è secca, acqua; se è umida, ombra." },
     { t:"mc", plant:"bouganville", q:"Come si annaffia la bouganville?", o:["Poco, lasciando asciugare la terra tra una volta e l’altra","Ogni giorno, tanta","Mai"], a:0, why:"Ama il secco: troppa acqua fa foglie e pochi fiori, e rischia di marcire." },
     { t:"tf", plant:"bouganville", q:"Un po’ di sete controllata aiuta la bouganville a fiorire.", a:true, why:"Un leggero stress da secco la spinge a fiorire. Leggero, non abbandono." }
   ]}],
   f3:[{ title:"Foglie che parlano", items:[
-    { t:"card", plant:"geranio", title:"Non solo fiori", body:"Molti gerani hanno foglie con una fascia più scura, come un anello. E se le sfreghi, profumano. Alcuni si coltivano apposta per il profumo delle foglie." },
     { t:"tf", plant:"geranio", q:"Alcune foglie di geranio hanno una fascia scura a forma di anello.", a:true, why:"Si chiamano gerani zonali proprio per questo: hanno una “zona” più scura sulla foglia." },
     { t:"id", plant:"geranio", q:"Quale è il geranio?", o:["petunia","geranio","bouganville","ortensia"], a:"geranio", why:"Foglie rotonde e vellutate, ciuffi di fiori rossi su steli dritti. Il balcone della nonna, parte due." },
     { t:"mc", plant:"petunia", q:"La petunia ha fusti lunghi e spogli, con pochi fiori in punta. Cosa fai?", o:["La accorci un po’: rifarà rami e fiori","La lasci, è il suo stile","La annaffi il triplo"], a:0, why:"Una spuntatina a metà estate la rinnova: ramifica e rifiorisce." },
     { t:"mc", q:"Un fiore che cambia colore con la terra, un “fiore” che è una foglia. Cosa insegnano?", o:["Che le piante non sono come sembrano: guarda meglio","Che i botanici si annoiano","Niente, è un caso"], a:0, why:"Brattee, terra acida, nomi sbagliati: osservare bene è metà del pollice verde." }
   ]}],
   f4:[{ title:"Annuali e ripartenze", items:[
-    { t:"card", plant:"petunia", title:"Annuale o no?", body:"Molte piante da balcone si comprano in primavera e si buttano in autunno. Alcune potrebbero vivere di più, con un po’ di cura. Altre no: è il loro ciclo, come per il basilico. Non è colpa tua. Stavolta." },
     { t:"tf", plant:"petunia", q:"La petunia da balcone di solito si coltiva come annuale.", a:true, why:"Si compra in primavera e dura fino all’autunno. Con tanta pazienza può svernare, ma di solito non ne vale la pena." },
     { t:"mc", plant:"bouganville", q:"Come si pota la bouganville?", o:["Dopo la fioritura, accorciando i rami lunghi","Mai, si offende","A zero ogni mese"], a:0, why:"Dopo i fiori si accorciano i rami: rifiorisce sui rami nuovi." },
     { t:"mc", plant:"ortensia", q:"Le teste secche dell’ortensia, in inverno...", o:["Si possono lasciare: proteggono le gemme dal freddo, si tolgono a fine inverno","Vanno tolte a ottobre con tutto il ramo","Diventano blu se le annaffi"], a:0, why:"Fanno da cappotto alle gemme sotto. A fine inverno si tolgono, sopra la prima coppia di gemme buone." },
@@ -494,7 +462,6 @@ Object.assign(PLANTS, {
 });
 STEPS.push(
   { id:"c1", zone:"z5", title:"Fame di terra", icon:"leaf", items:[
-    { t:"card", plant:"dionea", title:"Il gran finale", body:"Le piante carnivore vivono in paludi e torbiere, dove la terra è poverissima di nutrienti. Per sopravvivere hanno trovato un’altra strada: prendere l’azoto dagli insetti. L’energia la fanno col sole, come tutte. Gli insetti sono l’integratore." },
     { t:"mc", plant:"dionea", q:"Perché le piante carnivore catturano gli insetti?", o:["Per i nutrienti che nella loro terra mancano","Perché non sanno fare la fotosintesi","Per vendetta"], a:0, why:"La terra di palude è povera: gli insetti portano azoto e minerali. La vendetta è un effetto collaterale." },
     { t:"tf", plant:"dionea", q:"Le piante carnivore fanno la fotosintesi, come le altre.", a:true, why:"Certo: l’energia viene dal sole. Gli insetti sono un supplemento, non il pranzo." },
     { t:"id", plant:"dionea", q:"Quale è la dionea?", o:["sarracenia","dionea","drosera","nepenthes"], a:"dionea", why:"Trappole a forma di bocca, rosse dentro, con le ciglia sui bordi. La pianta più famosa del cinema horror botanico." },
@@ -502,21 +469,18 @@ STEPS.push(
     { t:"tf", plant:"dionea", q:"La dionea va nutrita con pezzetti di carne o di prosciutto.", a:false, why:"La carne marcisce nella trappola e la fa annerire. Al massimo piccoli insetti vivi, e di solito fa da sola. Il prosciutto mangialo tu." }
   ]},
   { id:"c2", zone:"z5", title:"Acqua di palude", icon:"drop", items:[
-    { t:"card", plant:"dionea", title:"Dimentica tutto (quasi)", body:"Per tutto il percorso ti abbiamo detto: mai acqua ferma nel sottovaso. Ecco l’eccezione. Dionea, sarracenia e drosera vivono in palude: la terra deve restare sempre bagnata, con il vaso in un sottovaso pieno d’acqua. Sì, stavolta è giusto." },
     { t:"tf", plant:"dionea", q:"Per la dionea il sottovaso sempre pieno d’acqua va bene.", a:true, why:"È il metodo del sottovaso: un paio di centimetri d’acqua sempre lì. Per lei la torba asciutta è il vero pericolo." },
     { t:"mc", plant:"dionea", q:"Che acqua vuole la dionea?", o:["Piovana o demineralizzata","Quella del rubinetto, più calcarea possibile","Acqua frizzante, per le bollicine"], a:0, why:"I sali del rubinetto si accumulano nella torba e le bruciano le radici. Piovana, demineralizzata o da osmosi." },
     { t:"tf", plant:"sarracenia", q:"La sarracenia sopporta bene l’acqua calcarea del rubinetto.", a:false, why:"Come la dionea: niente calcare. Acqua piovana o demineralizzata, sempre." },
     { t:"mc", plant:"drosera", q:"La torba della drosera si sta asciugando. Cosa fai?", o:["Riempi il sottovaso con acqua piovana","Aspetti che si secchi del tutto, come per la sansevieria","Le dai acqua del rubinetto con un po’ di concime"], a:0, why:"Piante di palude: la torba deve restare bagnata. La sansevieria qui non fa testo." }
   ]},
   { id:"c3", zone:"z5", title:"Sole e trappole", icon:"sun", items:[
-    { t:"card", plant:"sarracenia", title:"Più sole, più colore", body:"Le carnivore di palude vengono da posti aperti, senza alberi a fare ombra. Vogliono tanto sole: è con la luce piena che le trappole si colorano di rosso. All’ombra restano verdi, molli e tristi." },
     { t:"mc", plant:"sarracenia", q:"Dove sta bene la sarracenia?", o:["Sul balcone in pieno sole","In un angolo buio del soggiorno","In bagno senza finestre"], a:0, why:"Pieno sole, anche tutto il giorno. Per una carnivora di palude non è mai troppo." },
     { t:"tf", plant:"dionea", q:"Più sole prende, più l’interno delle trappole della dionea diventa rosso.", a:true, why:"Con poca luce le trappole restano verdi e deboli. Il rosso è il segno che sta bene." },
     { t:"mc", plant:"dionea", q:"Cosa succede se fai scattare le trappole della dionea per gioco?", o:["La pianta spreca energia e la trappola può annerire","Diventa più forte","Niente, le piace"], a:0, why:"Ogni chiusura le costa fatica, e una trappola si chiude solo poche volte nella sua vita. Non è un giocattolo (purtroppo)." },
     { t:"tf", plant:"dionea", q:"La trappola della dionea scatta al primo tocco di un solo pelo.", a:false, why:"Servono due tocchi sui peli sensibili in una ventina di secondi: così non spreca energia per una goccia di pioggia." }
   ]},
   { id:"c4", zone:"z5", title:"Il letargo", icon:"pot", items:[
-    { t:"card", plant:"dionea", title:"Il riposo invernale", body:"Dionea e sarracenia d’inverno vanno in letargo: smettono di crescere, alcune foglie anneriscono, e sembrano morte. Non lo sono. Senza questo riposo al fresco, in pochi anni si esauriscono. Un po’ come noi senza ferie." },
     { t:"tf", plant:"dionea", q:"La dionea va tenuta al caldo in casa tutto l’inverno.", a:false, why:"Ha bisogno di un inverno fresco, più o meno tra 0 e 10 gradi, per riposare. Al caldo tutto l’anno si esaurisce." },
     { t:"mc", plant:"sarracenia", q:"D’inverno la sarracenia ingiallisce e perde foglie. Cosa fai?", o:["Niente di drastico: è il riposo, togli solo le parti secche","La butti","La porti al caldo e la concimi"], a:0, why:"È il letargo. In primavera riparte con trombe nuove." },
     { t:"mc", plant:"dionea", q:"Durante il riposo invernale, la torba della dionea...", o:["Resta umida, con meno acqua nel sottovaso","Si lascia seccare del tutto","Va allagata con acqua calda"], a:0, why:"Riposa, ma non deve seccarsi: torba umida, sottovaso più basso." },
@@ -532,7 +496,6 @@ STEPS.push(
 );
 Object.assign(EXTRA, {
   c1:[{ title:"Le trappole", items:[
-    { t:"card", plant:"drosera", title:"Ognuna ha il suo trucco", body:"Non tutte le carnivore cacciano allo stesso modo. La dionea chiude una tagliola. La drosera incolla. Sarracenia e nepenthes preparano un pozzo da cui non si esce. Quattro piante, quattro film horror diversi." },
     { t:"mc", plant:"drosera", q:"Come cattura gli insetti la drosera?", o:["Con goccioline appiccicose sui tentacoli","Con una tagliola che scatta","Rincorrendoli"], a:0, why:"L’insetto si incolla, i tentacoli si piegano piano piano e lo avvolgono." },
     { t:"id", plant:"drosera", q:"Riconosci la drosera?", o:["nepenthes","drosera","dionea","sarracenia"], a:"drosera", why:"Foglie lunghe e sottili, piene di tentacoli con una goccia lucida in punta." },
     { t:"mc", plant:"sarracenia", q:"Come funziona la trappola della sarracenia?", o:["È un tubo: l’insetto scivola dentro e non riesce più a uscire","Morde","Spara spine"], a:0, why:"Il bordo è scivoloso e dentro i peli puntano verso il basso: si entra, non si esce." },
@@ -540,21 +503,18 @@ Object.assign(EXTRA, {
     { t:"id", plant:"sarracenia", q:"Quale è la sarracenia?", o:["sarracenia","nepenthes","drosera","dionea"], a:"sarracenia", why:"Trombe dritte con un cappuccio in cima, spesso venate di rosso." }
   ]}],
   c2:[{ title:"Non sono tutte uguali", items:[
-    { t:"card", plant:"nepenthes", title:"L’eccezione dell’eccezione", body:"La nepenthes è carnivora, ma non è di palude: viene dalle foreste tropicali, dove spesso vive appesa agli alberi. Le piace l’aria umida, non i piedi nell’acqua. Sì, è una regola dentro l’eccezione. Benvenuti nel gran finale." },
     { t:"tf", plant:"nepenthes", q:"Anche la nepenthes va tenuta con il vaso in un sottovaso sempre pieno.", a:false, why:"Con i piedi nell’acqua le sue radici marciscono. Terriccio umido ma drenante." },
     { t:"mc", plant:"nepenthes", q:"Cosa vuole la nepenthes?", o:["Terriccio umido ma drenante, e aria umida","Piedi sempre in acqua","Sole del deserto e acqua una volta al mese"], a:0, why:"Foresta tropicale: umidità nell’aria, terra che respira." },
     { t:"id", plant:"nepenthes", q:"Quale è la nepenthes?", o:["drosera","sarracenia","nepenthes","dionea"], a:"nepenthes", why:"Foglie lunghe e, appese ai viticci, le anfore con il coperchio." },
     { t:"tf", plant:"nepenthes", q:"Le anfore della nepenthes contengono un liquido che digerisce gli insetti.", a:true, why:"Il liquido lo produce la pianta: chi ci cade dentro non ne esce più." }
   ]}],
   c3:[{ title:"Luce per tutte", items:[
-    { t:"card", plant:"drosera", title:"Il davanzale delle carnivore", body:"Se non hai un balcone al sole, non è tutto perduto. La drosera capensis sta bene anche su un davanzale molto luminoso. La nepenthes vuole tanta luce, ma non il sole diretto delle ore più calde." },
     { t:"mc", plant:"drosera", q:"Dove metti una drosera in casa?", o:["Sul davanzale più luminoso, anche con un po’ di sole","In corridoio","In cantina"], a:0, why:"Più luce ha, più goccioline fa. Al buio smette di cacciare." },
     { t:"mc", plant:"nepenthes", q:"La nepenthes non fa più anfore. Cosa le manca, di solito?", o:["Luce e umidità","Carne","Musica classica"], a:0, why:"Con poca luce o aria secca smette di fare anfore e fa solo foglie. La musica è facoltativa." },
     { t:"tf", plant:"drosera", q:"Le goccioline della drosera spariscono se l’aria è troppo secca o la luce troppo poca.", a:true, why:"Senza goccioline non caccia: è il suo modo di dirti che qualcosa non va." },
     { t:"mc", q:"Perché le trappole di molte carnivore sono rosse?", o:["Il colore aiuta ad attirare gli insetti, e col sole si accende","Perché sono arrabbiate","Perché è sangue"], a:0, why:"Rosso e nettare fanno da insegna luminosa. Col sole pieno l’insegna si accende di più." }
   ]}],
   c4:[{ title:"Vasi e torba", items:[
-    { t:"card", plant:"sarracenia", title:"La terra giusta", body:"Le carnivore di palude vogliono una terra povera e acida: di solito torba bionda mescolata con perlite o sabbia silicea. Il terriccio universale, ricco di concime, per loro è veleno." },
     { t:"mc", plant:"sarracenia", q:"In che terra si coltiva la sarracenia?", o:["Torba bionda con perlite o sabbia silicea","Terriccio universale concimato","Terra del giardino"], a:0, why:"Povera e acida, come la palude da cui viene." },
     { t:"tf", plant:"dionea", q:"Il terriccio universale va bene per la dionea.", a:false, why:"Ha concime e sali: le brucia le radici. Torba bionda e perlite, nient’altro." },
     { t:"mc", plant:"nepenthes", q:"In che vaso sta bene la nepenthes?", o:["Un vaso appeso, così le anfore pendono libere","Un sottovaso sempre allagato","Un barattolo di vetro chiuso"], a:0, why:"Le anfore pendono dalle foglie: un vaso appeso le lascia libere. E il terriccio deve drenare." },
@@ -661,7 +621,6 @@ Object.assign(PLANTS, {
 const lv = (n, items) => items.map(it => ({ lv:n, ...it }));
 STEPS.push(
   { id:"d1", zone:"z6", title:"Foglie che parlano", icon:"leaf", items:lv(3, [
-    { t:"card", title:"Da qui si fa sul serio", body:"Le domande diventano più difficili: niente più “quale è il basilico?”. Sintomi, situazioni, casi veri, e due risposte su tre sembrano giuste. Sbagliare è previsto. (Anche incoraggiato.)" },
     { t:"mc", plant:"pothos", q:"Il pothos fa foglie nuove sempre più piccole, distanziate sul fusto e tutte verdi. La causa più probabile?", o:["Troppo poca luce","Troppa acqua","Troppo concime"], a:0, why:"Foglie piccole, fusto allungato e striature sparite: sta cercando luce. Più luce indiretta e una spuntatina." },
     { t:"mc", plant:"calathea", q:"Calathea con i bordi marroni, terra umida al punto giusto, vicina al termosifone. Cosa cambi per prima cosa?", o:["La allontani dal termosifone e alzi l’umidità intorno","La annaffi di più","La metti al sole"], a:0, why:"La terra è a posto: il problema è l’aria secca e calda. Cambiare l’acqua non serve." },
     { t:"mc", plant:"monstera", q:"Monstera con foglie gialle che partono dal basso, terra fradicia e odore di stantio dal vaso. Cosa sospetti?", o:["Marciume delle radici per troppa acqua","Poca luce","Fame di concime"], a:0, why:"Terra fradicia e cattivo odore: radici marce. Si controllano, si tolgono quelle molli, terra nuova e meno acqua." },
@@ -669,7 +628,6 @@ STEPS.push(
     { t:"mc", plant:"spatifillo", q:"Spatifillo con punte marroni e croccanti, ma non si affloscia mai. La causa più probabile?", o:["Aria secca o sali nell’acqua","Sete grave","Troppa luce della luna"], a:0, why:"Con la sete si affloscerebbe. Punte secche senza crolli: aria secca o sali accumulati dall’acqua del rubinetto." }
   ])},
   { id:"d2", zone:"z6", title:"Acqua: casi difficili", icon:"drop", items:lv(3, [
-    { t:"card", title:"Il dito non mente (quasi mai)", body:"La prova del dito funziona, ma con giudizio: vasi grandi, terricci diversi, stagioni. Ecco i casi in cui la risposta facile è quella sbagliata." },
     { t:"mc", plant:"sansevieria", q:"Sansevieria in un vaso enorme di plastica, d’inverno. I primi centimetri sono asciutti. Annaffi?", o:["Non ancora: in un vaso grande la terra in profondità resta umida a lungo","Sì, la regola dei primi centimetri vale sempre","Sì, e abbondante"], a:0, why:"Per chi accumula acqua conta la terra in profondità. D’inverno ancora di più." },
     { t:"mc", plant:"orchidea", q:"Nel vaso trasparente le radici dell’orchidea sono verdi e lucide. Annaffi?", o:["No: verdi vuol dire che hanno ancora acqua","Sì, subito","Sì, con un cubetto di ghiaccio"], a:0, why:"Si annaffia quando sono argentate. Verdi significa ancora idratate." },
     { t:"mc", plant:"menta", q:"Menta in pieno sole a luglio, in un vaso piccolo: si affloscia ogni pomeriggio anche se la annaffi al mattino. La soluzione migliore?", o:["Un vaso più grande, o ombra nel pomeriggio","Annaffiarla tre volte al giorno","Tagliarla a raso"], a:0, why:"Vaso piccolo e sole forte: poca terra non trattiene abbastanza acqua. Più terra, o meno sole pomeridiano." },
@@ -677,7 +635,6 @@ STEPS.push(
     { t:"mc", plant:"basilico", q:"Basilico con foglie basse gialle, terra sempre bagnata e sottovaso pieno. Cosa fai?", o:["Svuoti il sottovaso e lasci asciugare la superficie prima di annaffiare","Concimi di più","Lo sposti all’ombra"], a:0, why:"Radici a mollo: il basilico vuole terra fresca, non palude." }
   ])},
   { id:"d3", zone:"z6", title:"Luce: casi difficili", icon:"sun", items:lv(3, [
-    { t:"card", title:"Quanta luce è “tanta luce”?", body:"Una finestra a nord, un davanzale a sud senza tenda, un corridoio. Dire “luce indiretta” è facile; capire quale finestra fa per quale pianta è un altro mestiere." },
     { t:"mc", plant:"monstera", q:"Monstera vicino a una finestra a nord: foglie grandi ma senza buchi, piccioli lunghissimi. Cosa le manca?", o:["Luce: la finestra a nord non basta","Acqua","Un vaso più piccolo"], a:0, why:"Piccioli lunghi e foglie intere: cerca luce. Serve una finestra più luminosa, senza sole diretto." },
     { t:"tf", plant:"calathea", q:"Una calathea davanti a una finestra a sud, senza tenda, sta benissimo perché ha tanta luce.", a:false, why:"Il sole diretto da sud brucia e sbiadisce le foglie: tenda o qualche metro di distanza." },
     { t:"mc", plant:"zamioculcas", q:"Hai solo un corridoio con la luce di una finestra lontana. Quale di queste ci sopravvive?", o:["La zamioculcas","Il basilico","La lavanda"], a:0, why:"Tra queste, solo la zamioculcas tollera la poca luce. Le altre due lì dentro si spengono." },
@@ -685,7 +642,6 @@ STEPS.push(
     { t:"tf", plant:"orchidea", q:"Foglie dell’orchidea verde scuro e lucidissime sono sempre il segno di una luce perfetta.", a:false, why:"Un verde molto scuro spesso vuol dire poca luce. Un verde più chiaro, quasi oliva, è più vicino all’ideale." }
   ])},
   { id:"d4", zone:"z6", title:"Coinquilini indesiderati", icon:"pot", items:lv(3, [
-    { t:"card", title:"I piccoli coinquilini", body:"Prima o poi arrivano: ragnetti rossi, cocciniglie, moscerini. Riconoscerli in fretta fa la differenza tra un pomeriggio di pulizie e un funerale." },
     { t:"mc", plant:"calathea", q:"Sotto le foglie della calathea vedi ragnatele sottilissime e puntini che si muovono. Chi è?", o:["Il ragnetto rosso: ama l’aria secca","La cocciniglia","Il moscerino della frutta"], a:0, why:"Il ragnetto rosso adora l’aria secca. Si lavano le foglie e si alza l’umidità." },
     { t:"mc", plant:"pothos", q:"Batuffoli bianchi e cotonosi all’attaccatura delle foglie del pothos. Cosa sono?", o:["Cocciniglia cotonosa","Muffa buona","Semi"], a:0, why:"Si tolgono con un cotton fioc imbevuto di alcol e si controlla spesso, anche le piante vicine." },
     { t:"mc", plant:"spatifillo", q:"Moscerini neri che volano intorno al vaso dello spatifillo. Cosa li attira?", o:["La terra sempre bagnata in superficie","La luce","Le foglie lucide"], a:0, why:"Sono moscerini del terriccio: depongono nella terra umida. Lasciare asciugare la superficie li scoraggia." },
@@ -700,7 +656,6 @@ STEPS.push(
     { t:"match", q:"Abbina diva e capriccio", pairs:[["Alocasia","Odia l’acqua in eccesso"],["Fittonia","Crolla se ha sete"],["Maranta","Prega la sera"],["Begonia","Niente acqua sulle foglie"]] }
   ])},
   { id:"g1", zone:"z7", title:"Il sole degli estremi", icon:"sun", items:lv(3, [
-    { t:"card", plant:"ficodindia", title:"Benvenuti tra le grasse vere", body:"Le succulente accumulano acqua in foglie, fusti o radici. Sono facili, dicono. Poi muoiono. Quasi sempre per lo stesso motivo: troppo amore, troppa acqua, troppo poco sole." },
     { t:"mc", plant:"lavanda", q:"Lavanda in vaso su un balcone a est: fiorisce poco e si allunga. Cosa le manca?", o:["Ore di sole: a est ne prende troppo poche","Acqua","Concime con tanto azoto"], a:0, why:"Il sole del mattino non basta: vuole pieno sole per gran parte del giorno." },
     { t:"mc", plant:"olivo", q:"Olivo in vaso: a fine inverno perde foglie dopo mesi in casa vicino al termosifone. Causa probabile?", o:["Caldo secco e poca luce in casa","Troppo freddo","Troppa potatura"], a:0, why:"D’inverno vuole fresco e luce, non il salotto riscaldato." },
     { t:"tf", plant:"rosmarino", q:"Rosmarino che ingiallisce dal basso, in un vaso senza foro e con la terra che puzza: basta annaffiarlo meno da oggi.", a:false, why:"Le radici sono già marce: serve un vaso col foro e terra drenante, togliendo le radici molli. Meno acqua da sola non basta." },
@@ -708,7 +663,6 @@ STEPS.push(
     { t:"mc", plant:"bouganville", q:"Bouganville piena di foglie e rami lunghi, ma nessuna brattea colorata. Concime giusto?", o:["Meno azoto, più potassio, e più sole","Più azoto per spingere la crescita","Nessun cambio, aspetti"], a:0, why:"L’azoto spinge le foglie, il potassio i fiori. E senza sole pieno niente colore." }
   ])},
   { id:"g2", zone:"z7", title:"Bere poco, ma bene", icon:"drop", items:lv(3, [
-    { t:"card", title:"Il metodo “bagna e asciuga”", body:"Per le piante che temono i ristagni la regola non è “poca acqua”: è “acqua a fondo, poi aspetti che asciughi tutto”. Una spruzzatina al giorno è il modo migliore per far marcire le radici e seccare la pianta, insieme." },
     { t:"tf", plant:"sansevieria", q:"Per la sansevieria è meglio un goccio d’acqua ogni giorno che un’annaffiatura abbondante ogni tre settimane.", a:false, why:"Il goccio quotidiano bagna solo la superficie: radici deboli e marciume. Meglio a fondo e di rado." },
     { t:"mc", plant:"ficodindia", q:"Fico d’India con una pala molle e giallastra alla base, dopo un autunno piovoso all’aperto. Cosa fai?", o:["Togli la pala marcia, lo ripari dalla pioggia e niente acqua per un po’","Lo annaffi per tirarlo su","Lo poti tutto"], a:0, why:"Freddo e pioggia insieme: marciume. Via la parte molle, riparo e asciutto." },
     { t:"mc", plant:"salvia", q:"Salvia in vaso con le foglie che anneriscono dal basso dopo settimane di pioggia. Cosa fai?", o:["La metti al riparo dalla pioggia e controlli il drenaggio","La annaffi di più","La concimi"], a:0, why:"Troppa acqua, non troppo poca: riparo e terra che drena." },
@@ -716,7 +670,6 @@ STEPS.push(
     { t:"mc", plant:"zamioculcas", q:"Zamioculcas con foglioline gialle una dopo l’altra, ma i rizomi sono sodi e la terra è asciutta da più di un mese. Cosa le manca?", o:["Acqua: anche lei ha un limite","Meno acqua","Un vaso senza foro"], a:0, why:"Rizomi sodi: niente marciume. Più di un mese di secco è tanto anche per lei: una bella annaffiatura, poi di nuovo asciutto." }
   ])},
   { id:"g3", zone:"z7", title:"Spine e funghi", icon:"leaf", items:lv(3, [
-    { t:"card", title:"Spine, ma con cervello", body:"Le piante mediterranee e le grasse sono dure. Ma hanno nemici precisi: l’aria ferma, l’umidità che non va via, i parassiti venuti da lontano. E, nel caso del fico d’India, le tue dita." },
     { t:"mc", plant:"ficodindia", q:"Hai toccato il fico d’India e hai le dita piene di spine invisibili. Cosa usi?", o:["Nastro adesivo, da attaccare e staccare","Strofinare forte con le mani","Acqua calda e sapone"], a:0, why:"I glochidi si incastrano nella pelle: il nastro adesivo li porta via. Strofinare li spinge dentro." },
     { t:"tf", plant:"lavanda", q:"D’inverno la lavanda in vaso soffre più per l’umidità che per il freddo.", a:true, why:"Il freddo lo regge. Terra fredda e bagnata per settimane, no." },
     { t:"mc", plant:"olivo", q:"Vuoi ridurre l’altezza del tuo olivo in vaso. Quando lo poti?", o:["A fine inverno, quando il gelo è passato","In pieno agosto","Durante una gelata"], a:0, why:"A fine inverno la pianta sta per ripartire e il rischio di gelo è passato." },
@@ -724,7 +677,6 @@ STEPS.push(
     { t:"mc", plant:"geranio", q:"Geranio con boccioli bucati e una larvetta dentro. Chi è il colpevole più probabile?", o:["La farfalla del geranio, arrivata dal Sud Africa","Un afide","Una cocciniglia"], a:0, why:"Le sue larve scavano boccioli e steli. Si tolgono le parti colpite e si controlla spesso: sui balconi italiani è comunissima." }
   ])},
   { id:"g4", zone:"z7", title:"Radici e rinvasi", icon:"pot", items:lv(3, [
-    { t:"card", title:"Errori da esperti", body:"Questi sono gli errori che fa chi le piante le conosce già: terra troppo buona, vaso troppo grande, cure troppo attente. Il troppo, anche qui, stroppia." },
     { t:"mc", plant:"limone", q:"Limone con foglie accartocciate e appiccicose, e formiche che salgono sul tronco. Chi c’è?", o:["Afidi o cocciniglie: le formiche raccolgono la loro melata","Le formiche mangiano le foglie","È normale in estate"], a:0, why:"Le formiche “allevano” afidi e cocciniglie per la melata. Elimini i parassiti e le formiche se ne vanno." },
     { t:"mc", plant:"salvia", q:"Salvia dopo tre anni: tutta legno, foglie solo in punta. Come la ringiovanisci?", o:["Fai talee dalle punte e riparti con piante giovani","La tagli a raso sul legno","Impossibile, si butta"], a:0, why:"Dal legno vecchio ributta poco: le talee sono il modo più sicuro per ripartire." },
     { t:"tf", plant:"bouganville", q:"Rinvasare spesso la bouganville in vasi sempre più grandi la fa fiorire di più.", a:false, why:"Con le radici un po’ strette fiorisce meglio: si rinvasa solo quando serve davvero." },
@@ -739,7 +691,6 @@ STEPS.push(
     { t:"match", q:"Abbina grassa e segreto", pairs:[["Echeveria","La pruina non si tocca"],["Haworthia","Preferisce luce indiretta"],["Mammillaria","Inverno fresco e asciutto"],["Lithops","Spesso non annaffiare"]] }
   ])},
   { id:"h1", zone:"z8", title:"Acidofile e capricci", icon:"drop", items:lv(3, [
-    { t:"card", plant:"ortensia", title:"L’ultima zona", body:"Collezione rara: piante esigenti, per chi ormai sa il fatto suo. Le domande mescolano tutto quello che hai imparato. Se arrivi in fondo, sei ufficialmente una minaccia per i vivai." },
     { t:"mc", plant:"ortensia", q:"Ortensia blu che dopo un anno di acqua molto calcarea diventa viola-rosa. Se la vuoi blu, cosa fai?", o:["Acqua meno calcarea e terriccio per acidofile, con un prodotto per ortensie blu","Più sole","Concime per cactus"], a:0, why:"Serve terra acida con alluminio disponibile: i prodotti per “azzurrare” le ortensie servono a questo." },
     { t:"mc", plant:"petunia", q:"Petunia con foglie giallastre e venature verdi a metà estate, annaffiata con acqua dura. Cosa le manca?", o:["Ferro: il calcare lo blocca, come per il limone","Sole","Azoto"], a:0, why:"È clorosi ferrica, frequente nelle petunie. Concime con ferro e acqua meno dura." },
     { t:"tf", plant:"ortensia", q:"L’ortensia si affloscia alle tre del pomeriggio ma la sera è dritta, con la terra umida: ha bisogno di più acqua.", a:false, why:"Se la terra è umida è il caldo: si chiude per risparmiare acqua. Serve ombra nel pomeriggio, non altra acqua." },
@@ -747,7 +698,6 @@ STEPS.push(
     { t:"mc", plant:"geranio", q:"Vuoi i gerani anche l’anno prossimo senza ricomprarli. Il metodo più semplice?", o:["Talee a fine estate, tenute al riparo d’inverno","I semi dei fiori secchi","Lasciarli fuori a gelare"], a:0, why:"Le talee radicano facilmente e passano l’inverno al riparo, pronte per la primavera." }
   ])},
   { id:"h2", zone:"z8", title:"Agrumi e funghi", icon:"sun", items:lv(3, [
-    { t:"card", plant:"limone", title:"Esperienza da vendere", body:"Fiori senza frutti, macchie tonde, concime al momento sbagliato: i problemi da secondo anno, quando la pianta è sopravvissuta al primo e tu ti sei rilassato troppo." },
     { t:"mc", plant:"limone", q:"Limone tenuto sempre in casa: tanti fiori ma pochissimi limoni. Cosa manca?", o:["Impollinatori e aria: in primavera all’aperto va meglio","Acqua del rubinetto","Ombra"], a:0, why:"Fuori, insetti e vento aiutano l’impollinazione. In casa si può aiutare con un pennellino." },
     { t:"mc", plant:"olivo", q:"Olivo con macchie tonde scure, con un alone giallo, dopo una primavera piovosa. Cosa può essere?", o:["L’occhio di pavone, un fungo","Scottature da sole","Fame di concime"], a:0, why:"È un fungo che ama l’umido: si tolgono le foglie colpite e si tratta con prodotti a base di rame." },
     { t:"tf", plant:"limone", q:"Gli agrumi in vaso si concimano soprattutto nella stagione di crescita, non in pieno inverno.", a:true, why:"D’inverno crescono poco: il concime resta nella terra e non serve." },
@@ -755,7 +705,6 @@ STEPS.push(
     { t:"mc", plant:"rosmarino", q:"Rosmarino in un vaso piccolo che deve passare l’inverno al Nord. Cosa fai?", o:["Lo avvicini al muro al riparo, con la terra più asciutta che bagnata","Lo porti in salotto al caldo","Lo annaffi ogni giorno"], a:0, why:"Il muro ripara dal gelo; terra asciutta d’inverno perché il freddo umido è il vero nemico." }
   ])},
   { id:"h3", zone:"z8", title:"Carnivore per esperti", icon:"leaf", items:lv(3, [
-    { t:"card", plant:"dionea", title:"Le hai capite davvero?", body:"Acqua, luce, riposo, terra: con le carnivore ogni errore si vede. Qui i casi sono misti, e a volte l’errore è più d’uno." },
     { t:"mc", plant:"dionea", q:"Dionea tenuta in salotto tutto l’anno e annaffiata con acqua del rubinetto. Quali sono gli errori?", o:["Poca luce, niente riposo invernale e acqua con sali","Nessuno, è perfetta","Solo l’acqua"], a:0, why:"Tre errori in uno: le serve sole pieno, un inverno fresco e acqua senza sali." },
     { t:"mc", plant:"sarracenia", q:"In primavera la sarracenia fa trombe nuove piatte e storte. Cosa le manca?", o:["Sole pieno","Acqua del rubinetto","Concime"], a:0, why:"Senza sole pieno le trombe crescono deboli e non si colorano." },
     { t:"tf", plant:"drosera", q:"Se la drosera smette di fare goccioline d’inverno in casa, è sicuramente morta.", a:false, why:"Spesso è poca luce o aria secca: con più luce torna a farle." },
@@ -763,7 +712,6 @@ STEPS.push(
     { t:"mc", plant:"dionea", q:"Dionea a febbraio, dopo il riposo invernale: tante foglie nere. Cosa fai?", o:["Togli le foglie nere: in primavera ripartirà dal centro","La butti","La porti al caldo e la concimi"], a:0, why:"Il riposo lascia foglie nere: il centro è vivo e ripartirà." }
   ])},
   { id:"h4", zone:"z8", title:"Orchidee difficili", icon:"pot", items:lv(3, [
-    { t:"card", plant:"orchidea", title:"Stesso sintomo, due cause", body:"Foglie molli e raggrinzite possono voler dire sete o radici marce: l’esatto opposto. La differenza la fanno le radici. Guardale, sempre." },
     { t:"mc", plant:"orchidea", q:"Phalaenopsis con foglie molli e raggrinzite, radici argentate e secche. Cosa fai?", o:["Immersioni più frequenti: ha sete","Meno acqua","Più sole diretto"], a:0, why:"Radici secche e argentate: le serve acqua." },
     { t:"mc", plant:"orchidea", q:"Phalaenopsis con foglie molli e raggrinzite, ma radici marroni e molli. Causa?", o:["Radici marce: non riesce a bere nemmeno con l’acqua","Sete","Troppa luce"], a:0, why:"Stesso sintomo dell’altra domanda, causa opposta. Via le radici marce, corteccia nuova, meno acqua." },
     { t:"tf", plant:"orchidea", q:"Dopo la fioritura si può tagliare lo stelo sopra un nodo: a volte rifiorisce da lì.", a:true, why:"Dal nodo può nascere un nuovo ramo di fiori. Se lo stelo secca, si taglia alla base." },
@@ -780,7 +728,6 @@ STEPS.push(
 );
 Object.assign(EXTRA, {
   d1:[{ title:"L’alocasia", items:lv(2, [
-    { t:"card", plant:"alocasia", title:"La diva per eccellenza", body:"L’alocasia è cugina della monstera: foglie enormi a freccia o a orecchio d’elefante, venature chiare, portamento da copertina. E un carattere da diva: troppa acqua, poca luce o uno spiffero, e si offende." },
     { t:"id", plant:"alocasia", q:"Quale è l’alocasia?", o:["alocasia","monstera","maranta","fittonia"], a:"alocasia", why:"Foglie a freccia, lucide, con venature chiarissime. La monstera ha i buchi, lei no." },
     { t:"mc", plant:"alocasia", q:"Cosa vuole l’alocasia?", o:["Luce indiretta intensa, terra che drena, aria umida","Sole pieno e terra sempre zuppa","Buio e freddo"], a:0, why:"Luce sì ma filtrata, acqua sì ma senza ristagni, aria umida. Diva, appunto." },
     { t:"tf", plant:"alocasia", q:"D’inverno l’alocasia può perdere foglie e quasi “sparire”: spesso è riposo, non morte.", a:true, why:"Al fresco rallenta: il rizoma sotto terra è vivo. Meno acqua e pazienza." },
@@ -788,7 +735,6 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"alocasia", q:"L’alocasia è innocua per cani e gatti.", a:false, why:"Come la monstera, è irritante se masticata." }
   ])}],
   d2:[{ title:"La fittonia", items:lv(2, [
-    { t:"card", plant:"fittonia", title:"La regina del dramma", body:"La fittonia ha foglie piccole con venature bianche o rosa, come un mosaico. Se ha sete crolla tutta, sdraiata sul vaso come in un film muto. Poi beve e in un’ora si rialza. Ti ricorda qualcuno?" },
     { t:"id", plant:"fittonia", q:"Quale è la fittonia?", o:["fittonia","maranta","alocasia","begonia"], a:"fittonia", why:"Foglioline basse con una rete di venature chiare, come un mosaico." },
     { t:"tf", plant:"fittonia", q:"La fittonia ama la terra sempre leggermente umida e l’aria umida.", a:true, why:"Viene dal sottobosco tropicale: umido sopra e sotto." },
     { t:"mc", plant:"fittonia", q:"Perché la fittonia sta benissimo in un terrario chiuso?", o:["Perché lì l’aria resta umida","Perché le piace il buio","Perché odia l’ossigeno"], a:0, why:"Nel terrario l’umidità resta alta: il suo ambiente ideale, in miniatura." },
@@ -796,42 +742,36 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"fittonia", q:"La fittonia vuole sole diretto per avere venature più chiare.", a:false, why:"Il sole diretto le brucia le foglie: luce indiretta." }
   ])}],
   d3:[{ title:"La maranta", items:lv(2, [
-    { t:"card", plant:"maranta", title:"La vera pianta della preghiera", body:"La maranta è cugina della calathea, e il soprannome “pianta della preghiera” in origine è suo: la sera alza le foglie come mani giunte. Stessa famiglia, stesse esigenze, stessa permalosità." },
     { t:"id", plant:"maranta", q:"Quale è la maranta?", o:["calathea","maranta","fittonia","alocasia"], a:"maranta", why:"Foglie ovali con macchie scure a spina di pesce e venature rosse." },
     { t:"tf", plant:"maranta", q:"Maranta e calathea appartengono alla stessa famiglia.", a:true, why:"Sono entrambe Marantacee: stesse manie per umidità e acqua." },
     { t:"mc", plant:"maranta", q:"La maranta ha punte secche e foglie arricciate. Cosa le manca più spesso?", o:["Umidità nell’aria e acqua poco calcarea","Sole diretto","Concime per cactus"], a:0, why:"Come la calathea: aria secca e calcare sono i suoi nemici." },
     { t:"mc", plant:"maranta", q:"Che terra vuole la maranta?", o:["Sempre leggermente umida, mai zuppa né secca","Secca per settimane","Allagata"], a:0, why:"La via di mezzo, sempre: la parte difficile è proprio quella." }
   ])}],
   d4:[{ title:"La begonia a pois", items:lv(2, [
-    { t:"card", plant:"begonia", title:"La begonia a pois", body:"La begonia maculata ha foglie verde scuro con pois argentati e il retro rosso: sembra disegnata da qualcuno con troppo caffè in corpo. È bellissima, ed è anche delicata." },
     { t:"id", plant:"begonia", q:"Quale è la begonia maculata?", o:["fittonia","begonia","maranta","alocasia"], a:"begonia", why:"Foglie lunghe e appuntite, a pois argentati, rosse sotto." },
     { t:"tf", plant:"begonia", q:"La begonia maculata va spruzzata spesso sulle foglie per darle umidità.", a:false, why:"Le foglie bagnate rischiano l’oidio. Umidità sì, ma intorno: altre piante vicine o argilla espansa bagnata." },
     { t:"mc", plant:"begonia", q:"Come annaffi la begonia maculata?", o:["Quando i primi centimetri sono asciutti, senza bagnare le foglie","Ogni giorno, abbondante","Una volta al mese"], a:0, why:"Terra appena asciutta in superficie, acqua alla base." },
     { t:"mc", plant:"begonia", q:"Come ottieni una begonia nuova gratis?", o:["Talea di fusto con un nodo, in acqua o in terra","Seminando i pois","Comprandola"], a:0, why:"Radica facilmente: un pezzo di fusto con un nodo e un po’ di pazienza." }
   ])}],
   g1:[{ title:"L’echeveria", items:lv(2, [
-    { t:"card", plant:"echeveria", title:"La rosa di pietra", body:"L’echeveria è una rosetta perfetta e carnosa, spesso coperta da una polverina chiara. Viene dalle zone aride del Messico. Sembra finta, ma è sensibilissima a due cose: poco sole e troppa acqua." },
     { t:"id", plant:"echeveria", q:"Quale è l’echeveria?", o:["echeveria","haworthia","lithops","mammillaria"], a:"echeveria", why:"Una rosa fatta di foglie carnose, azzurrine o rosate." },
     { t:"mc", plant:"echeveria", q:"L’echeveria in casa si allunga, la rosetta si apre e il fusto si piega verso la finestra. Cosa le manca?", o:["Sole: si sta “filando” per cercare luce","Acqua","Un vaso più grande"], a:0, why:"Si chiama filatura: in casa la luce non basta. Sul balcone al sole torna compatta (le parti già allungate restano)." },
     { t:"tf", plant:"echeveria", q:"La polverina chiara sulle foglie dell’echeveria va pulita via con un panno.", a:false, why:"È pruina, una protezione naturale dal sole. Toccandola si toglie, e sulle foglie vecchie non ricresce." },
     { t:"mc", plant:"echeveria", q:"Come si annaffia un’echeveria?", o:["A fondo, solo quando la terra è asciutta del tutto, senza bagnare la rosetta","Un goccio ogni giorno","Spruzzando le foglie"], a:0, why:"Bagna e asciuga. L’acqua ferma nella rosetta la fa marcire dal centro." }
   ])}],
   g2:[{ title:"L’haworthia", items:lv(2, [
-    { t:"card", plant:"haworthia", title:"La piccola zebra", body:"L’haworthia è una piccola succulenta a rosetta, spesso con strisce bianche in rilievo, come una zebra. A differenza di molte grasse non ama il sole cocente: è perfetta per un davanzale luminoso in casa." },
     { t:"id", plant:"haworthia", q:"Riconosci l’haworthia?", o:["mammillaria","echeveria","haworthia","lithops"], a:"haworthia", why:"Rosetta di foglie appuntite con strisce bianche in rilievo." },
     { t:"tf", plant:"haworthia", q:"L’haworthia sopporta la luce indiretta di casa meglio dell’echeveria.", a:true, why:"In natura cresce all’ombra di rocce e cespugli. Al sole cocente diventa rossiccia e soffre." },
     { t:"mc", plant:"haworthia", q:"L’haworthia è diventata rossastra con le punte secche, dopo un’estate sul balcone a sud. Cosa è successo?", o:["Troppo sole diretto","Troppo poca luce","Freddo"], a:0, why:"Si è scottata: torna alla luce indiretta e recupera il verde." },
     { t:"mc", plant:"haworthia", q:"Come fai una nuova haworthia?", o:["Stacchi i figli che crescono alla base, con un po’ di radici","Metti una foglia intera in acqua","La tagli a metà"], a:0, why:"I figli alla base sono piante pronte: si staccano e si rinvasano." }
   ])}],
   g3:[{ title:"La mammillaria", items:lv(2, [
-    { t:"card", plant:"mammillaria", title:"Il cactus a cuscino", body:"La mammillaria è un piccolo cactus tondo, coperto di spine sottili, che in primavera si fa una corona di fiorellini. È tra i cactus più facili da far fiorire: basta un trucco, un inverno fresco e asciutto." },
     { t:"id", plant:"mammillaria", q:"Quale è la mammillaria?", o:["lithops","mammillaria","haworthia","echeveria"], a:"mammillaria", why:"Un cuscino tondo di spine, con la corona di fiori in cima." },
     { t:"mc", plant:"mammillaria", q:"Cosa aiuta la mammillaria a fiorire in primavera?", o:["Un inverno fresco e quasi senz’acqua","Annaffiarla molto d’inverno","Tenerla al buio"], a:0, why:"Il riposo invernale prepara i fiori. Caldo e acqua d’inverno, niente corona." },
     { t:"tf", plant:"mammillaria", q:"I cactus hanno bisogno di acqua anche d’estate, quando crescono.", a:true, why:"D’estate crescono: acqua a fondo quando il terriccio è asciutto. È d’inverno che si sospende quasi del tutto." },
     { t:"mc", plant:"mammillaria", q:"Che terriccio vuole la mammillaria?", o:["Specifico per cactacee, molto drenante, con sabbia o pomice","Torba pura sempre umida","Terra del giardino"], a:0, why:"Deve asciugare in fretta: niente terra che trattiene acqua." }
   ])}],
   g4:[{ title:"I lithops", items:lv(2, [
-    { t:"card", plant:"lithops", title:"I sassi viventi", body:"I lithops sembrano sassolini: due foglie carnose unite, colorate come le pietre del deserto in cui vivono. Il mimetismo li protegge dagli animali assetati. Coltivarli è un esame di autocontrollo: la regola principale è non fare niente, quasi sempre." },
     { t:"id", plant:"lithops", q:"Quale è il lithops?", o:["haworthia","echeveria","lithops","mammillaria"], a:"lithops", why:"Due “sassi” uniti con una fessura in mezzo. Se non lo sapessi, lo calpesteresti." },
     { t:"tf", plant:"lithops", q:"Quando il lithops fa una nuova coppia di foglie, va annaffiato di più per aiutarlo.", a:false, why:"Le foglie nuove si nutrono delle vecchie, che si svuotano. Annaffiare in quel momento è il modo classico di ucciderlo." },
     { t:"mc", plant:"lithops", q:"Quanto annaffi un lithops?", o:["Pochissimo e solo in certi periodi: spesso il segreto è non annaffiare","Ogni settimana","Ogni giorno, è piccolo"], a:0, why:"Vive dove piove quasi mai. Il suo nemico numero uno è l’annaffiatoio." },
@@ -839,28 +779,24 @@ Object.assign(EXTRA, {
     { t:"tf", plant:"lithops", q:"I lithops vogliono molta luce, anche sole diretto.", a:true, why:"Con poca luce si allungano e perdono la forma da sasso." }
   ])}],
   h1:[{ title:"La gardenia", items:lv(2, [
-    { t:"card", plant:"gardenia", title:"La diva profumata", body:"La gardenia ha fiori bianchi dal profumo fortissimo e un carattere difficile: terra acida, acqua non calcarea, luce senza sole cocente, temperature regolari. Basta uno sbalzo e lascia cadere i boccioli, offesa." },
     { t:"id", plant:"gardenia", q:"Quale è la gardenia?", o:["gardenia","kumquat","vanda","cephalotus"], a:"gardenia", why:"Foglie lucide verde scuro e fiori bianchi a rosa, profumatissimi." },
     { t:"mc", plant:"gardenia", q:"Che terriccio vuole la gardenia?", o:["Per acidofile, come le ortensie blu","Per cactacee","Terra di giardino calcarea"], a:0, why:"Terra acida: con il calcare le foglie ingialliscono." },
     { t:"mc", plant:"gardenia", q:"La gardenia lascia cadere i boccioli prima che si aprano. Cause tipiche?", o:["Sbalzi di temperatura, spostamenti, aria troppo secca","Troppi complimenti","Acqua poco calcarea"], a:0, why:"Odia i cambiamenti: un posto fisso e condizioni stabili." },
     { t:"tf", plant:"gardenia", q:"Foglie gialle con le venature verdi possono indicare che alla gardenia manca ferro.", a:true, why:"Clorosi ferrica, come per limone e petunia: terra acida e concime con ferro." }
   ])}],
   h2:[{ title:"Il kumquat", items:lv(2, [
-    { t:"card", plant:"kumquat", title:"Il mandarino cinese", body:"Il kumquat è un agrume piccolo, con frutti che si mangiano con tutta la buccia: dolce fuori, aspro dentro. Regge il freddo meglio del limone, ma ha le stesse manie: sole, acqua non calcarea, niente ristagni." },
     { t:"id", plant:"kumquat", q:"Quale è il kumquat?", o:["kumquat","gardenia","vanda","cephalotus"], a:"kumquat", why:"Un alberello pieno di piccoli frutti arancioni ovali." },
     { t:"tf", plant:"kumquat", q:"Il kumquat sopporta il freddo meglio del limone.", a:true, why:"È tra gli agrumi più resistenti al freddo, ma le gelate forti restano un problema." },
     { t:"mc", plant:"kumquat", q:"Come si mangia il frutto del kumquat?", o:["Intero, con la buccia","Solo il succo","Solo la buccia, il resto si butta"], a:0, why:"La buccia è la parte dolce. Il dentro è aspro: è il bello del contrasto." },
     { t:"mc", plant:"kumquat", q:"Il kumquat ha foglie gialle con le venature verdi. Cosa gli dai?", o:["Concime con ferro per agrumi","Più ombra","Acqua del rubinetto molto calcarea"], a:0, why:"Stessa clorosi del limone: ferro e acqua meno dura." }
   ])}],
   h3:[{ title:"Il cephalotus", items:lv(2, [
-    { t:"card", plant:"cephalotus", title:"La carnivora australiana", body:"Il cephalotus viene da un angolo minuscolo dell’Australia occidentale. Fa piccole anfore pelose con il coperchio, come una nepenthes in miniatura. È raro, lento e un po’ permaloso." },
     { t:"id", plant:"cephalotus", q:"Quale è il cephalotus?", o:["nepenthes","cephalotus","sarracenia","drosera"], a:"cephalotus", why:"Tante piccole anfore tozze e pelose, a terra, con il coperchio. Nepenthes in versione tascabile." },
     { t:"tf", plant:"cephalotus", q:"Il cephalotus vuole la torba umida, ma senza stare sempre a bagno come la dionea.", a:true, why:"Umido sì, allagato per settimane no: poca acqua nel sottovaso." },
     { t:"mc", plant:"cephalotus", q:"Che acqua vuole il cephalotus?", o:["Piovana o demineralizzata, come le altre carnivore","Del rubinetto","Frizzante"], a:0, why:"Niente sali: stessa regola di tutte le carnivore." },
     { t:"mc", plant:"cephalotus", q:"Più luce riceve il cephalotus, più le sue anfore...", o:["Si colorano di rosso scuro","Diventano trasparenti","Spariscono"], a:0, why:"Con tanta luce diventano rosso scuro, quasi nere." }
   ])}],
   h4:[{ title:"La vanda", items:lv(2, [
-    { t:"card", plant:"vanda", title:"L’orchidea senza vaso", body:"La vanda è un’orchidea dai fiori enormi, spesso blu-viola. Si coltiva a radice nuda, in un cesto o in un vaso di vetro vuoto. Bellissima, affamata di luce e d’acqua: per molti è l’orchidea più difficile da tenere in casa." },
     { t:"id", plant:"vanda", q:"Quale è la vanda?", o:["orchidea","vanda","gardenia","cephalotus"], a:"vanda", why:"Radici lunghe e nude che pendono, foglie a ventaglio e fiori viola enormi." },
     { t:"mc", plant:"vanda", q:"Come si annaffia una vanda a radice nuda?", o:["Immergendo le radici spesso, d’estate anche ogni giorno","Una volta al mese","Mai, vive d’aria"], a:0, why:"Le radici nude asciugano in fretta: bagni frequenti, poi all’aria." },
     { t:"tf", plant:"vanda", q:"La vanda vuole più luce della phalaenopsis.", a:true, why:"Molta più luce: è uno dei motivi per cui in casa è difficile." },
@@ -1110,3 +1046,104 @@ Object.assign(EMERG, {
   van_sete:{ plant:"vanda", step:"h4", lesson:1, title:"Radici argentate e foglie raggrinzite, d’estate", q:"Cosa fai?", o:["Bagni più frequenti, anche ogni giorno","Meno luce","La pianti nel terriccio"], a:0, why:"D’estate beve tantissimo: le radici nude asciugano in fretta." },
   van_terra:{ plant:"vanda", step:"h4", lesson:1, title:"Qualcuno l’ha messa nel terriccio: radici molli", q:"Cosa fai?", o:["Togli le radici marce e la rimetti a radice nuda","Annaffi di più","Aggiungi altro terriccio"], a:0, why:"Le sue radici vogliono aria: nel terriccio soffocano." }
 });
+
+// ---------- Glossario: parole colorate nelle domande ----------
+// Al posto delle schede iniziali: le parole qui sotto si colorano nelle domande le prime volte che le incontri,
+// e toccandole compare la spiegazione. "forms" sono i modi in cui la parola compare nel testo
+// (un asterisco finale vuol dire "e tutto quello che segue": rinvas* trova rinvaso, rinvasare, rinvasata...).
+// Le piante hanno la loro voce in PLANT_HINT: il nome si colora da solo, con il disegno.
+const PLANT_HINT = {
+  basilico:"La vittima più famosa. Il vasetto del supermercato muore quasi sempre: dentro ci sono decine di piantine che si rubano luce e acqua. Tipo un monolocale da fuorisede in sei.",
+  pothos:"Rampicante con foglie a cuore, spesso striate di giallo o bianco. Quasi indistruttibile: per questo lo regalano a chiunque.",
+  sansevieria:"Foglie dritte e dure come spade. Stoica: accumula acqua e resta zitta per settimane. La uccide solo l’amore in eccesso.",
+  menta:"Aromatica fresca, ama la terra umida. Le sue radici corrono sotto terra e invadono tutto: coinquilina pessima.",
+  olivo:"Viene da estati lunghe, calde e secche, come rosmarino e lavanda. Tanto sole, poca acqua. Dietro un vetro si deprime, sul balcone rinasce.",
+  rosmarino:"Mediterraneo duro e puro: sole pieno, terra che drena, acqua con moderazione. Muore più spesso annegato che di sete.",
+  lavanda:"Spighe viola e profumo da cassetto della nonna. Vuole sole pieno e terra povera: più la tratti male, più fiorisce.",
+  ficodindia:"Un cactus arrivato dalle Americhe secoli fa, oggi più siciliano dei cannoli. Le sue “foglie” sono fusti piatti, le pale, che fanno da serbatoio.",
+  monstera:"Viene dalla giungla, dove la luce arriva filtrata dagli alberi. In casa: vicino alla finestra, ma senza sole sulle foglie. I buchi arrivano con l’età.",
+  calathea:"Foglie disegnate come un tappeto, che la sera si alzano. Bellissima e permalosa: aria secca e acqua calcarea la offendono.",
+  orchidea:"Non tocca mai terra: in natura sta aggrappata agli alberi, con le radici all’aria. Quando i fiori cadono non è morta, sta riposando.",
+  felce:"Una delle piante più antiche del pianeta. Ama l’aria umida e la terra sempre fresca: il termosifone è il suo nemico giurato.",
+  zamioculcas:"La pianta da corridoio: si accontenta di poca luce. Si accontenta, non la adora. Sotto terra ha bulbi grossi che fanno da serbatoio.",
+  spatifillo:"Foglie lucide e “fiore” bianco. È una pianta drammatica: quando ha sete crolla con una scena madre, poi beve e si rialza.",
+  limone:"Il sogno di ogni balcone: fiori profumati, frutti, foglie lucide tutto l’anno. Mediterraneo d’adozione: viene dall’Asia.",
+  salvia:"Foglie vellutate e grigie, parente del rosmarino. Con gli anni diventa legnosa alla base: una potatura in primavera la tiene giovane. Magari funzionasse anche con noi.",
+  tillandsia:"La pianta senza terra: beve dalle foglie, coperte di squame argentate. In natura sta appesa agli alberi e vive di pioggia e umidità.",
+  ficus:"Foglie grandi, spesse e lucide, come di gomma. Un tempo dal suo lattice si ricavava proprio la gomma. Odia i traslochi.",
+  geranio:"Il re dei balconi. In realtà non è un geranio ma un Pelargonium: un errore diventato tradizione, come la panna nella carbonara (no).",
+  petunia:"Fiori a trombetta tutta l’estate, a patto di avere sole, acqua e concime. Di solito si tiene un anno solo.",
+  ortensia:"Il nome scientifico, Hydrangea, vuol dire più o meno “vaso d’acqua”. Non è un caso: è tra le più assetate del balcone.",
+  bouganville:"Rampicante dei posti caldi, con macchie di colore accesissime. Quelle non sono petali: sono foglie colorate.",
+  dionea:"La carnivora con la tagliola. Viene dalle paludi della Carolina, dove la terra è poverissima: gli insetti sono il suo integratore.",
+  sarracenia:"Carnivora a trombe: l’insetto scivola dentro e non esce più. Vuole sole pieno, è con la luce che le trappole si colorano.",
+  drosera:"Carnivora a colla: tentacoli con goccioline appiccicose. Si accontenta anche di un davanzale molto luminoso.",
+  nepenthes:"Carnivora tropicale con anfore che pendono dalle foglie. Non è di palude: le piace l’aria umida, non i piedi nell’acqua.",
+  alocasia:"Cugina della monstera: foglie enormi a orecchio d’elefante, venature chiare. Carattere da diva: troppa acqua, poca luce o uno spiffero, e si offende.",
+  fittonia:"Foglie piccole a mosaico, con venature bianche o rosa. Se ha sete crolla tutta come in un film muto, poi beve e si rialza in un’ora.",
+  maranta:"Cugina della calathea. La “pianta della preghiera” vera è lei: la sera alza le foglie come mani giunte.",
+  begonia:"Foglie verde scuro con pois argentati e il retro rosso: sembra disegnata da qualcuno con troppo caffè in corpo. Bellissima e delicata.",
+  echeveria:"La rosa di pietra: rosetta carnosa, spesso coperta da una polverina chiara. Sensibilissima a due cose: poco sole e troppa acqua.",
+  haworthia:"Piccola succulenta a rosetta, spesso a strisce bianche come una zebra. Non ama il sole cocente: perfetta per il davanzale di casa.",
+  mammillaria:"Piccolo cactus tondo con spine sottili, che in primavera si fa una corona di fiorellini. Il trucco: un inverno fresco e asciutto.",
+  lithops:"I sassi viventi: due foglie carnose colorate come le pietre del deserto. Coltivarli è un esame di autocontrollo: quasi sempre, non fare niente.",
+  gardenia:"Fiori bianchi dal profumo fortissimo e carattere difficile: terra acida, acqua non calcarea. Basta uno sbalzo e lascia cadere i boccioli, offesa.",
+  kumquat:"Agrume piccolo che si mangia con la buccia: dolce fuori, aspro dentro. Regge il freddo meglio del limone, ma ha le stesse manie.",
+  cephalotus:"Carnivora di un angolo minuscolo dell’Australia: piccole anfore pelose con il coperchio, una nepenthes in miniatura. Rara, lenta, permalosa.",
+  vanda:"Orchidea dai fiori enormi, spesso blu-viola, coltivata a radice nuda. Affamata di luce e d’acqua: per molti la più difficile da tenere in casa."
+};
+// Nomi alternativi con cui le piante compaiono nelle domande
+const PLANT_FORMS = { ficodindia:["fico d’India","fichi d’India"], ficus:["ficus elastica","ficus"], begonia:["begonia maculata","begonia","begonie"], orchidea:["orchidea","orchidee","phalaenopsis"], ortensia:["ortensia","ortensie"], geranio:["geranio","gerani"], petunia:["petunia","petunie"], felce:["felce","felci"], lithops:["lithops"], kumquat:["kumquat"] };
+const GLOSS = {
+  luce:{ forms:["luce indiretta","luce diretta","sole diretto"], text:"Luce diretta: il sole che colpisce le foglie. Indiretta: la stanza è luminosa, ma il sole non le tocca. Ogni pianta ha i suoi gusti, come per il caffè." },
+  cimatura:{ forms:["sopra una coppia di foglie","togli le punte"], text:"È la cimatura: tagli la punta sopra una coppia di foglie e la pianta, invece di salire, si allarga. Come potare, ma con la mozzarella." },
+  marciume:{ forms:["marcire","marcisce","marciscono","marciume","marce","marcia"], text:"Il killer numero uno. Le piante di casa non muoiono di sete: muoiono annegate. Con la terra sempre zuppa le radici non respirano e marciscono." },
+  ristagno:{ forms:["ristagn*","troppa acqua"], text:"Acqua ferma nel vaso o nel sottovaso. Le radici restano a bagno e smettono di respirare. Amore sì, ma con moderazione." },
+  sottovaso:{ forms:["sottovaso"], text:"Raccoglie l’acqua in più e va svuotato: non è una piscina. L’eccezione sono le carnivore di palude, che lo vogliono pieno." },
+  drenaggio:{ forms:["drenaggio","drena","drenante"], text:"Quanto in fretta l’acqua in più esce dalla terra. Terra che drena: l’acqua passa e se ne va. Terra pesante: l’acqua resta e le radici affogano." },
+  rinvaso:{ forms:["rinvas*"], text:"Un trasloco in un vaso più grande. Va fatto al momento giusto e senza esagerare: il monolocale in sei non va bene, ma neanche la villa con piscina." },
+  rizoma:{ forms:["rizom*"], text:"Un fusto sotterraneo gonfio che fa da serbatoio d’acqua e di energia. Per questo chi ce l’ha beve poco." },
+  talea:{ forms:["talea","talee"], text:"Un pezzo di pianta che, in acqua o in terra, mette radici e diventa una pianta nuova. Piante gratis, legalmente." },
+  nodo:{ forms:["nodo"], text:"Il punto del fusto da cui nascono foglie e radici. Una talea senza nodo resta un rametto e basta." },
+  afflosciata:{ forms:["afflosciat*","affloscia","crollata"], text:"Alcune piante ti avvisano della sete con una scena madre: crollano. Altre accumulano acqua e stanno zitte. Conoscerne il carattere evita omicidi." },
+  mediterranee:{ forms:["mediterrane*"], text:"Vengono da posti con estati lunghe, calde e secche. Tanto sole, poca acqua, terra che drena. Dietro un vetro si deprimono." },
+  calcare:{ forms:["calcare","calcarea","calcaree","acqua dura"], text:"Il nemico nascosto. Blocca il ferro nella terra e le foglie ingialliscono, anche se le venature restano verdi." },
+  clorosi:{ forms:["venature verdi","venature restano verdi"], text:"Foglie gialle con le venature verdi: si chiama clorosi. Di solito manca ferro, spesso per colpa del calcare." },
+  potatura:{ forms:["pota","poti","potare","potata","potato","potatura"], text:"Potare non vuol dire fare male alla pianta: vuol dire dirle dove crescere. Attenzione però al legno vecchio." },
+  legno:{ forms:["legno"], text:"Le mediterranee con gli anni diventano legnose alla base. Se tagli sul legno vecchio e spoglio, spesso non rispuntano più." },
+  gelo:{ forms:["gelo","gelata","gela"], text:"Un vaso è peggio della terra: le radici sono fuori, al freddo, senza coperta. Le piante dei posti caldi col gelo non sopravvivono." },
+  polloni:{ forms:["polloni","portainnesto"], text:"Rami selvatici che spuntano dalla base, sotto l’innesto. Rubano energia alla pianta buona: vanno tagliati." },
+  umidita:{ forms:["aria secca","aria umida","umidità","termosifone"], text:"Le tropicali vengono da posti dove l’aria è umida tutto l’anno. In casa, coi termosifoni accesi, l’aria è secca come nel deserto." },
+  squame:{ forms:["squame"], text:"Minuscole scaglie sulle foglie della tillandsia: catturano acqua e nutrienti dall’aria. Per questo è argentata." },
+  epifite:{ forms:["epifit*"], text:"Piante che vivono appoggiate su altre piante, senza rubare niente. Usano gli alberi come scala per stare più vicine alla luce." },
+  radiciaeree:{ forms:["radici aeree","radici che escono dal fusto"], text:"Radici che stanno all’aria invece che sotto terra. Servono ad aggrapparsi, e alcune anche a bere umidità." },
+  lattice:{ forms:["lattice","liquido bianco"], text:"Il liquido bianco che esce da alcune piante tagliate. Appiccicoso e irritante: guanti, e niente occhi." },
+  stelo:{ forms:["stelo"], text:"Il gambo che porta i fiori. Nell’orchidea, se è ancora verde, a volte rifiorisce da un nodo." },
+  figli:{ forms:["figli","figlio"], text:"Piantine nuove che nascono alla base della madre. Si staccano quando sono abbastanza grandi da cavarsela." },
+  spore:{ forms:["spore"], text:"Le felci non fanno fiori né semi: si riproducono con le spore, puntini marroni sotto le fronde. Tutto normale." },
+  fronde:{ forms:["fronde"], text:"Le foglie delle felci, divise in tante fogliette. Si chiamano così per fare i botanici." },
+  mezzombra:{ forms:["mezz’ombra","mezza ombra"], text:"Qualche ora di sole, meglio quello gentile del mattino, e ombra nel resto della giornata." },
+  sfiorire:{ forms:["fiori appassiti","fiori secchi","teste secche"], text:"Quando un fiore appassisce, la pianta inizia a fare semi, e fare semi stanca. Togliendo i fiori secchi la convinci a fiorire ancora." },
+  concime:{ forms:["concime","concimi","concimata","concimano","concimare","azoto","potassio"], text:"Cibo per la pianta. L’azoto spinge le foglie, il potassio i fiori. Troppo concime fa più danni di troppo poco." },
+  terraacida:{ forms:["acida","acidofile"], text:"Terra con poco calcare. Ortensie blu, gardenie e carnivore la vogliono: con la terra calcarea ingialliscono o cambiano colore." },
+  brattee:{ forms:["brattea","brattee"], text:"Foglie colorate attorno ai fiori veri, che spesso sono minuscoli. Sembrano petali, ma è un trucco per attirare gli impollinatori." },
+  annuale:{ forms:["annuale","annuali"], text:"Una pianta che vive una stagione: nasce, fiorisce, fa i semi e saluta. Non è colpa tua. Stavolta." },
+  carnivore:{ forms:["carnivor*"], text:"Vivono in terre poverissime e prendono l’azoto dagli insetti. L’energia la fanno col sole, come tutte: gli insetti sono l’integratore." },
+  trappole:{ forms:["trappol*","tagliola"], text:"Ogni carnivora ha il suo trucco: la dionea chiude una tagliola, la drosera incolla, sarracenia e nepenthes preparano un pozzo. Quattro film horror diversi." },
+  anfore:{ forms:["anfor*"], text:"Trappole a forma di vaso, piene di liquido digestivo. L’insetto ci cade dentro e non esce più." },
+  demineralizzata:{ forms:["piovana","demineralizzata","acqua del rubinetto"], text:"Acqua povera di sali e di calcare. Per carnivore e piante che odiano il calcare è la scelta giusta: il rubinetto, spesso, di calcare ne porta parecchio." },
+  riposo:{ forms:["riposo invernale","riposo","letargo"], text:"D’inverno alcune piante si fermano e sembrano morte. Non lo sono. Senza questo riposo al fresco, in pochi anni si esauriscono. Come noi senza ferie." },
+  torba:{ forms:["torba","perlite","sabbia silicea"], text:"La terra delle carnivore di palude: povera e acida, di solito torba bionda con perlite o sabbia. Il terriccio universale per loro è veleno." },
+  universale:{ forms:["terriccio universale"], text:"Il terriccio da supermercato, ricco di concime. Va bene per tante piante, ma è troppo ricco per grasse, mediterranee e carnivore." },
+  guttazione:{ forms:["guttazione"], text:"Goccioline che la pianta spinge fuori dalla punta delle foglie quando ha acqua in più. Non sta piangendo, giuro." },
+  nordsud:{ forms:["finestra a nord","finestra a sud","a nord","a sud","a est"], text:"Sud: tanto sole diretto. Nord: luce tutto il giorno, ma mai sole. Est: il sole gentile del mattino. Dire “luce indiretta” è facile, scegliere la finestra è un mestiere." },
+  parassiti:{ forms:["ragnetto rosso","cocciniglia","cocciniglie","moscerini","moscerino","afidi","afide"], text:"I piccoli coinquilini. Riconoscerli in fretta fa la differenza tra un pomeriggio di pulizie e un funerale." },
+  melata:{ forms:["melata"], text:"Il liquido zuccherino che lasciano afidi e cocciniglie. Le formiche ne vanno matte: se le vedi salire sul tronco, c’è qualcuno da sfrattare." },
+  succulente:{ forms:["succulent*","grasse","cactus","cactacee"], text:"Piante che accumulano acqua in foglie, fusti o radici. Facili, dicono. Poi muoiono, quasi sempre per troppo amore e poco sole." },
+  bagnaeasciuga:{ forms:["un goccio","annaffiatura abbondante"], text:"Per chi teme i ristagni la regola non è “poca acqua”: è acqua a fondo, poi aspetti che asciughi tutto. La spruzzatina quotidiana fa marcire e seccare insieme." },
+  glochidi:{ forms:["spine invisibili"], text:"Si chiamano glochidi: ciuffetti di spine minuscole che si staccano al primo tocco e restano nella pelle. Il regalo d’addio del fico d’India." },
+  terrario:{ forms:["terrario"], text:"Un contenitore di vetro chiuso con piante dentro: l’acqua evapora, si condensa e ricade. Aria umida, sempre." },
+  impollinatori:{ forms:["impollinatori"], text:"Api e altri insetti che portano il polline da un fiore all’altro. Senza di loro, molti fiori non diventano frutti." },
+  fotosintesi:{ forms:["fotosintesi"], text:"Il modo in cui le piante si fanno il cibo da sole: luce, acqua e aria diventano zuccheri. Niente luce, niente pranzo." },
+  variegato:{ forms:["variegat*"], text:"Foglie con macchie o strisce chiare. Le parti chiare non fanno fotosintesi: per questo le variegate vogliono più luce." }
+};

@@ -311,3 +311,28 @@ main{flex:1;padding:0 0 96px}
 .p-zuppa .leaves{transform:rotate(3deg);transform-origin:50% 90%;filter:hue-rotate(-22deg) saturate(.9)}
 .p-fradicia .leaves{transform:rotate(7deg) skewX(-6deg) scaleY(.92);transform-origin:50% 95%;filter:hue-rotate(-45deg) saturate(.8) brightness(.92)}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* ---- Parole colorate e suggerimenti ---- */
+.term{font:inherit;color:var(--water-dark);background:none;border:0;padding:0;margin:0;cursor:pointer;text-decoration:underline dotted 2px;text-underline-offset:5px;touch-action:manipulation}
+.term.new{color:#8e44ad}
+.term.open{background:var(--water-bg);border-radius:6px}
+.hint{position:fixed;z-index:60;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--surface);border:2px solid var(--line);box-shadow:0 6px 0 var(--line),0 12px 30px rgba(0,0,0,.12);animation:fade .15s}
+.hint b{font-size:15px;color:var(--ink)}.hint p{margin:3px 0 0;font-size:14px;line-height:1.4;color:var(--ink-2)}
+.hint .hart{flex:none}
+.kind.isnew{color:#8e44ad}
+.kind.isnew::after{content:"";display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:#8e44ad;vertical-align:middle;animation:bump 1s infinite}
+/* ---- Giorni di fila ---- */
+.pill.streak{background:#e2f4fc;color:#1f7fb8;gap:3px;padding:4px 10px 4px 6px}
+.pill.streak svg{width:22px;height:22px}
+.pill.streak.off{filter:grayscale(1);opacity:.6}
+:root[data-theme="dark"] .pill.streak{background:#0f2a38;color:#7cc6f6}
+.result.streak{justify-content:flex-start;padding-top:56px}
+.result.streak h1{color:#1f7fb8}
+.snum{font-size:48px}
+.sfall{height:70px;display:flex;align-items:flex-end;justify-content:center;animation:fall .7s cubic-bezier(.5,0,.9,.4) .1s both}
+.sfall svg{animation:fade .2s}
+@keyframes fall{0%{transform:translateY(-60px);opacity:0}60%{opacity:1}100%{transform:translateY(70px);opacity:0}}
+.svessel{margin-top:-30px}
+.sweek{display:flex;gap:8px;justify-content:center}
+.sweek i{opacity:.25;filter:grayscale(1)}.sweek i.on{opacity:1;filter:none}
+@media (prefers-reduced-motion: reduce){.sfall{animation:none;opacity:0}.kind.isnew::after{animation:none}}
+.shoph{font-size:18px;margin:18px 0 10px}

@@ -6,7 +6,7 @@ const KEY = "vasanicola.v1";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
-const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false, recent:[] });
+const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false, recent:[], terms:{}, streak:{ n:0, last:null, best:0, lids:0 } });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
 S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -181,6 +181,7 @@ function bump(sel){ const el = document.querySelector(sel); if (el) { el.classLi
 
 function topbar(){
   return `<header class="top"><div class="brand">${mascot(30)}<b>Vasanicola</b></div>
+    <div class="pill streak${streakToday() ? "" : " off"}" aria-label="${S.streak.n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${vesselSVG(tierOf(Math.max(1, S.streak.n)).t.k, S.streak.n ? streakLevel(S.streak.n) : 0, 22)}${S.streak.n}</div>
     <div class="pill water" id="pGocce" aria-label="Gocce">${ICON.drop}${S.gocce}</div>
     <div class="pill sun" id="pXp" aria-label="Esperienza">${ICON.sun}${S.xp}</div></header>`;
 }
@@ -189,12 +190,13 @@ function tabbar(){
   return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}${t("negozio","Negozio",ICON.shop)}</nav>`;
 }
 function render(){
-  settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); save();
+  settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); settleStreak(); save();
   if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
   if (!S.onboarded) return renderOnboarding(0);
   if (!welcomed) { welcomed = true; return renderWelcome(); }
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
   app.innerHTML = topbar() + `<main>${body}</main>` + tabbar();
+  streakNotice();
   const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", bar.offsetHeight + "px");
 }
 
@@ -301,33 +303,90 @@ function startLesson(i, li){
   // "review" = ripasso di una casella finita: domande pescate a caso da tutta la casella
   const review = li === "review";
   if (review || li === undefined) li = Math.min(progOf(step), lessonCount(step) - 1);   // di default: la prossima da fare
-  L = { i, li, step, items: review ? practiceItems(step) : lessonItems(step, li), idx: 0, mistakes: 0, gained:{}, before:{}, seen:[],
+  L = { i, li, step, items: review ? practiceItems(step) : withNewPlants(lessonItems(step, li)), idx: 0, mistakes: 0, gained:{}, before:{}, seen:[],
     replay: review || li < progOf(step), title: review ? "Ripasso a sorpresa" : lessonTitle(step, li) };
   showItem();
 }
 function shuffle(a){ const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+/* --- Parole colorate: i termini del glossario si colorano le prime volte e, toccati, si spiegano --- */
+const TERM_SHOWS = 3;   // dopo 3 volte che l'hai vista colorata, la parola torna normale
+const reEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const TERMS = (() => {
+  const list = [];
+  Object.keys(PLANT_HINT).forEach(id => (PLANT_FORMS[id] || [PLANTS[id].name]).forEach(f => list.push({ key:"p:" + id, f })));
+  Object.entries(GLOSS).forEach(([k, g]) => g.forms.forEach(f => list.push({ key:"g:" + k, f })));
+  // Le forme più lunghe vincono ("luce indiretta" prima di "luce")
+  return list.sort((a, b) => b.f.length - a.f.length).map(t => ({ key:t.key,
+    re: new RegExp(`(?<!\\p{L})${reEsc(t.f.replace(/\*$/, "")).replace(/’/g, "['’]")}${t.f.endsWith("*") ? "\\p{L}*" : ""}(?!\\p{L})`, "giu") }));
+})();
+// Colora al massimo 3 parole per frase, ognuna una volta sola; "force" colora comunque quella chiave
+function hl(text, force){
+  const hits = [], used = new Set();
+  TERMS.forEach(t => { if (used.has(t.key) || ((S.terms[t.key] || 0) >= TERM_SHOWS && t.key !== force)) return;
+    t.re.lastIndex = 0; let m;
+    while ((m = t.re.exec(text))) { const a = m.index, b = a + m[0].length;
+      if (!hits.some(h => a < h.b && b > h.a)) { hits.push({ a, b, key:t.key }); used.add(t.key); break; } } });
+  const pick = hits.filter(h => h.key === force).concat(hits.filter(h => h.key !== force)).slice(0, 3).sort((x, y) => x.a - y.a);
+  let out = "", at = 0;
+  pick.forEach(h => { out += text.slice(at, h.a) + `<button class="term${h.key === force ? " new" : ""}" data-term="${h.key}">${text.slice(h.a, h.b)}</button>`; at = h.b; });
+  return out + text.slice(at);
+}
+const qText = (it, force) => hl(esc(it.q), force);
+function countTerms(){ app.querySelectorAll(".qbody .term").forEach(b => S.terms[b.dataset.term] = (S.terms[b.dataset.term] || 0) + 1); }
+function openHint(btn){
+  document.querySelector(".hint")?.remove();
+  const [kind, k] = btn.dataset.term.split(":"), plant = kind === "p";
+  const h = document.createElement("div"); h.className = "hint"; h.setAttribute("role", "tooltip");
+  h.innerHTML = `${plant ? `<div class="hart">${plantSVG(k, 56)}</div>` : ""}<div><b>${plant ? PLANTS[k].name : esc(btn.textContent)}</b><p>${esc(plant ? PLANT_HINT[k] : GLOSS[k].text)}</p></div>`;
+  document.body.appendChild(h);
+  // Sotto la parola, dentro lo schermo; se sotto non c'è spazio, sopra
+  const r = btn.getBoundingClientRect(), w = Math.min(320, innerWidth - 24);
+  h.style.width = w + "px"; h.style.left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2)) + "px";
+  const below = r.bottom + 10 + h.offsetHeight < innerHeight;
+  h.style.top = (below ? r.bottom + 10 : r.top - 10 - h.offsetHeight) + "px";
+  h.classList.add(below ? "down" : "up");
+  btn.classList.add("open");
+  const close = e => { if (e && h.contains(e.target)) return; h.remove(); btn.classList.remove("open"); document.removeEventListener("pointerdown", close, true); removeEventListener("scroll", close, true); };
+  setTimeout(() => { document.addEventListener("pointerdown", close, true); addEventListener("scroll", close, true); });
+}
+// Prima volta che una pianta compare in una lezione: prima di tutto, una domanda "Pianta nuova".
+// Se la lezione ha già "Quale è la ...?" la sposta davanti; altrimenti ne crea una con due piante già note.
+// Articolo davanti al nome ("il basilico", "l’olivo", "lo spatifillo"): lo ricava da delOf
+const artOf = id => { const d = delOf(id); return d.startsWith("dell’") ? "l’" : d.startsWith("della") ? "la " : d.startsWith("dello") ? "lo " : "il "; };
+function withNewPlants(items){
+  const out = items.slice(), seen = new Set(S.discovered);
+  items.forEach(it => { const p = it.plant; if (!p || seen.has(p)) return; seen.add(p);
+    const at = out.findIndex(x => x.plant === p), idq = out.findIndex(x => x.t === "id" && x.a === p);
+    let nw;
+    if (idq >= 0) { nw = { ...out[idq], isNew:true }; out.splice(idq, 1); }
+    else { const pool = Object.keys(PLANTS).filter(x => x !== p && S.discovered.includes(x));
+      const others = shuffle(pool.length >= 2 ? pool : Object.keys(PLANTS).filter(x => x !== p)).slice(0, 2);
+      nw = { t:"id", plant:p, isNew:true, q:`Quale è ${artOf(p)}${PLANTS[p].name[0].toLowerCase() + PLANTS[p].name.slice(1)}?`, o:shuffle([p, ...others]), a:p, why:PLANT_HINT[p] }; }
+    out.splice(at, 0, nw); });
+  return out;
+}
 function showItem(){
   const it = L.items[L.idx];
   const pct = Math.round(L.idx / L.items.length * 100);
   let inner = "", kind = "";
-  if (it.t === "card") { kind = "Scheda"; inner = `<div class="q">${esc(it.title)}</div><div class="card">${it.plant ? `<div class="art">${plantSVG(it.plant, 110)}</div>` : ""}${esc(it.body)}</div>`; }
-  if (it.t === "mc") { kind = "Scegli la risposta"; inner = `<div class="q">${esc(it.q)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
-  if (it.t === "tf") { kind = "Vero o falso?"; inner = `<div class="q">${esc(it.q)}</div><div class="tf"><button class="opt" data-k="true" aria-pressed="false">Vero</button><button class="opt" data-k="false" aria-pressed="false">Falso</button></div>`; }
-  if (it.t === "id") { kind = "Riconosci la pianta"; inner = `<div class="q">${esc(it.q)}</div><div class="ids">${it.o.map(p => `<button class="opt" data-k="${p}" aria-pressed="false" aria-label="Pianta ${["A","B","C","D"][it.o.indexOf(p)]}">${plantSVG(p, 92)}</button>`).join("")}</div>`; }
-  if (it.t === "err") { kind = "Trova l’errore"; inner = `<div class="q">${esc(it.q)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
+  if (it.t === "mc") { kind = "Scegli la risposta"; inner = `<div class="q">${qText(it)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
+  if (it.t === "tf") { kind = "Vero o falso?"; inner = `<div class="q">${qText(it)}</div><div class="tf"><button class="opt" data-k="true" aria-pressed="false">Vero</button><button class="opt" data-k="false" aria-pressed="false">Falso</button></div>`; }
+  if (it.t === "id") { kind = it.isNew ? "Pianta nuova" : "Riconosci la pianta"; inner = `<div class="q">${qText(it, it.isNew ? "p:" + it.a : null)}</div><div class="ids">${it.o.map(p => `<button class="opt" data-k="${p}" aria-pressed="false" aria-label="Pianta ${["A","B","C","D"][it.o.indexOf(p)]}">${plantSVG(p, 92)}</button>`).join("")}</div>`; }
+  if (it.t === "err") { kind = "Trova l’errore"; inner = `<div class="q">${qText(it)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
   if (it.t === "order") { kind = "Metti in ordine"; let mix; do { mix = shuffle(it.steps.map((_, k) => k)); } while (mix.every((v, k) => v === k));
-    inner = `<div class="q">${esc(it.q)}</div><ol class="ordans" aria-label="La tua sequenza"></ol><div class="opts ordpool">${mix.map(k => `<button class="opt" data-o="${k}">${esc(it.steps[k])}</button>`).join("")}</div>`; }
-  if (it.t !== "card") markSeen(it);
+    inner = `<div class="q">${qText(it)}</div><ol class="ordans" aria-label="La tua sequenza"></ol><div class="opts ordpool">${mix.map(k => `<button class="opt" data-o="${k}">${esc(it.steps[k])}</button>`).join("")}</div>`; }
+  markSeen(it);
   if (it.t === "match") { kind = "Abbina le coppie"; const L1 = shuffle(it.pairs.map(p => p[0])), R1 = shuffle(it.pairs.map(p => p[1]));
     inner = `<div class="q">${esc(it.q)}</div><div class="match">${L1.map((l, k) => `<button class="opt" data-side="l" data-v="${esc(l)}">${esc(l)}</button><button class="opt" data-side="r" data-v="${esc(R1[k])}">${esc(R1[k])}</button>`).join("")}</div>`; }
   app.innerHTML = `<section class="lesson"><div class="lhead"><button id="quit" aria-label="Esci dalla lezione">${ICON.x}</button><div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
-    <div class="qbody"><div class="kind">${kind}${it.lv === 3 ? '<span class="lvtag">Difficile</span>' : ""}</div>${inner}</div>
-    <div class="lfoot"><button class="btn" id="check" ${it.t === "card" ? "" : "disabled"}>${it.t === "card" ? "Ho capito" : "Controlla"}</button></div></section>
+    <div class="qbody"><div class="kind${it.isNew ? " isnew" : ""}">${kind}${it.lv === 3 ? '<span class="lvtag">Difficile</span>' : ""}</div>${inner}</div>
+    <div class="lfoot"><button class="btn" id="check" disabled>Controlla</button></div></section>
     <div class="sheet" id="sheet" role="status" aria-live="polite"></div>`;
   requestAnimationFrame(() => { const bar = app.querySelector(".prog i"); if (bar) bar.style.width = pct + "%"; });
   document.getElementById("quit").onclick = () => ask("Mollare adesso?", "Vasanicola ci resterà male (lo nasconde bene) (non lo nasconde). I progressi di questa lezione si perdono, quello che hai scoperto sulle piante no.", "Esci lo stesso", () => { L = null; render(); }, "Resto, dai");
   const check = document.getElementById("check");
-  if (it.t === "card") { check.onclick = next; return; }
+  countTerms(); save();
+  app.querySelectorAll(".qbody .term").forEach(b => b.onclick = e => { e.stopPropagation(); openHint(b); });
   if (it.t === "match") return setupMatch(it, check);
   if (it.t === "order") return setupOrder(it, check);
   let sel = null;
@@ -412,13 +471,82 @@ function feedback(ok, why, plant, lvl = 1){
   const sh = document.getElementById("sheet");
   sh.className = "sheet " + (ok ? "ok" : "ko");
   const title = (ok ? OK_TITLES : KO_TITLES)[Math.floor(Math.random() * 4)];
-  sh.innerHTML = `<h3>${ok ? ICON.check.replace("<svg", '<svg width="26" height="26"') : ICON.x.replace("<svg", '<svg width="24" height="24"')}${title}</h3><p>${esc(why || "")}</p>${discovery}<button class="btn ${ok ? "" : "bad"}" id="cont">Continua</button>`;
+  sh.innerHTML = `<h3>${ok ? ICON.check.replace("<svg", '<svg width="26" height="26"') : ICON.x.replace("<svg", '<svg width="24" height="24"')}${title}</h3><p>${hl(esc(why || ""))}</p>${discovery}<button class="btn ${ok ? "" : "bad"}" id="cont">Continua</button>`;
   requestAnimationFrame(() => sh.classList.add("show"));
   setTimeout(() => sh.querySelectorAll(".disc .bar i").forEach(i => i.style.width = i.dataset.to + "%"), 300);
   document.getElementById("check").style.visibility = "hidden";
+  sh.querySelectorAll(".term").forEach(b => { S.terms[b.dataset.term] = (S.terms[b.dataset.term] || 0) + 1; b.onclick = e => { e.stopPropagation(); openHint(b); }; });
   document.getElementById("cont").onclick = next;
 }
 function next(){ L.idx++; if (L.idx >= L.items.length) finishLesson(); else showItem(); }
+
+/* =========================================================
+   Giorni di fila: una goccia al giorno, al primo quiz finito
+   ========================================================= */
+// Il giorno lo decide il calendario del telefono (mezzanotte locale), non "24 ore dall'ultima volta"
+const localDay = t => { const d = new Date(t); return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY); };
+const TIERS = [
+  { n:7,   k:"tazzina",      name:"la tazzina",      g:20,  x:30,  msg:"Bravo, hai riempito una tazzina! Ci beve a malapena un basilico, ma è un inizio." },
+  { n:14,  k:"bicchiere",    name:"il bicchiere",    g:30,  x:50,  msg:"Ottimo, hai riempito un bicchiere! Due settimane di fila: il basilico ti guarda con rispetto." },
+  { n:30,  k:"bottiglia",    name:"la bottiglia",    g:50,  x:100, msg:"Un mese intero: hai riempito una bottiglia. Da mezzo litro, non montarti la testa." },
+  { n:60,  k:"annaffiatoio", name:"l’annaffiatoio", g:80,  x:150, msg:"Due mesi: hai riempito un annaffiatoio. Adesso sì che sei pericoloso." },
+  { n:100, k:"secchio",      name:"il secchio",      g:120, x:200, msg:"Cento giorni: un secchio pieno. Le piante del quartiere parlano di te." },
+  { n:365, k:"vasca",        name:"la vasca",        g:300, x:500, msg:"Un anno. Hai riempito una vasca da bagno. Vasanicola si è commosso, ma non lo ammetterà mai." }
+];
+const LID = { cost:30, max:2 };
+// A che punto sei: recipiente da riempire, livello (0-1), quanto manca. Dopo un anno si ricomincia con un'altra vasca.
+function tierOf(n){
+  const last = TIERS[TIERS.length - 1];
+  if (n > last.n) { const base = Math.floor((n - 1) / last.n) * last.n; return { t:last, prev:base, next:base + last.n }; }
+  const i = TIERS.findIndex(t => n <= t.n);
+  return { t:TIERS[i], prev:i ? TIERS[i - 1].n : 0, next:TIERS[i].n };
+}
+const streakLevel = n => { const { prev, next } = tierOf(n); return (n - prev) / (next - prev); };
+const streakToday = () => S.streak.last === localDay(now());
+// All'apertura: se hai saltato dei giorni, li coprono i coperchi; se non bastano, la goccia evapora
+function settleStreak(){
+  const st = S.streak, today = localDay(now());
+  if (!st.n || st.last === null || today - st.last <= 1) return;
+  const missed = today - st.last - 1;
+  if (st.lids >= missed) { st.lids -= missed; st.last = today - 1; st.saved = (st.saved || 0) + missed; }
+  else { st.lost = st.n; st.n = 0; st.last = null; }
+}
+function streakNotice(){
+  const st = S.streak;
+  if (st.saved) { const k = st.saved; st.saved = 0; save(); toast(`${k === 1 ? "Il coperchio ha" : `${k} coperchi hanno`} salvato la serie: ${st.n} giorni di fila, ancora lì.`); }
+  else if (st.lost) { const k = st.lost; st.lost = 0; save();
+    modal(`<div style="text-align:center">${mascot(110, "sad")}<h2>La goccia è evaporata</h2><p style="color:var(--ink-2)">Avevi ${k} ${k === 1 ? "giorno" : "giorni"} di fila. Si riparte da zero: la prossima goccia arriva al primo quiz di oggi.</p>
+      <p style="color:var(--ink-2);font-size:14px">Un coperchio dal Negozio avrebbe salvato la serie. Lo diciamo con affetto.</p></div><button class="btn" data-close="1">Ricomincio</button>`); }
+}
+// Al primo quiz finito della giornata: goccia nuova (ed eventuale premio). Torna null se oggi era già fatta.
+function bumpStreak(){
+  const st = S.streak, today = localDay(now());
+  if (st.last === today) return null;
+  st.n = st.last === today - 1 ? st.n + 1 : 1; st.last = today; st.best = Math.max(st.best || 0, st.n);
+  const tier = TIERS.find(t => t.n === st.n) || (st.n > 365 && st.n % 365 === 0 ? TIERS[TIERS.length - 1] : null);
+  if (tier) { S.gocce += tier.g; S.xp += tier.x; }
+  save();
+  return { n:st.n, tier };
+}
+function showStreak(info, done){
+  const { n, tier } = info, { t, next } = tierOf(n), lvl = streakLevel(n), prevLvl = n === 1 || tier ? 0 : streakLevel(n - 1);
+  const left = next - n;
+  const sub = tier ? tier.msg
+    : n === 1 ? "Prima goccia. Domani torna per la seconda, e così via fino a riempire la tazzina."
+    : `Ancora ${left} ${left === 1 ? "giorno" : "giorni"} per riempire ${t.name}.`;
+  app.innerHTML = `<section class="result streak">
+    <div class="sfall">${streakDrop(26 + Math.round(lvl * 26))}</div>
+    <div class="svessel">${vesselSVG(t.k, prevLvl, 170)}</div>
+    <h1><span class="snum">${n}</span> ${n === 1 ? "giorno" : "giorni"} di fila</h1>
+    <p class="sub">${sub}</p>
+    ${tier ? `<div class="rewards"><div class="reward water"><b>+${tier.g}</b><span>Gocce</span></div><div class="reward sun"><b>+${tier.x}</b><span>Esperienza</span></div></div>` : ""}
+    <div class="sweek" aria-hidden="true">${Array.from({ length:7 }, (_, k) => `<i class="${k < ((n - 1) % 7) + 1 ? "on" : ""}">${streakDrop(14)}</i>`).join("")}</div>
+    <div style="width:100%;margin-top:auto"><button class="btn" id="sgo">Continua</button></div></section>`;
+  // La goccia cade, il livello sale
+  const w = app.querySelector(".vwater"), V = VESSELS[t.k], y = V.bot - (V.bot - V.top) * (tier ? 1 : lvl);
+  setTimeout(() => { if (w) { w.style.transition = "y .7s ease"; w.setAttribute("y", y); w.nextElementSibling?.setAttribute("y", y); } }, 650);
+  document.getElementById("sgo").onclick = done;
+}
 function finishLesson(){
   const perfect = L.mistakes === 0;
   // Ricompense: l'Allenamento (domande già viste) vale metà esperienza; le zone difficili (dalla 6) valgono di più
@@ -426,6 +554,7 @@ function finishLesson(){
   const g = L.replay ? RULES.replayGocce : RULES.stepGocce + (perfect ? RULES.perfectBonusGocce : 0) + (hardZone ? 2 : 0);
   const x = L.replay ? RULES.replayXp : Math.round((RULES.stepXp + (perfect ? RULES.perfectBonusXp : 0)) / (practice ? 2 : 1)) + (hardZone ? 5 : 0);
   S.gocce += g; S.xp += x;
+  const day = bumpStreak();
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
   if (!L.replay) S.prog[L.step.id] = L.li + 1;
@@ -447,8 +576,10 @@ function finishLesson(){
       <button class="btn ${readyNow || unblocked.length ? "ghost" : ""}" id="toPath">Continua</button></div></section>`;
   setTimeout(() => app.querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.to + "%"), 250);
   const back = L.from || "path";
-  document.getElementById("toPath").onclick = () => { L = null; tab = back; render(); };
-  const ts = document.getElementById("toSerra"); if (ts) ts.onclick = () => { L = null; tab = "serra"; render(); };
+  // Prima di tornare: se è il primo quiz di oggi, la schermata della goccia
+  const go = dest => { L = null; if (day) showStreak(day, () => { tab = dest; render(); window.scrollTo(0, 0); }); else { tab = dest; render(); } };
+  document.getElementById("toPath").onclick = () => go(back);
+  const ts = document.getElementById("toSerra"); if (ts) ts.onclick = () => go("serra");
 }
 
 /* --- Serra --- */
@@ -516,7 +647,12 @@ function renderNegozio(){
       <p class="pnote">Per: ${names}</p>
       ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small sun" style="width:auto" data-buypot="${mo}" ${S.xp < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
   }).join("");
-  return `<section class="sec"><h1>Negozio</h1><p class="lead">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
+  const lids = S.streak.lids, full = lids >= LID.max;
+  const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${lidSVG(80)}</div><div class="t"><h3>Coperchio</h3><span class="tag ptag study">Salva la serie</span><p>Se salti un giorno, copre la goccia e i giorni di fila non evaporano. Si usa da solo.</p>
+    <p class="pnote">Ne hai ${lids} su ${LID.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : `<button class="btn small" style="width:auto" data-buylid="1" ${S.gocce < LID.cost ? "disabled" : ""}>Compra ${LID.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+  return `<section class="sec"><h1>Negozio</h1><p class="lead">Coperchi per i giorni no, vasi per sempre.</p>
+    <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
+    <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
 function renderSerra(){
   const empty = !S.garden.length;
@@ -610,6 +746,8 @@ app.addEventListener("click", e => {
   if (t.dataset.gift !== undefined) { const g = S.garden[+t.dataset.gift];
     return ask(g.dead ? "Liberare il posto?" : `Regalare ${esc(nameOf(g))}?`, g.dead ? "Il seme va nel compost e il posto torna libero." : "Va a vivere da qualcun altro (si spera con più attenzioni). Il posto torna libero; soprannome e giorni di vita se ne vanno con lei.", g.dead ? "Libera il posto" : "Regala", () => {
       S.garden.splice(S.garden.indexOf(g), 1); render(); toast(g.dead ? "Posto libero. Si ricomincia." : "Regalata. Chi l’ha ricevuta non sa cosa l’aspetta."); }, "Tienila"); }
+  if (t.dataset.buylid) { if (S.gocce < LID.cost || S.streak.lids >= LID.max) return;
+    S.gocce -= LID.cost; S.streak.lids++; render(); bump("#pGocce"); toast("Coperchio in scorta. Ora puoi anche dimenticarti di noi per un giorno (uno)."); return; }
   if (t.dataset.buypot) { const mo = t.dataset.buypot, c = POT_SHOP[mo].cost; if (S.xp < c || S.pots.includes(mo)) return;
     S.xp -= c; S.pots.push(mo); render(); bump("#pXp"); toast(`${POT_SHOP[mo].name}: tuo. Ora vai in serra a sfoggiarlo.`); return; }
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
