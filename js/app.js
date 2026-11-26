@@ -185,10 +185,11 @@ function toast(msg){ document.querySelector(".toast")?.remove(); const t = docum
 function bump(sel){ const el = document.querySelector(sel); if (el) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); } }
 
 function topbar(){
-  return `<header class="top"><div class="brand">${mascot(30)}<b>Vasanicola</b></div>
-    <div class="pill streak${streakToday() ? "" : " off"}" aria-label="${S.streak.n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${vesselSVG(tierOf(Math.max(1, S.streak.n)).t.k, S.streak.n ? streakLevel(S.streak.n) : 0, 22)}${S.streak.n}</div>
-    <div class="pill water" id="pGocce" aria-label="Gocce">${ICON.drop}${S.gocce}</div>
-    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${levelInfo(S.xp).n}, ${S.xp} punti esperienza">${ICON.sun}${S.xp}</button></header>`;
+  const n = S.streak.n, lv = levelInfo(S.xp).n;
+  return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div>
+    <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanSVG(beanStage(n), 26)}${n}</button>
+    <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ICON.drop}${S.gocce}</div>
+    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ICON.sun}<span class="lvl">Liv.</span>${lv}</button></header>`;
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
@@ -541,71 +542,90 @@ function openLevel(){
     <p class="pnote" style="margin:12px 0 0">L’esperienza non si spende: misura quanto hai imparato. Si paga tutto in gocce.</p></div><button class="btn" data-close="1">Ok</button>`);
 }
 /* =========================================================
-   Giorni di fila: una goccia al giorno, al primo quiz finito
+   Giorni di fila: il fagiolo nel cotone. Cresce a ogni giorno con almeno un quiz finito.
    ========================================================= */
 // Il giorno lo decide il calendario del telefono (mezzanotte locale), non "24 ore dall'ultima volta"
 const localDay = t => { const d = new Date(t); return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY); };
-const TIERS = [
-  { n:7,   k:"tazzina",      name:"la tazzina",      g:20,  x:30,  msg:"Bravo, hai riempito una tazzina! Ci beve a malapena un basilico, ma è un inizio." },
-  { n:14,  k:"bicchiere",    name:"il bicchiere",    g:30,  x:50,  msg:"Ottimo, hai riempito un bicchiere! Due settimane di fila: il basilico ti guarda con rispetto." },
-  { n:30,  k:"bottiglia",    name:"la bottiglia",    g:50,  x:100, msg:"Un mese intero: hai riempito una bottiglia. Da mezzo litro, non montarti la testa." },
-  { n:60,  k:"annaffiatoio", name:"l’annaffiatoio", g:80,  x:150, msg:"Due mesi: hai riempito un annaffiatoio. Adesso sì che sei pericoloso." },
-  { n:100, k:"secchio",      name:"il secchio",      g:120, x:200, msg:"Cento giorni: un secchio pieno. Le piante del quartiere parlano di te." },
-  { n:365, k:"vasca",        name:"la vasca",        g:300, x:500, msg:"Un anno. Hai riempito una vasca da bagno. Vasanicola si è commosso, ma non lo ammetterà mai." }
+// Fasi del fagiolo: da quale giorno di fila, e il premio quando ci arrivi (le prime due non ne hanno)
+const BEAN = [
+  { n:1,   name:"Seme",               msg:"Primo giorno: un fagiolo nel cotone bagnato, come alle elementari. Domani torna a vedere se si muove." },
+  { n:3,   name:"Radichetta",         msg:"Spunta la radichetta. Il fagiolo è vivo, e adesso dipende da te." },
+  { n:7,   name:"Germoglio",          msg:"Germoglio! Una settimana di fila: il fagiolo ti ringrazia, a modo suo.", g:20, x:30 },
+  { n:14,  name:"Prime foglie",       msg:"Prime foglie vere. Due settimane: la maestra delle elementari sarebbe fiera.", g:30, x:50 },
+  { n:30,  name:"Col bastoncino",     msg:"Un mese! È così alto che serve un bastoncino. Di quelli del gelato, ovvio.", g:50, x:100 },
+  { n:60,  name:"Sulla finestra",     msg:"Due mesi: si arrampica sulla finestra. I vicini iniziano a preoccuparsi.", g:80, x:150 },
+  { n:100, name:"In fiore",           msg:"Cento giorni: il fagiolo fiorisce. Nessuno ci credeva. Nemmeno il fagiolo.", g:120, x:200 },
+  { n:365, name:"Oltre le nuvole",    msg:"Un anno. Il fagiolo ha bucato le nuvole. Lassù c’è un gigante che chiede di te.", g:300, x:500 }
 ];
-const LID = { cost:100, max:2 };
-// A che punto sei: recipiente da riempire, livello (0-1), quanto manca. Dopo un anno si ricomincia con un'altra vasca.
-function tierOf(n){
-  const last = TIERS[TIERS.length - 1];
-  if (n > last.n) { const base = Math.floor((n - 1) / last.n) * last.n; return { t:last, prev:base, next:base + last.n }; }
-  const i = TIERS.findIndex(t => n <= t.n);
-  return { t:TIERS[i], prev:i ? TIERS[i - 1].n : 0, next:TIERS[i].n };
-}
-const streakLevel = n => { const { prev, next } = tierOf(n); return (n - prev) / (next - prev); };
+const SPRAY = { cost:100, max:2 };
+const beanStage = n => Math.max(0, BEAN.reduce((k, b, i) => n >= b.n ? i : k, 0));
+const nextBean = n => BEAN.find(b => b.n > n) || null;
 const streakToday = () => S.streak.last === localDay(now());
-// All'apertura: se hai saltato dei giorni, li coprono i coperchi; se non bastano, la goccia evapora
+// All'apertura: se hai saltato dei giorni li copre lo spruzzino; se non basta, il cotone si secca
 function settleStreak(){
   const st = S.streak, today = localDay(now());
   if (!st.n || st.last === null || today - st.last <= 1) return;
   const missed = today - st.last - 1;
-  if (st.lids >= missed) { st.lids -= missed; st.last = today - 1; st.saved = (st.saved || 0) + missed; }
-  else { st.lost = st.n; st.n = 0; st.last = null; }
+  if (st.lids >= missed) { st.lids -= missed; st.wet = [...(st.wet || []), ...Array.from({ length:missed }, (_, k) => st.last + 1 + k)].slice(-14); st.last = today - 1; st.saved = (st.saved || 0) + missed; }
+  else { st.lost = st.n; st.n = 0; st.last = null; st.hist = []; st.wet = []; }
 }
 function streakNotice(){
   const st = S.streak;
-  if (st.saved) { const k = st.saved; st.saved = 0; save(); toast(`${k === 1 ? "Il coperchio ha" : `${k} coperchi hanno`} salvato la serie: ${st.n} giorni di fila, ancora lì.`); }
+  if (st.saved) { const k = st.saved; st.saved = 0; save(); toast(`${k === 1 ? "Lo spruzzino ha" : `${k} spruzzini hanno`} tenuto umido il cotone: il fagiolo è salvo, ${st.n} giorni di fila.`); }
   else if (st.lost) { const k = st.lost; st.lost = 0; save();
-    modal(`<div style="text-align:center">${mascot(110, "sad")}<h2>La goccia è evaporata</h2><p style="color:var(--ink-2)">Avevi ${k} ${k === 1 ? "giorno" : "giorni"} di fila. Si riparte da zero: la prossima goccia arriva al primo quiz di oggi.</p>
-      <p style="color:var(--ink-2);font-size:14px">Un coperchio dal Negozio avrebbe salvato la serie. Lo diciamo con affetto.</p></div><button class="btn" data-close="1">Ricomincio</button>`); }
+    modal(`<div style="text-align:center">${beanSVG(Math.min(3, beanStage(k)), 110, true)}<h2>Il cotone si è seccato</h2><p style="color:var(--ink-2)">Il fagiolo aveva ${k} ${k === 1 ? "giorno" : "giorni"} di fila. Si riparte da un seme nuovo: cresce dal primo quiz di oggi.</p>
+      <p style="color:var(--ink-2);font-size:14px">Uno spruzzino dal Negozio l’avrebbe salvato. Lo diciamo con affetto.</p></div><button class="btn" data-close="1">Nuovo seme</button>`); }
 }
-// Al primo quiz finito della giornata: goccia nuova (ed eventuale premio). Torna null se oggi era già fatta.
+// Al primo quiz finito della giornata: il fagiolo cresce (ed eventuale premio). Torna null se oggi era già fatto.
 function bumpStreak(){
   const st = S.streak, today = localDay(now());
   if (st.last === today) return null;
-  st.n = st.last === today - 1 ? st.n + 1 : 1; st.last = today; st.best = Math.max(st.best || 0, st.n);
-  const tier = TIERS.find(t => t.n === st.n) || (st.n > 365 && st.n % 365 === 0 ? TIERS[TIERS.length - 1] : null);
-  if (tier) { S.gocce += tier.g; S.xp += tier.x; }
+  const before = st.n && st.last === today - 1 ? st.n : 0;
+  st.n = before + 1; st.last = today; st.best = Math.max(st.best || 0, st.n);
+  st.hist = [...(st.hist || []).filter(d => d > today - 14), today];
+  const b = BEAN.find(x => x.n === st.n) || (st.n > 365 && st.n % 365 === 0 ? BEAN[BEAN.length - 1] : null);
+  if (b && b.g) { S.gocce += b.g; S.xp += b.x; }
   save();
-  return { n:st.n, tier };
+  return { n:st.n, b, grew: beanStage(st.n) > beanStage(before) || st.n === 1 };
+}
+// Ultimi 7 giorni: annaffiato (quiz), spruzzato (salvato) o vuoto
+function weekRow(){
+  const st = S.streak, today = localDay(now()), names = ["D","L","M","M","G","V","S"];
+  return `<div class="bweek">${Array.from({ length:7 }, (_, k) => { const d = today - 6 + k, wd = new Date((d * DAY) + 12 * 3600e3).getUTCDay();
+    const on = (st.hist || []).includes(d), wet = (st.wet || []).includes(d);
+    return `<div class="${on ? "on" : wet ? "wet" : ""}${d === today ? " today" : ""}"><i></i><span>${names[wd]}</span></div>`; }).join("")}</div>`;
 }
 function showStreak(info, done){
-  const { n, tier } = info, { t, next } = tierOf(n), lvl = streakLevel(n), prevLvl = n === 1 || tier ? 0 : streakLevel(n - 1);
-  const left = next - n;
-  const sub = tier ? tier.msg
-    : n === 1 ? "Prima goccia. Domani torna per la seconda, e così via fino a riempire la tazzina."
-    : `Ancora ${left} ${left === 1 ? "giorno" : "giorni"} per riempire ${t.name}.`;
+  const { n, b, grew } = info, st = beanStage(n), nx = nextBean(n);
+  const sub = b ? b.msg : nx ? `Giorno ${n}. Prossima tappa: ${nx.name.toLowerCase()}, tra ${nx.n - n} ${nx.n - n === 1 ? "giorno" : "giorni"}.` : `Giorno ${n}. Il fagiolo ormai vive tra le nuvole.`;
   app.innerHTML = `<section class="result streak">
-    <div class="sfall">${streakDrop(26 + Math.round(lvl * 26))}</div>
-    <div class="svessel">${vesselSVG(t.k, prevLvl, 170)}</div>
+    <div class="bstage${grew ? " grow" : ""}">${grew && st > 0 ? `<div class="bold">${beanSVG(st - 1, 170)}</div>` : ""}<div class="bnew">${beanSVG(st, 170)}</div></div>
     <h1><span class="snum">${n}</span> ${n === 1 ? "giorno" : "giorni"} di fila</h1>
+    ${b ? `<div class="kind" style="margin:-6px 0 0">${b.name}</div>` : ""}
     <p class="sub">${sub}</p>
-    ${tier ? `<div class="rewards"><div class="reward water"><b>+${tier.g}</b><span>Gocce</span></div><div class="reward sun"><b>+${tier.x}</b><span>Esperienza</span></div></div>` : ""}
-    <div class="sweek" aria-hidden="true">${Array.from({ length:7 }, (_, k) => `<i class="${k < ((n - 1) % 7) + 1 ? "on" : ""}">${streakDrop(14)}</i>`).join("")}</div>
+    ${b && b.g ? `<div class="rewards"><div class="reward water"><b>+${b.g}</b><span>Gocce</span></div></div><p class="sub" style="margin:0">E una bella spinta di esperienza.</p>` : ""}
+    ${weekRow()}
     <div style="width:100%;margin-top:auto"><button class="btn" id="sgo">Continua</button></div></section>`;
-  // La goccia cade, il livello sale
-  const w = app.querySelector(".vwater"), V = VESSELS[t.k], y = V.bot - (V.bot - V.top) * (tier ? 1 : lvl);
-  setTimeout(() => { if (w) { w.style.transition = "y .7s ease"; w.setAttribute("y", y); w.nextElementSibling?.setAttribute("y", y); } }, 650);
   document.getElementById("sgo").onclick = done;
+}
+// Tocco sul fagiolo in alto: come la fiamma di Duolingo, ti dice a che punto sei
+function openStreak(){
+  const st = S.streak, n = st.n, today = streakToday(), nx = nextBean(n), cur = BEAN[beanStage(n)];
+  const prev = n ? cur.n : 0, pct = nx ? Math.round((n - (n ? cur.n : 0)) / (nx.n - prev) * 100) : 100;
+  const status = !n ? "Il cotone è pronto, il fagiolo anche. Manchi tu: finisci un quiz e si parte."
+    : today ? "Oggi l’hai già annaffiato. Torna domani per farlo crescere ancora."
+    : "Oggi ancora niente: finisci un quiz prima di mezzanotte, o il cotone inizia a seccarsi.";
+  modal(`<div style="text-align:center"><div class="${today || !n ? "" : "thirsty"}">${beanSVG(beanStage(n), 120)}</div>
+    <h2>${n} ${n === 1 ? "giorno" : "giorni"} di fila</h2><div class="kind" style="margin-top:2px">${n ? cur.name : "Ancora da piantare"}</div>
+    <p style="color:var(--ink-2);margin:8px 0 14px">${status}</p></div>
+    ${weekRow()}
+    ${nx ? `<div class="bnext"><div><b>Prossima tappa: ${nx.name}</b><span>Al giorno ${nx.n}${nx.g ? `, con ${nx.g} gocce di premio` : ""}.</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>` : ""}
+    <div class="binfo">
+      <p><b>Come funziona.</b> Ogni giorno in cui finisci almeno un quiz, il fagiolo cresce. Se salti un giorno, il cotone si secca e si ricomincia dal seme.</p>
+      <p><b>Spruzzini: ${st.lids} su ${SPRAY.max}.</b> Ognuno tiene umido il cotone per un giorno saltato, da solo. Si comprano nel Negozio.</p>
+      ${st.best > n ? `<p><b>Record:</b> ${st.best} giorni di fila.</p>` : ""}
+    </div>
+    <button class="btn" data-close="1">Ok</button>`);
 }
 function finishLesson(){
   const perfect = L.mistakes === 0;
@@ -614,7 +634,10 @@ function finishLesson(){
   const g = L.replay ? RULES.replayGocce : RULES.stepGocce + (perfect ? RULES.perfectBonusGocce : 0) + (hardZone ? 2 : 0);
   const x = L.replay ? RULES.replayXp : Math.round((RULES.stepXp + (perfect ? RULES.perfectBonusXp : 0)) / (practice ? 2 : 1)) + (hardZone ? 5 : 0);
   S.gocce += g; S.xp += x;
-  const day = bumpStreak(), ups = settleLevel();
+  const xpBefore = S.xp - x, day = bumpStreak(), ups = settleLevel();
+  // Esperienza: niente numeri, solo la barra del livello che avanza (i punti sono nella finestra del livello)
+  const lb = levelInfo(xpBefore), la = levelInfo(S.xp), frac = (v, l) => Math.round((v - l.from) / (l.to - l.from) * 100);
+  const lvBar = `<div class="lvres"><div class="lvhead"><b>Livello ${la.n}</b><span>${esc(la.L.name)}</span></div><div class="bar"><i data-to="${frac(S.xp, la)}" style="width:${la.n > lb.n ? 0 : frac(xpBefore, lb)}%"></i></div></div>`;
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
   if (!L.replay) S.prog[L.step.id] = L.li + 1;
@@ -628,7 +651,8 @@ function finishLesson(){
   const readyNow = Object.keys(L.gained).some(p => canPlant(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
   app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
-    <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div><div class="reward sun"><b>+${x}</b><span>Esperienza</span></div></div>
+    <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div></div>
+    ${lvBar}
     ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
     ${ups.map(n => `<div class="lvup"><b>Livello ${n}: ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
@@ -674,7 +698,7 @@ function renderArea(a){
   S.garden.forEach((g, i) => { if (g.area === a) slots.push(slotCard(g, i)); });
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
   const nx = nextSlotLevel(a);
-  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}, ${esc(nx.L.name)}. Mancano ${nx.L.xp - S.xp} XP.</span></div>`);
+  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}, ${esc(nx.L.name)}.</span></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
@@ -708,10 +732,10 @@ function renderNegozio(){
       <p class="pnote">Per: ${names}</p>
       ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small water" style="width:auto" data-buypot="${mo}" ${S.gocce < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
   }).join("");
-  const lids = S.streak.lids, full = lids >= LID.max;
-  const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${lidSVG(80)}</div><div class="t"><h3>Coperchio</h3><span class="tag ptag study">Salva la serie</span><p>Se salti un giorno, copre la goccia e i giorni di fila non evaporano. Si usa da solo.</p>
-    <p class="pnote">Ne hai ${lids} su ${LID.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : `<button class="btn small" style="width:auto" data-buylid="1" ${S.gocce < LID.cost ? "disabled" : ""}>Compra ${LID.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
-  return `<section class="sec"><h1>Negozio</h1><p class="lead">Coperchi per i giorni no, vasi per sempre.</p>
+  const lids = S.streak.lids, full = lids >= SPRAY.max;
+  const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${sprayerSVG(80)}</div><div class="t"><h3>Spruzzino</h3><span class="tag ptag study">Salva il fagiolo</span><p>Se salti un giorno, tiene umido il cotone e i giorni di fila non si perdono. Si usa da solo.</p>
+    <p class="pnote">Ne hai ${lids} su ${SPRAY.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : `<button class="btn small water" style="width:auto" data-buylid="1" ${S.gocce < SPRAY.cost ? "disabled" : ""}>Compra ${SPRAY.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+  return `<section class="sec"><h1>Negozio</h1><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
     <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
     <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
@@ -744,9 +768,10 @@ function modal(html){ const m = document.createElement("div"); m.className = "mo
       m.style.top = vv.offsetTop + "px"; m.style.height = vv.height + "px"; };
     vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true"><button class="grab" data-close="1" aria-label="Chiudi"></button>${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
   // Trascina giù per chiudere: vale solo se il pannello è già in cima, altrimenti scorre normalmente
-  const p = m.querySelector(".panel"); let y0 = null, dy = 0;
-  p.addEventListener("touchstart", e => { y0 = p.scrollTop <= 0 ? e.touches[0].clientY : null; dy = 0; }, { passive: true });
+  const p = m.querySelector(".panel"); let y0 = null, x0 = 0, dy = 0;
+  p.addEventListener("touchstart", e => { y0 = p.scrollTop <= 0 && !e.target.closest(".fcar") ? e.touches[0].clientY : null; x0 = e.touches[0].clientX; dy = 0; }, { passive: true });
   p.addEventListener("touchmove", e => { if (y0 === null) return; dy = e.touches[0].clientY - y0;
+    if (!p.classList.contains("drag") && Math.abs(e.touches[0].clientX - x0) > Math.abs(dy)) { y0 = null; return; }
     if (dy > 0) { e.preventDefault(); p.classList.add("drag"); p.style.transform = `translateY(${dy}px)`; } else y0 = null; }, { passive: false });
   p.addEventListener("touchend", () => { if (!p.classList.contains("drag")) { y0 = null; return; } y0 = null; p.classList.remove("drag");
     if (dy > 90) { m.remove(); return; } p.classList.add("back"); p.style.transform = ""; setTimeout(() => p.classList.remove("back"), 220); });
@@ -767,9 +792,14 @@ function openCard(id){
   const shown = Math.max(1, Math.round(k / RULES.knowledgeMax * p.facts.length));
   m = modal(`<div style="display:flex;gap:14px;align-items:center">${plantSVG(id, 90)}<div><h2>${p.name}</h2><div style="color:var(--ink-2);font-size:14px;font-style:italic">${p.sci}</div><span class="tag ${p.indoor ? "planted" : "study"}" style="display:inline-block;margin-top:6px">${p.indoor ? "Casa o balcone" : "Solo balcone"}</span></div></div>
     ${expertBox(id)}
-    <ul class="facts">${p.facts.map((f, i) => i < shown ? `<li>${esc(f)}</li>` : `<li class="lock">Da scoprire nelle prossime lezioni.</li>`).join("")}</ul>
+    <div class="kind" style="margin:16px 0 8px">Curiosità ${shown}/${p.facts.length}</div>
+    <div class="fcar" role="list" aria-label="Curiosità">${p.facts.map((f, i) => i < shown ? `<div class="fcard" role="listitem"><small>${i + 1}</small><p>${esc(f)}</p></div>` : `<div class="fcard lock" role="listitem"><small>${i + 1}</small><p>Da scoprire nelle prossime lezioni.</p></div>`).join("")}</div>
+    <div class="fdots" aria-hidden="true">${p.facts.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>
     <div style="display:flex;flex-direction:column;gap:12px">${k >= RULES.knowledgeMax ? `<button class="btn" id="practice">Allenati su questa pianta</button>` : ""}<button class="btn ghost" data-close="1">Chiudi</button></div>`);
   m.querySelector("#practice")?.addEventListener("click", () => { m.remove(); startPlantPractice(id); });
+  // Pallini sotto il carosello: seguono la card più visibile
+  const car = m.querySelector(".fcar"), dots = m.querySelectorAll(".fdots i");
+  car.addEventListener("scroll", () => { const k = Math.round(car.scrollLeft / (car.firstElementChild.offsetWidth + 10)); dots.forEach((d, i) => d.classList.toggle("on", i === k)); }, { passive:true });
 }
 // Riquadro del titolo nella scheda: grado attuale, prossimo passo, eventuale sblocco di una rara
 function expertBox(id){
@@ -807,8 +837,8 @@ app.addEventListener("click", e => {
   if (t.dataset.gift !== undefined) { const g = S.garden[+t.dataset.gift];
     return ask(g.dead ? "Liberare il posto?" : `Regalare ${esc(nameOf(g))}?`, g.dead ? "Il seme va nel compost e il posto torna libero." : "Va a vivere da qualcun altro (si spera con più attenzioni). Il posto torna libero; soprannome e giorni di vita se ne vanno con lei.", g.dead ? "Libera il posto" : "Regala", () => {
       S.garden.splice(S.garden.indexOf(g), 1); render(); toast(g.dead ? "Posto libero. Si ricomincia." : "Regalata. Chi l’ha ricevuta non sa cosa l’aspetta."); }, "Tienila"); }
-  if (t.dataset.buylid) { if (S.gocce < LID.cost || S.streak.lids >= LID.max) return;
-    S.gocce -= LID.cost; S.streak.lids++; render(); bump("#pGocce"); toast("Coperchio in scorta. Ora puoi anche dimenticarti di noi per un giorno (uno)."); return; }
+  if (t.dataset.buylid) { if (S.gocce < SPRAY.cost || S.streak.lids >= SPRAY.max) return;
+    S.gocce -= SPRAY.cost; S.streak.lids++; render(); bump("#pGocce"); toast("Spruzzino in scorta. Ora puoi anche dimenticarti di noi per un giorno (uno)."); return; }
   if (t.dataset.buypot) { const mo = t.dataset.buypot, c = POT_SHOP[mo].cost; if (S.gocce < c || S.pots.includes(mo)) return;
     S.gocce -= c; S.pots.push(mo); render(); bump("#pGocce"); toast(`${POT_SHOP[mo].name}: tuo. Ora vai in serra a sfoggiarlo.`); return; }
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
@@ -825,6 +855,7 @@ app.addEventListener("click", e => {
   }
   if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
   if (t.dataset.level) return openLevel();
+  if (t.dataset.streak) return openStreak();
   if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
   if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
@@ -861,7 +892,7 @@ function openEmergency(g){
     else g.em.retryAt = now() + DAY;
     save();
     m.querySelector("#emOut").innerHTML = ok
-      ? `<div class="card" style="margin-top:14px;font-size:15px"><b style="color:var(--leaf-dark)">Salvata.</b> ${esc(e.why)} <b style="color:var(--water)">+${EM.cureGocce} gocce</b>, <b style="color:var(--sun-dark)">+${EM.cureXp} esperienza</b>.</div>`
+      ? `<div class="card" style="margin-top:14px;font-size:15px"><b style="color:var(--leaf-dark)">Salvata.</b> ${esc(e.why)} <b style="color:var(--water)">+${EM.cureGocce} gocce</b>, e un po’ di esperienza.</div>`
       : `<div class="card" style="margin-top:14px;font-size:15px;background:var(--bad-bg);border-color:var(--bad)"><b style="color:var(--bad)">Non era la cura giusta.</b> Riprova domani, oppure ripassa lo step “${esc(step.title)}” e riprova subito.</div>`;
     m.querySelector("[data-close]").textContent = "Torna alla serra";
     m.addEventListener("click", ev => { if (ev.target.closest("[data-close]") || ev.target === m) render(); });

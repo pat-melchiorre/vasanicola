@@ -54,7 +54,7 @@ h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em}
 @keyframes bump{30%{transform:scale(1.25)}}
 
 /* ---- Tab ---- */
-main{flex:1;padding:0 0 96px}
+main{flex:1;padding:0 0 calc(118px + env(safe-area-inset-bottom,0px))}
 .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;display:flex;background:var(--bg);border-top:2px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
 .tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:14px;font-size:12px;font-weight:900;color:var(--ink-2);border:2px solid transparent}
 .tabs button svg{width:30px;height:30px}
@@ -265,9 +265,6 @@ main{flex:1;padding:0 0 96px}
 .panel.back{transition:transform .2s ease}
 @keyframes up{from{transform:translateY(40px)}}
 .panel h2{font-size:24px}
-.panel .facts{margin:12px 0 16px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.panel .facts li{background:var(--surface);border-radius:14px;padding:10px 12px;font-size:15px;line-height:1.4}
-.panel .facts li.lock{color:var(--ink-2);background:transparent;border:2px dashed var(--line)}
 .pick{display:flex;flex-direction:column;gap:10px;margin:14px 0}
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-size:14px;z-index:40;max-width:90%;text-align:center;animation:fade .2s}
 
@@ -320,24 +317,54 @@ main{flex:1;padding:0 0 96px}
 .hint .hart{flex:none}
 .kind.isnew{color:#8e44ad}
 .kind.isnew::after{content:"";display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:#8e44ad;vertical-align:middle;animation:bump 1s infinite}
-/* ---- Giorni di fila ---- */
-.pill.streak{background:#e2f4fc;color:#1f7fb8;gap:3px;padding:4px 10px 4px 6px}
-.pill.streak svg{width:22px;height:22px}
-.pill.streak.off{filter:grayscale(1);opacity:.6}
-:root[data-theme="dark"] .pill.streak{background:#0f2a38;color:#7cc6f6}
-.result.streak{justify-content:flex-start;padding-top:56px}
-.result.streak h1{color:#1f7fb8}
-.snum{font-size:48px}
-.sfall{height:70px;display:flex;align-items:flex-end;justify-content:center;animation:fall .7s cubic-bezier(.5,0,.9,.4) .1s both}
-.sfall svg{animation:fade .2s}
-@keyframes fall{0%{transform:translateY(-60px);opacity:0}60%{opacity:1}100%{transform:translateY(70px);opacity:0}}
-.svessel{margin-top:-30px}
-.sweek{display:flex;gap:8px;justify-content:center}
-.sweek i{opacity:.25;filter:grayscale(1)}.sweek i.on{opacity:1;filter:none}
-@media (prefers-reduced-motion: reduce){.sfall{animation:none;opacity:0}.kind.isnew::after{animation:none}}
 .shoph{font-size:18px;margin:18px 0 10px}
 /* ---- Livelli ---- */
 button.pill{border:0;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .lvup{width:100%;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:16px;background:var(--sun-bg);border:2px solid var(--sun);color:var(--sun-dark)}
 .lvup b{font-size:16px}.lvup span{font-size:14px;color:var(--ink-2)}
 .lvbar{height:14px}
+/* ---- Barra in alto ---- */
+.top{gap:8px}
+.brand svg{width:34px;height:auto}
+.pill.lvl,.pill .lvl{font-size:12px;opacity:.8;margin-right:-2px}
+/* ---- Giorni di fila: fagiolo ---- */
+.pill.streak{background:#e9f6e6;color:#2e8b48;gap:2px;padding:2px 10px 2px 4px}
+.pill.streak svg{width:22px;height:26px}
+.pill.streak.off{filter:grayscale(1);opacity:.6}
+:root[data-theme="dark"] .pill.streak{background:#173322;color:#7ad69a}
+.result.streak{justify-content:flex-start;padding-top:40px}
+.result.streak h1{color:var(--leaf-dark)}
+.snum{font-size:48px}
+.bstage{position:relative;width:170px;height:204px}
+.bstage>div{position:absolute;inset:0}
+.bstage.grow .bold{animation:bfade .6s .5s both}
+.bstage.grow .bnew{animation:bgrow .7s .5s both}
+@keyframes bfade{to{opacity:0}}
+@keyframes bgrow{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:none}}
+.bweek{display:flex;justify-content:space-between;gap:6px;width:100%;max-width:330px;margin:4px auto 0}
+.bweek div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:900;color:var(--ink-2)}
+.bweek i{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--surface)}
+.bweek .on i{background:#43b05c;border-color:#2e8b48}
+.bweek .wet i{background:#3da5ec;border-color:#2a6fa8}
+.bweek .today span{color:var(--ink)}
+.bweek .today i{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--line)}
+.bnext{margin:16px 0 0;padding:12px 14px;border:2px solid var(--line);border-radius:16px;display:flex;flex-direction:column;gap:8px}
+.bnext b{display:block;font-size:15px}.bnext span{font-size:14px;color:var(--ink-2)}
+.binfo{margin:14px 0;font-size:14px;color:var(--ink-2);line-height:1.45}.binfo p{margin:0 0 8px}.binfo b{color:var(--ink)}
+.thirsty svg{filter:saturate(.4)}
+.lvres{width:100%;padding:12px 14px;border:2px solid var(--sun);border-radius:16px;background:var(--sun-bg);text-align:left}
+.lvhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.lvhead b{color:var(--sun-dark)}.lvhead span{font-size:14px;color:var(--ink-2);font-weight:800}
+.lvres .bar i{background:var(--sun)}
+@media (prefers-reduced-motion: reduce){.bstage.grow .bold,.bstage.grow .bnew{animation:none}.bstage.grow .bold{opacity:0}}
+/* ---- Erbario: curiosità a carosello ---- */
+.fcar{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:2px 18px 6px;scroll-padding:0 18px;scrollbar-width:none;overscroll-behavior-x:contain}
+.fcar::-webkit-scrollbar{display:none}
+.fcard{flex:0 0 82%;scroll-snap-align:start;padding:14px 16px;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--line);background:var(--surface);min-height:110px}
+.fcard small{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--surface-2);font-weight:900;font-size:12px;color:var(--leaf-dark)}
+.fcard p{margin:8px 0 0;font-size:15px;line-height:1.45}
+.fcard.lock{border-style:dashed;box-shadow:none;background:none}.fcard.lock p{color:var(--ink-2)}
+.fdots{display:flex;justify-content:center;gap:6px;margin:8px 0 16px}
+.fdots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .2s}
+.fdots i.on{width:18px;border-radius:4px;background:var(--leaf)}
+.pill.streak svg{width:26px;height:31px;margin:-4px 0}
+.rewards>:only-child{grid-column:1/-1}

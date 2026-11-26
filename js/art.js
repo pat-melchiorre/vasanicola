@@ -264,29 +264,32 @@ const mascot = (size = 150, mood = "happy") => {
   <path d="M28 98h64l-6 30H34z" fill="#e0773a"/><rect x="24" y="90" width="72" height="12" rx="4" fill="#e0773a"/></svg>`;
 };
 
-/* ---- Recipienti dei giorni di fila: si riempiono d'acqua (level da 0 a 1) ---- */
-const VESSELS = {
-  tazzina:{ top:38, bot:78, body:"M20 38h52v14a26 26 0 0 1-26 26a26 26 0 0 1-26-26z",
-    extra:'<path d="M72 44h6a9 9 0 0 1 0 18h-8" fill="none" stroke="#2a6fa8" stroke-width="5"/><ellipse cx="46" cy="84" rx="34" ry="6" fill="#cfe6f7" stroke="#2a6fa8" stroke-width="4"/>' },
-  bicchiere:{ top:16, bot:88, body:"M26 16h48l-7 72h-34z", extra:"" },
-  bottiglia:{ top:22, bot:90, body:"M42 22c0 8-14 10-14 22v42a4 4 0 0 0 4 4h36a4 4 0 0 0 4-4v-42c0-12-14-14-14-22z",
-    extra:'<rect x="40" y="8" width="20" height="14" rx="3" fill="#2a6fa8"/>' },
-  annaffiatoio:{ top:36, bot:86, body:"M30 36h38v46a4 4 0 0 1-4 4h-30a4 4 0 0 1-4-4z",
-    extra:'<path d="M68 70l22-26" stroke="#2a6fa8" stroke-width="7" stroke-linecap="round"/><path d="M84 40l10 8" stroke="#2a6fa8" stroke-width="7" stroke-linecap="round"/><path d="M36 36c0-16 26-16 26 0" fill="none" stroke="#2a6fa8" stroke-width="6"/>' },
-  secchio:{ top:32, bot:88, body:"M22 32h56l-7 56h-42z",
-    extra:'<path d="M22 34c0-30 56-30 56 0" fill="none" stroke="#2a6fa8" stroke-width="4"/>' },
-  vasca:{ top:46, bot:80, body:"M6 46h88v12a22 22 0 0 1-22 22h-44a22 22 0 0 1-22-22z",
-    extra:'<path d="M18 80l-4 10M82 80l4 10" stroke="#2a6fa8" stroke-width="6" stroke-linecap="round"/><path d="M80 46v-20a8 8 0 0 0-16 0" fill="none" stroke="#2a6fa8" stroke-width="5"/>' }
-};
-let vesselN = 0;
-function vesselSVG(kind, level = 0, size = 120){
-  const V = VESSELS[kind], id = "vs" + (++vesselN), lv = Math.max(0, Math.min(1, level));
-  const y = V.bot - (V.bot - V.top) * lv;
-  return `<svg class="vessel" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="${id}"><path d="${V.body}"/></clipPath></defs>
-  <path d="${V.body}" fill="#eef7fd"/><g clip-path="url(#${id})"><rect class="vwater" x="0" y="${y}" width="100" height="100" fill="#3da5ec"/><rect x="0" y="${y}" width="100" height="4" fill="#7cc6f6"/></g>
-  <path d="${V.body}" fill="none" stroke="#2a6fa8" stroke-width="5" stroke-linejoin="round"/>${V.extra}</svg>`;
+/* ---- Il fagiolo nel cotone (giorni di fila): 8 fasi, più la versione secca ---- */
+function beanSVG(stage = 0, size = 120, dry = false){
+  const leaf = (x, y, r, flip) => `<path d="M0 0C5-8 17-9 23-2C17 6 6 7 0 0z" transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1) rotate(${r})" fill="${dry ? "#a68b5b" : "#43b05c"}" stroke="${dry ? "#7a6340" : "#2e8b48"}" stroke-width="1.5"/><path d="M0 0L18 -2" transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1) rotate(${r})" stroke="${dry ? "#7a6340" : "#2e8b48"}" stroke-width="1" opacity=".6"/>`;
+  const stemC = dry ? "#9b7e4f" : "#3f9d52";
+  const top = [96, 92, 54, 42, 22, 8, 8, -4][stage];
+  // Fusto: da dentro il cotone fino a "top"; da secco si piega di lato
+  const stem = stage < 2 ? "" : dry
+    ? `<path d="M50 72C50 60 52 54 60 52S70 58 72 64" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`
+    : stage === 2 ? `<path d="M50 72C50 62 50 56 46 52" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`
+    : `<path d="M50 72C46 ${(72 + top) / 2 + 10} 56 ${(72 + top) / 2 - 6} 50 ${top}" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`;
+  let extra = "";
+  if (!dry) {
+    if (stage === 2) extra = `<ellipse cx="44" cy="52" rx="6" ry="4" fill="#b98a4e"/><ellipse cx="52" cy="54" rx="5" ry="3.5" fill="#c99a5e"/>`;
+    if (stage >= 3) extra += leaf(50, top + 2, -20, true) + leaf(50, top + 2, 20, false);
+    if (stage >= 4) extra = `<rect x="58" y="6" width="6" height="72" rx="3" fill="#e9c98f" stroke="#c9a66a" stroke-width="1.5"/>` + extra + leaf(52, 46, -30, true) + leaf(48, 34, 30, false);
+    if (stage >= 5) extra = `<rect x="6" y="4" width="34" height="44" rx="3" fill="#e2f4fc" stroke="#9cc3e0" stroke-width="3"/><path d="M23 4v44M6 26h34" stroke="#9cc3e0" stroke-width="3"/>` + extra + leaf(50, 58, 25, false) + leaf(50, 22, -35, true);
+    if (stage >= 6) extra += [[44, 30], [56, 18], [46, 48]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#f7a8c8" stroke="#d6488d" stroke-width="1.5"/><circle cx="${x}" cy="${y}" r="1.8" fill="#fff"/>`).join("");
+    if (stage >= 7) extra += `<g fill="#fff" stroke="#9cc3e0" stroke-width="2.5"><path d="M14 22a12 12 0 0 1 20-10a16 16 0 0 1 30 0a12 12 0 0 1 22 12a8 8 0 0 1-4 10H18a10 10 0 0 1-4-12z"/></g>`;
+  }
+  return `<svg class="bean" width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" aria-hidden="true">
+  ${stem}${extra}
+  <path d="M24 66h52l-6 48a4 4 0 0 1-4 4H34a4 4 0 0 1-4-4z" fill="${dry ? "#f1ece2" : "#eaf6ff"}" stroke="#9cc3e0" stroke-width="3" opacity=".95"/>
+  <path d="M27 72c4-8 10-2 14-6s10 2 14-2 10 4 14 0 6 4 4 8v6H28z" fill="${dry ? "#ddd3c2" : "#fff"}" stroke="${dry ? "#c4b69c" : "#dfe8ef"}" stroke-width="2"/>
+  ${stage === 1 && !dry ? `<path d="M52 77c3 5-3 7 1 12" fill="none" stroke="#c9a66a" stroke-width="3.5" stroke-linecap="round"/>` : ""}
+  <ellipse cx="50" cy="73" rx="9" ry="6" fill="${dry ? "#8a6a45" : "#a8743f"}" stroke="#7a4f24" stroke-width="2"/><ellipse cx="47" cy="71" rx="3" ry="1.6" fill="#fff" opacity=".35"/>
+  </svg>`;
 }
-// La goccia dei giorni di fila: azzurra e "lucida", diversa dalle gocce da spendere
-const streakDrop = (size = 40) => `<svg class="sdrop" width="${size}" height="${size * 1.25}" viewBox="0 0 40 50" aria-hidden="true"><path d="M20 2C20 2 4 22 4 32a16 16 0 0 0 32 0C36 22 20 2 20 2z" fill="#3da5ec" stroke="#2a6fa8" stroke-width="3"/><ellipse cx="13" cy="31" rx="4" ry="7" fill="#fff" opacity=".55"/></svg>`;
-// Il coperchio salva-serie: un coperchio sopra la goccia
-const lidSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 40C50 40 30 64 30 76a20 20 0 0 0 40 0C70 64 50 40 50 40z" fill="#3da5ec" stroke="#2a6fa8" stroke-width="4"/><ellipse cx="42" cy="76" rx="5" ry="8" fill="#fff" opacity=".5"/><path d="M14 36c0-14 72-14 72 0z" fill="#f2c230" stroke="#b8860b" stroke-width="4" stroke-linejoin="round"/><rect x="10" y="34" width="80" height="8" rx="4" fill="#f2c230" stroke="#b8860b" stroke-width="4"/><circle cx="50" cy="16" r="6" fill="#f2c230" stroke="#b8860b" stroke-width="4"/></svg>`;
+// Lo spruzzino: tiene umido il cotone per un giorno saltato
+const sprayerSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><path d="M36 40h28v46a6 6 0 0 1-6 6H42a6 6 0 0 1-6-6z" fill="#3da5ec" stroke="#2a6fa8" stroke-width="4"/><rect x="40" y="28" width="20" height="12" rx="2" fill="#f2c230" stroke="#b8860b" stroke-width="3"/><path d="M44 28V16h22l6 6h-12v6" fill="#f2c230" stroke="#b8860b" stroke-width="3" stroke-linejoin="round"/><path d="M60 34l10 8" stroke="#b8860b" stroke-width="4" stroke-linecap="round"/><g fill="#7cc6f6"><circle cx="82" cy="16" r="3"/><circle cx="88" cy="24" r="2.5"/><circle cx="80" cy="28" r="2"/></g><rect x="40" y="56" width="20" height="16" rx="3" fill="#fff" opacity=".4"/></svg>`;
