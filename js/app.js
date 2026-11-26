@@ -640,6 +640,18 @@ function openStreak(){
 // Riquadro delle gocce guadagnate: goccia grande, totale e da dove arrivano
 const dropBox = (g, parts) => `<div class="dropbox"><div class="dbicon">${ICON.drop}</div><div class="dbt"><b>+${g}</b><span>Gocce</span></div>
   <ul class="dbparts">${parts.map(([t, v]) => `<li><span>${t}</span><b>+${v}</b></li>`).join("")}</ul></div>`;
+// Fine lezione: il numero delle gocce conta da 0, e con zero errori piovono foglie
+function celebrate(leaves){
+  const quiet = matchMedia("(prefers-reduced-motion: reduce)").matches, num = app.querySelector(".dbt b");
+  if (num && !quiet) { const to = +num.textContent.replace(/\D/g, ""), t0 = performance.now() + 200;
+    const tick = t => { const k = Math.min(1, Math.max(0, (t - t0) / 700)); num.textContent = "+" + Math.round(to * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(tick); };
+    num.textContent = "+0"; requestAnimationFrame(tick); }
+  if (!leaves || quiet) return;
+  const box = document.createElement("div"); box.className = "confetti"; box.setAttribute("aria-hidden", "true");
+  const cols = ["#43b05c", "#5cc875", "#f2c230", "#3da5ec", "#f28bb5"];
+  box.innerHTML = Array.from({ length:22 }, (_, k) => `<i style="left:${Math.random() * 100}%;color:${cols[k % cols.length]};animation-delay:${Math.random() * .6}s;animation-duration:${1.8 + Math.random() * 1.2}s;--r:${Math.round(Math.random() * 720 - 360)}deg;--x:${Math.round(Math.random() * 80 - 40)}px">${ICON.leaf}</i>`).join("");
+  app.appendChild(box); setTimeout(() => box.remove(), 3600);
+}
 function finishLesson(){
   const perfect = L.mistakes === 0;
   // Ricompense: l'Allenamento (domande già viste) vale metà esperienza; le zone difficili (dalla 6) valgono di più
@@ -672,6 +684,7 @@ function finishLesson(){
       ${unblocked.length ? `<p class="sub" style="margin:0">Ora sai cosa fare: puoi riprovare a curare ${unblocked.map(x => esc(nameOf(x))).join(" e ")}.</p><button class="btn bad" id="toSerra">Torna a curarla</button>` : readyNow ? `<button class="btn sun" id="toSerra">Vai a piantarla</button>` : ""}
       <button class="btn ${readyNow || unblocked.length ? "ghost" : ""}" id="toPath">Continua</button></div></section>`;
   setTimeout(() => app.querySelectorAll(".bar i").forEach(i => i.style.width = i.dataset.to + "%"), 250);
+  celebrate(perfect && !L.replay);
   const back = L.from || "path";
   // Prima di tornare: se è il primo quiz di oggi, la schermata della goccia
   const go = dest => { L = null; if (day) showStreak(day, () => { tab = dest; render(); window.scrollTo(0, 0); }); else { tab = dest; render(); } };
@@ -878,11 +891,22 @@ app.addEventListener("click", e => {
   if (t.id === "reset") return ask("Ricominciare da zero?", "Si perde tutto: piante, gocce, esperienza. Anche la dignità.", "Ricomincia", () => { S = fresh(); tab = "path"; render(); }, "Annulla");
   if (t.dataset.card) return openCard(t.dataset.card);
 });
+// Goccioline che cadono sul disegno; se la pianta aveva sete, si raddrizza
+function splashWater(i, perk){
+  const art = document.querySelector(`[data-gift="${i}"]`)?.closest(".slot")?.querySelector(".sart");
+  if (!art || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (perk) art.classList.add("perk");
+  const box = document.createElement("div"); box.className = "rain"; box.setAttribute("aria-hidden", "true");
+  box.innerHTML = Array.from({ length:7 }, (_, k) => `<i style="left:${18 + k * 10 + Math.random() * 6}%;animation-delay:${(k % 4) * .08 + Math.random() * .1}s">${ICON.drop}</i>`).join("");
+  art.appendChild(box); setTimeout(() => box.remove(), 1200);
+}
 function water(g, level){
   S.gocce -= RULES.waterCost; g.wateredAt = now(); g.wet = level; felt.delete(g);
   const c = care(g), dead = level >= c.rot, n = nameOf(g);
+  const wasDry = ["assetata", "appassita"].includes(plantState(g));
   if (dead) kill(g, "marcita");
   render(); bump("#pGocce");
+  if (!dead) splashWater(S.garden.indexOf(g), wasDry && !level);
   toast(!level ? `${n} ha bevuto. Ti perdona. (Per ora.)`
     : dead ? `${n} ha le radici marcite. ${c.wetTip}`
     : level >= c.rot - 1 ? `${n} ha la terra fradicia: un altro sorso e le radici marciscono. ${c.wetTip}`

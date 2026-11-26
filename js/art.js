@@ -260,7 +260,7 @@ const mascot = (size = 150, mood = "happy") => {
   return `<svg class="mascot" width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">
   <ellipse cx="38" cy="30" rx="12" ry="18" transform="rotate(-30 38 30)" fill="#43b05c"/><ellipse cx="82" cy="30" rx="12" ry="18" transform="rotate(30 82 30)" fill="#43b05c"/><ellipse cx="60" cy="20" rx="11" ry="17" fill="#4fc06a"/>
   <ellipse cx="60" cy="62" rx="38" ry="34" fill="#43b05c"/><ellipse cx="60" cy="56" rx="30" ry="22" fill="#5cc875" opacity=".6"/>
-  <circle cx="47" cy="56" r="7" fill="#fff"/><circle cx="73" cy="56" r="7" fill="#fff"/><circle cx="48" cy="57" r="3.5" fill="#173b26"/><circle cx="72" cy="57" r="3.5" fill="#173b26"/>${mouth}
+  <g class="eyes"><circle cx="47" cy="56" r="7" fill="#fff"/><circle cx="73" cy="56" r="7" fill="#fff"/><circle cx="48" cy="57" r="3.5" fill="#173b26"/><circle cx="72" cy="57" r="3.5" fill="#173b26"/></g>${mouth}
   <path d="M28 98h64l-6 30H34z" fill="#e0773a"/><rect x="24" y="90" width="72" height="12" rx="4" fill="#e0773a"/></svg>`;
 };
 
