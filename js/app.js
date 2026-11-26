@@ -763,7 +763,7 @@ function renderNegozio(){
   const lids = S.streak.lids, full = lids >= SPRAY.max;
   const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${sprayerSVG(80)}</div><div class="t"><h3>Spruzzino</h3><span class="tag ptag study">Salva il fagiolo</span><p>Se salti un giorno, tiene umido il cotone e i giorni di fila non si perdono. Si usa da solo.</p>
     <p class="pnote">Ne hai ${lids} su ${SPRAY.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : `<button class="btn small water" style="width:auto" data-buylid="1" ${S.gocce < SPRAY.cost ? "disabled" : ""}>Compra ${SPRAY.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
-  return `<section class="sec"><h1>Negozio</h1><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
+  return `<section class="sec"><div class="sechead"><h1>Negozio</h1><div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div></div><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
     <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
     <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
