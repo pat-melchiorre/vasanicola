@@ -202,9 +202,11 @@ function render(){
   if (!S.onboarded) return renderOnboarding(0);
   if (!welcomed) { welcomed = true; return renderWelcome(); }
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
-  app.innerHTML = topbar() + `<main>${body}</main>` + tabbar();
+  // La barra in alto (fagiolo, gocce, livello) c'è solo nel Percorso, attaccata all'intestazione della zona
+  app.innerHTML = (tab === "path" ? topbar() : "") + `<main class="${tab === "path" ? "" : "notop"}">${body}</main>` + tabbar();
   streakNotice();
-  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", (bar.offsetHeight + 12) + "px");   // +12: la barra galleggia, con un po' d'aria sopra e sotto
+  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", (bar.offsetHeight + 8) + "px");   // +8: lo spazio sopra la barra
+  markStuck();
 }
 
 /* --- Bentornato: si vede una volta a ogni apertura, dopo l’onboarding --- */
@@ -903,6 +905,10 @@ function splashWater(i, perk){
   art.appendChild(box); setTimeout(() => box.remove(), 1200);
 }
 // Tocco sull'intestazione della zona: torna all'inizio di quella zona; se ci sei già, all'inizio del percorso
+// L'intestazione della zona agganciata in alto si "salda" alla barra: angoli dritti in alto
+function markStuck(){ if (tab !== "path") return; const y = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--toph")) || 62) + (parseFloat(getComputedStyle(document.querySelector(".top") || document.body).top) || 0) - 8;
+  document.querySelectorAll(".zhead").forEach(z => z.classList.toggle("stuck", Math.abs(z.getBoundingClientRect().top - y) < 2)); }
+addEventListener("scroll", markStuck, { passive:true });
 function zoneTop(el){
   const sec = el.closest(".zsec"), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--toph")) || 62;
   const y = sec.getBoundingClientRect().top + scrollY - bar, smooth = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";

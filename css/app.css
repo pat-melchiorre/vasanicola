@@ -495,3 +495,9 @@ i.lvsun{font-style:normal;color:inherit}
 /* ---- Barra in alto galleggiante, senza linea ---- */
 .top{top:calc(env(safe-area-inset-top,0px) + 8px);margin:8px 12px 0;border:0;border-radius:22px;background:var(--bg);box-shadow:0 6px 18px rgba(23,59,38,.10),0 1px 0 rgba(23,59,38,.04);padding:10px 12px}
 .node svg{width:36px;height:36px}
+/* ---- Barra in alto solo nel Percorso, senza ombra, attaccata alla zona ---- */
+.top{box-shadow:none;margin:8px 12px 0;border-radius:22px 22px 0 0;background:var(--bg)}
+.zhead{padding:0 12px 10px}
+.zhead.stuck .zone{border-top-left-radius:0;border-top-right-radius:0}
+.zhead:not(.stuck){padding-top:12px}
+main.notop{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
