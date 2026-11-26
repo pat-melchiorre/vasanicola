@@ -40,9 +40,10 @@
 :root[data-theme="dark"]{ --bg:#0f1a13; --surface:#17271c; --surface-2:#1f3426; --ink:#e7f3e9; --ink-2:#a7c2ae; --line:#2b4433; --leaf-dark:#7ad69a;
   --water-bg:#10283f; --sun-bg:#3a2e0b; --bad-bg:#3b1517; --dry-bg:#33280f; --soak:#4cc9c3; --soak-bg:#0f2d2b; --locked:#3a463d; --locked-dark:#2a332c; color-scheme:dark; }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
-body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:700;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;overscroll-behavior:none}
+html.locked,html.locked body{overflow:hidden}
+body{margin:0;min-height:100%;overscroll-behavior:none;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:700;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :focus-visible{outline:3px solid var(--water);outline-offset:3px;border-radius:12px}
 .app{max-width:460px;margin:0 auto;min-height:var(--screen);display:flex;flex-direction:column;position:relative}
 h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em}
@@ -264,9 +265,17 @@ main{flex:1;padding:0 0 96px}
 .sil{width:46px;display:grid;place-items:center}.sil svg{filter:brightness(0);opacity:.3}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .sil svg{filter:brightness(0) invert(1);opacity:.25} }
 :root[data-theme="dark"] .sil svg{filter:brightness(0) invert(1);opacity:.25}
-.modal{position:fixed;top:0;left:0;right:0;height:100%;background:rgba(10,30,15,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.modal{position:fixed;top:0;left:0;right:0;height:100%;background:rgba(10,30,15,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s;overscroll-behavior:contain}
 @keyframes fade{from{opacity:0}}
-.panel{width:100%;max-width:460px;max-height:92%;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s ease}
+.panel{width:100%;max-width:460px;max-height:92%;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .25s ease;overscroll-behavior:contain;position:relative}
+.potempty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin:18px 0 14px;padding:18px 16px;border:2px dashed var(--line);border-radius:18px}
+.potempty p{margin:0;font-size:15px;color:var(--ink-2)}
+.potempty b{color:var(--ink)}
+.shopcard .ptag{margin-top:4px}
+.grab{display:block;width:100%;height:24px;margin:-14px 0 4px;position:relative}
+.grab::before{content:"";position:absolute;left:50%;top:9px;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:var(--line)}
+.panel.drag{animation:none;transition:none}
+.panel.back{transition:transform .2s ease}
 @keyframes up{from{transform:translateY(40px)}}
 .panel h2{font-size:24px}
 .panel .facts{margin:12px 0 16px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
@@ -1590,21 +1599,21 @@ const daysSince = t => Math.floor((now() - t) / DAY);
 // "soak" = per quanti giorni la terra resta bagnata dopo un'annaffiatura (dipende dalla pianta).
 // Catalogo del negozio. "fits" = piante adatte, con informazioni vere; "why" = perché non va bene per le altre.
 const POT_SHOP = {
-  coprivaso:{ name:"Coprivaso della nonna", cost:80, show:"spatifillo", effect:"Solo estetico.",
-    desc:"Ceramica bianca a fiorellini blu. Dentro resta il vaso di plastica con il foro: fa scena, e la nonna approva.",
+  coprivaso:{ name:"Coprivaso della nonna", cost:80, show:"spatifillo", effect:"Solo estetico.", tag:"Solo bellezza",
+    desc:"Ceramica a fiorellini sopra il solito vaso col foro. La nonna approva.",
     fits: id => PLANTS[id].indoor, why:"È un vaso da interno: fuori si riempie di pioggia e diventa una piscina." },
-  appeso:{ name:"Vaso appeso", cost:110, show:"pothos", effect:"Solo estetico.",
-    desc:"Sospeso con le corde, per le piante che ricadono: foglie e anfore pendono libere.",
+  appeso:{ name:"Vaso appeso", cost:110, show:"pothos", effect:"Solo estetico.", tag:"Solo bellezza",
+    desc:"Per le piante che ricadono. Foglie libere, mensole pure.",
     fits: id => ["pothos","petunia","felce","nepenthes"].includes(id), why:"È per le piante ricadenti: questa cresce dritta, o è troppo pesante per stare appesa." },
-  balconiera:{ name:"Balconiera di legno", cost:120, show:"geranio", effect:"Solo estetico.",
-    desc:"Cassetta lunga di legno, da ringhiera: tanto spazio per radici di fiori e aromatiche.",
+  balconiera:{ name:"Balconiera di legno", cost:120, show:"geranio", effect:"Solo estetico.", tag:"Solo bellezza",
+    desc:"Cassetta da ringhiera per fiori e aromatiche. Le radici si allargano.",
     fits: id => ["geranio","petunia","basilico","menta","salvia","lavanda","rosmarino"].includes(id), why:"È da balcone, per fiori e aromatiche: questa sta meglio in un vaso suo." },
-  terracotta:{ name:"Vaso di terracotta", cost:150, show:"lavanda", effect:"Asciuga prima: la terra resta bagnata meno a lungo e un’annaffiatura di troppo fa meno danni. In cambio, ha sete un po’ prima.",
-    desc:"La terracotta è porosa: l’acqua in più evapora attraverso le pareti. Il vaso di chi teme i piedi bagnati.",
+  terracotta:{ name:"Vaso di terracotta", cost:150, show:"lavanda", effect:"Asciuga prima: la terra resta bagnata meno a lungo e un’annaffiatura di troppo fa meno danni. In cambio, ha sete un po’ prima.", tag:"Asciuga prima",
+    desc:"Porosa: l’acqua in più esce dalle pareti. Perdona chi annaffia troppo.",
     fits: id => ["olivo","rosmarino","lavanda","ficodindia","salvia","limone","kumquat","sansevieria","zamioculcas","geranio","bouganville","echeveria","haworthia","mammillaria","lithops"].includes(id),
     why:"Asciuga in fretta: per una pianta che vuole la terra sempre umida è un piccolo deserto." },
-  autoirrigante:{ name:"Vaso autoirrigante", cost:180, show:"basilico", effect:"Riserva d’acqua sul fondo: la pianta resta senza sete molto più a lungo.",
-    desc:"Ha una riserva d’acqua sotto la terra e un indicatore del livello. La pianta beve quando le serve.",
+  autoirrigante:{ name:"Vaso autoirrigante", cost:180, show:"basilico", effect:"Riserva d’acqua sul fondo: la pianta resta senza sete molto più a lungo.", tag:"Acqua di scorta",
+    desc:"Riserva d’acqua sotto la terra: la pianta beve da sola. Per chi dimentica.",
     fits: id => ["basilico","menta","felce","spatifillo","ortensia","calathea","maranta","fittonia","petunia"].includes(id),
     why:"Tiene la terra sempre umida: per una pianta che teme i ristagni è una condanna." }
 };
@@ -1811,7 +1820,7 @@ function renderPath(){
       const ring = (current || partial) ? stepperRing(pr, n) : "";
       return `<div class="nodewrap" style="transform:translateX(${offsets[k % offsets.length]}px)">
         <button class="node ${cls}" data-step="${i}" aria-label="${esc(s.title)}${done ? ", completato" : locked ? ", bloccato" : `, lezione ${pr + 1} di ${n}`}" ${locked ? "aria-disabled=\"true\"" : ""}>${ring}${current ? `<span class="bubble">${partial ? "Continua" : S.done.length ? "Avanti" : "Inizia da qui"}</span>` : ""}${ico}</button>
-        <div class="nodelabel">${esc(s.title)}${partial ? `<small>${pr}/${n}</small>` : ""}</div></div>`;
+        <div class="nodelabel">${esc(s.title)}</div></div>`;
     }).join("");
     return `<section class="zsec" style="--z:${z.color};--zs:${z.shade}">
       <div class="zhead"><div class="zone ${open ? "" : "locked"}"><div><small>Zona ${zi + 1}</small><h2>${z.title}</h2><p>${open ? z.desc : `Si apre finendo ${ZONES[zi - 1].title}.`}</p></div></div></div>
@@ -1986,8 +1995,8 @@ function slotCard(g, i){
   const action = g.dead
     ? `<button class="btn small" data-replant="${i}" ${S.gocce < RULES.replantCost ? "disabled" : ""}>Ripianta il seme ${RULES.replantCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`
     : `<div class="acts"><button class="btn small ghost" data-feel="${i}">Dito nella terra</button><button class="btn small water" data-water="${i}" ${S.gocce < RULES.waterCost ? "disabled" : ""}>Annaffia ${RULES.waterCost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button></div>`;
-  const growing = !g.dead && g.growAt, day = growing ? Math.min(growDays(g), Math.floor(growFrac(g) * growDays(g)) + 1) : 0;
-  const grow = growing ? `<div class="grow"><b>${stageLabel(g)}</b>: giorno ${day} di ${growDays(g)}<div class="bar"><i style="width:${Math.round(growFrac(g) * 100)}%"></i></div></div>` : "";
+  const growing = !g.dead && g.growAt;
+  const grow = growing ? `<span class="tag study">${stageLabel(g)}</span>` : "";
   return `<div class="slot plant${em ? " alarm" : ""}">
     <div class="sart">${plantSVG(g.plant, 96, st, g.dead ? "adulta" : stageOf(g), g.pot)}${!g.dead && !potBlock(g.plant) ? `<button class="potbtn" data-pot="${i}">Cambia vaso</button>` : ""}<button class="potbtn gift" data-gift="${i}">${g.dead ? "Libera il posto" : "Regala"}</button></div>
     <div class="sinfo">
@@ -2034,21 +2043,17 @@ function renderNegozio(){
   const cards = Object.entries(POT_SHOP).map(([mo, P]) => {
     const owned = S.pots.includes(mo);
     const ok = Object.keys(PLANTS).filter(id => potFits(mo, id)), known = ok.filter(id => S.discovered.includes(id));
-    const names = known.length ? known.map(id => PLANTS[id].name).join(", ") + (ok.length > known.length ? ` e altre ${ok.length - known.length} da scoprire` : "") : `${ok.length} piante, da scoprire nel percorso`;
-    return `<div class="shopcard${owned ? " owned" : ""}"><div class="sart">${plantSVG(P.show, 96, "sana", "adulta", mo)}</div><div class="t"><h3>${P.name}</h3><p>${P.desc}</p>
-      <p class="pnote"><b>Effetto:</b> ${P.effect}</p><p class="pnote"><b>Per:</b> ${names}</p>
-      ${owned ? '<span class="tag planted">Tuo: lo cambi in serra, toccando “Cambia vaso”</span>' : `<button class="btn small sun" style="width:auto" data-buypot="${mo}" ${S.xp < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+    // Solo i nomi delle piante già incontrate (massimo 3), il resto è un numero: niente liste chilometriche
+    const names = known.length ? known.slice(0, 3).map(id => PLANTS[id].name).join(", ") + (ok.length > 3 && known.length ? ` e altre ${ok.length - Math.min(3, known.length)}` : "") : `${ok.length} piante da scoprire`;
+    return `<div class="shopcard${owned ? " owned" : ""}"><div class="sart">${plantSVG(P.show, 96, "sana", "adulta", mo)}</div><div class="t"><h3>${P.name}</h3><span class="tag ptag ${P.tag === "Solo bellezza" ? "study" : "planted"}">${P.tag}</span><p>${P.desc}</p>
+      <p class="pnote">Per: ${names}</p>
+      ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small sun" style="width:auto" data-buypot="${mo}" ${S.xp < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
   }).join("");
-  return `<section class="sec"><h1>Negozio</h1><p class="lead">Vasi nuovi per le piante che hai già. Si comprano una volta sola e valgono per sempre, su tutte le piante adatte. Non tutti i vasi vanno bene per tutte: qui si studia anche questo.</p><div class="shop">${cards}</div></section>`;
+  return `<section class="sec"><h1>Negozio</h1><p class="lead">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
 function renderSerra(){
   const empty = !S.garden.length;
-  // Piante pronte che non hanno un posto libero dove possono stare: lo diciamo chiaro
-  const waiting = Object.keys(PLANTS).filter(id => canPlant(id) && !inGarden(id)
-    && !(fitsIn(id, "casa") && freeSlots("casa") > 0) && !(balconyOpen() && freeSlots("balcone") > 0));
-  const hint = waiting.length
-    ? `<p class="lead" style="color:var(--leaf-dark)">${waiting.length === 1 ? `${PLANTS[waiting[0]].name} è ${gen(waiting[0], "pronto", "pronta")}` : `${waiting.length} piante sono pronte`}, ma non c’è un posto libero adatto. Sblocca un posto con l’esperienza.</p>` : "";
-  return `<section class="sec"><h1>La tua serra</h1><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${hint}${renderArea("casa")}${renderArea("balcone")}</section>
+  return `<section class="sec"><h1>La tua serra</h1><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
     ${testTools()}`;
 }
 let pickArea = "casa";
@@ -2073,7 +2078,17 @@ function modal(html){ const m = document.createElement("div"); m.className = "mo
   const vv = window.visualViewport;
   if (vv) { const fit = () => { if (!m.isConnected) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); return; }
       m.style.top = vv.offsetTop + "px"; m.style.height = vv.height + "px"; };
-    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true">${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); }); return m; }
+    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true"><button class="grab" data-close="1" aria-label="Chiudi"></button>${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
+  // Trascina giù per chiudere: vale solo se il pannello è già in cima, altrimenti scorre normalmente
+  const p = m.querySelector(".panel"); let y0 = null, dy = 0;
+  p.addEventListener("touchstart", e => { y0 = p.scrollTop <= 0 ? e.touches[0].clientY : null; dy = 0; }, { passive: true });
+  p.addEventListener("touchmove", e => { if (y0 === null) return; dy = e.touches[0].clientY - y0;
+    if (dy > 0) { e.preventDefault(); p.classList.add("drag"); p.style.transform = `translateY(${dy}px)`; } else y0 = null; }, { passive: false });
+  p.addEventListener("touchend", () => { if (!p.classList.contains("drag")) { y0 = null; return; } y0 = null; p.classList.remove("drag");
+    if (dy > 90) { m.remove(); return; } p.classList.add("back"); p.style.transform = ""; setTimeout(() => p.classList.remove("back"), 220); });
+  return m; }
+// Finché c'è una finestra aperta, la pagina dietro non scorre
+new MutationObserver(() => document.documentElement.classList.toggle("locked", !!document.querySelector(".modal"))).observe(document.body, { childList: true });
 
 /* --- Erbario --- */
 function renderErbario(){
@@ -2081,7 +2096,7 @@ function renderErbario(){
     if (!known) return `<div class="krow unknown"><div class="sil">${plantSVG(id, 46)}</div><div class="t"><b>Pianta misteriosa</b><span style="font-size:13px;color:var(--ink-2)">La scopri andando avanti nel percorso.</span></div></div>`;
     const tl = titleOf(id);
     return `<button class="krow" data-card="${id}">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b>${tl ? `<small class="xtitle">${tl}</small>` : ""}<div class="bar ${full ? "full" : ""}"><i style="width:${k / RULES.knowledgeMax * 100}%"></i></div></div>${inGarden(id) ? '<span class="tag planted">In serra</span>' : full && !gateOk(id) ? '<span class="tag study">Rara</span>' : full ? '<span class="tag ready">Pronta</span>' : `<span class="tag study">${k}/${RULES.knowledgeMax}</span>`}</button>`; }).join("");
-  return `<section class="sec"><h1>Erbario</h1><p class="lead">Tutto quello che sai sulle piante che hai incontrato. (Per ora è poco.) La barra si riempie rispondendo bene alle domande su di loro.</p><div class="herb">${rows}</div></section>`;
+  return `<section class="sec"><h1>Erbario</h1><p class="lead">Quello che sai delle piante incontrate. Rispondi bene e la barra cresce.</p><div class="herb">${rows}</div></section>`;
 }
 function openCard(id){
   const p = PLANTS[id], k = kOf(id); let m;
@@ -2114,7 +2129,7 @@ function startPlantPractice(id){
    ========================================================= */
 app.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
-  if (t.dataset.tab) { tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.tab) { if (tab === t.dataset.tab) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
   if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } openNode(+t.dataset.step); return; }
   if (t.dataset.water !== undefined) {
     const g = S.garden[+t.dataset.water]; if (S.gocce < RULES.waterCost) return toast("Zero gocce. Fai una lezione e torna (la pianta aspetta) (non a lungo).");
@@ -2186,15 +2201,21 @@ function openEmergency(g){
   });
 }
 function openPotPicker(i){
-  const g = S.garden[i], models = [null, ...Object.keys(POT_SHOP)];
+  const g = S.garden[i], models = [null, ...Object.keys(POT_SHOP).filter(mo => S.pots.includes(mo))];
   const rows = models.map(mo => {
-    const name = mo ? POT_SHOP[mo].name : "Vaso di base", using = (g.pot || null) === mo, owned = !mo || S.pots.includes(mo), fits = !mo || potFits(mo, g.plant);
-    const right = using ? '<span class="tag planted">In uso</span>' : !owned ? `<span class="tag study">Nel negozio: ${POT_SHOP[mo].cost}</span>` : fits ? `<button class="btn small" style="width:auto" data-usepot="${mo || ""}">Usa</button>` : "";
-    const note = mo && owned && !fits && !using ? `<span class="pnote">${POT_SHOP[mo].why}</span>` : mo ? `<span class="pnote">${POT_SHOP[mo].effect}</span>` : '<span class="pnote">Plastica con il foro. Non sbaglia mai.</span>';
-    return `<div class="krow${owned && !fits && !using ? " unknown" : ""}">${plantSVG(g.plant, 54, "sana", "adulta", mo)}<div class="t"><b>${name}</b>${note}</div>${right}</div>`;
+    const name = mo ? POT_SHOP[mo].name : "Vaso di base", using = (g.pot || null) === mo, fits = !mo || potFits(mo, g.plant);
+    const right = using ? '<span class="tag planted">In uso</span>' : fits ? `<button class="btn small" style="width:auto" data-usepot="${mo || ""}">Usa</button>` : "";
+    const note = !mo ? "Plastica col foro. Non sbaglia mai." : !fits && !using ? POT_SHOP[mo].why : POT_SHOP[mo].tag + ".";
+    return `<div class="krow${!fits && !using ? " unknown" : ""}">${plantSVG(g.plant, 54, "sana", "adulta", mo)}<div class="t"><b>${name}</b><span class="pnote">${note}</span></div>${right}</div>`;
   }).join("");
-  const m = modal(`<h2>Che vaso le diamo?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">${esc(nameOf(g))}. Il vaso giusto dipende dalla pianta, non dal divano.</p><div class="pick">${rows}</div><button class="btn ghost" data-close="1">Chiudi</button>`);
+  // Nessun vaso comprato: al posto della lista, un invito al negozio
+  const none = models.length === 1;
+  const body = none
+    ? `<div class="potempty">${plantSVG(g.plant, 72, "sana", "adulta")}<p><b>Per ora c’è solo il vaso di base.</b> Nel negozio ce ne sono altri: alcuni sono solo belli, altri cambiano davvero come beve la pianta.</p><button class="btn sun" data-gotab="negozio">Vai al Negozio</button></div>`
+    : `<div class="pick">${rows}</div>`;
+  const m = modal(`<h2>Che vaso le diamo?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">${esc(nameOf(g))}. Il vaso giusto dipende dalla pianta, non dal divano.</p>${body}<button class="btn ghost" data-close="1">Chiudi</button>`);
   m.querySelectorAll("[data-usepot]").forEach(b => b.onclick = () => { g.pot = b.dataset.usepot || null; m.remove(); render(); toast(g.pot ? `${nameOf(g)} ha un vaso nuovo: ${POT_SHOP[g.pot].name.toLowerCase()}.` : `${nameOf(g)} torna nel vaso di base.`); });
+  m.querySelector("[data-gotab]")?.addEventListener("click", () => { m.remove(); tab = "negozio"; render(); window.scrollTo(0, 0); });
 }
 function openNick(g){
   const m = modal(`<form id="nickForm"><h2>Come ${gen(g.plant, "lo", "la")} chiami?</h2><p style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Un soprannome per ${gen(g.plant, "il tuo", "la tua")} ${PLANTS[g.plant].name}. Dare un nome crea un legame. E un senso di colpa: se muore, il soprannome se ne va con lei.</p>
