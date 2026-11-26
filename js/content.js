@@ -3,7 +3,7 @@
    Dati: piante, step, regole
    ========================================================= */
 const DAY = 86400000;
-const RULES = { waterCost:5, replantCost:10, stepGocce:10, stepXp:20, perfectBonusGocce:4, perfectBonusXp:5, replayGocce:6, replayXp:8, knowledgeMax:3, slotCosts:{ casa:[0,30,50,80,150,220], balcone:[60,60,90,90,170,240] } };
+const RULES = { waterCost:10, replantCost:20, stepGocce:10, stepXp:20, perfectBonusGocce:4, perfectBonusXp:5, replayGocce:6, replayXp:8, knowledgeMax:3, slotCosts:{ casa:[0,30,50,80,150,220], balcone:[60,60,90,90,170,240] } };
 const PLANTS = {
   basilico:{ name:"Basilico", g:"m", indoor:true, sci:"Ocimum basilicum, in abruzzese vasanicola", cost:0,
     care:{ soak:1, thirsty:2, wilt:4, dead:7, rot:3, rule:"Ogni 1-2 giorni: in vaso beve tanto",

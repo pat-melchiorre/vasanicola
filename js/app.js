@@ -493,7 +493,7 @@ const TIERS = [
   { n:100, k:"secchio",      name:"il secchio",      g:120, x:200, msg:"Cento giorni: un secchio pieno. Le piante del quartiere parlano di te." },
   { n:365, k:"vasca",        name:"la vasca",        g:300, x:500, msg:"Un anno. Hai riempito una vasca da bagno. Vasanicola si è commosso, ma non lo ammetterà mai." }
 ];
-const LID = { cost:30, max:2 };
+const LID = { cost:100, max:2 };
 // A che punto sei: recipiente da riempire, livello (0-1), quanto manca. Dopo un anno si ricomincia con un'altra vasca.
 function tierOf(n){
   const last = TIERS[TIERS.length - 1];
