@@ -204,7 +204,7 @@ function render(){
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
   app.innerHTML = topbar() + `<main>${body}</main>` + tabbar();
   streakNotice();
-  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", bar.offsetHeight + "px");
+  const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", (bar.offsetHeight + 12) + "px");   // +12: la barra galleggia, con un po' d'aria sopra e sotto
 }
 
 /* --- Bentornato: si vede una volta a ogni apertura, dopo l’onboarding --- */
@@ -547,12 +547,10 @@ function levelCheers(ups){
 let lvToast = "";
 function openLevel(){
   const { n, L, from, to } = levelInfo(S.xp), nx = levelReward(n + 1), nxName = levelInfo(to).L.name;
-  modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">${lvTxt(n)}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
+  modal(`<div style="text-align:center"><div class="lvhero">${levelBadge(n, 132)}</div><div class="kind" style="margin-top:8px">${lvTxt(n)}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
     <div class="bar lvbar"><i style="width:${Math.round((S.xp - from) / (to - from) * 100)}%"></i></div>
     <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p></div>
-    <div class="kind" style="margin:20px 0 10px">Distintivi</div>
-    <div class="badges-grid">${LEVELS.map((l, k) => `<div class="lvb${k + 1 <= n ? "" : " off"}" aria-label="Livello ${k + 1}, ${esc(l.name)}${k + 1 <= n ? "" : ", da sbloccare"}">${levelBadge(k + 1, k + 1 <= n, k + 1 === n)}<span>${k + 1 <= n ? esc(l.name) : "???"}</span></div>`).join("")}</div>
-    <button class="btn" data-close="1" style="margin-top:20px">Ok</button>`);
+    <button class="btn" data-close="1">Ok</button>`);
 }
 /* =========================================================
    Giorni di fila: il fagiolo nel cotone. Cresce a ogni giorno con almeno un quiz finito.
@@ -632,7 +630,7 @@ function openStreak(){
     <h2>${n} ${n === 1 ? "giorno" : "giorni"} di fila</h2><div class="kind" style="margin-top:2px">${n ? cur.name : "Ancora da piantare"}</div>
     <p style="color:var(--ink-2);margin:8px 0 14px">${status}</p></div>
     ${weekRow()}
-    ${nx ? `<div class="bgrow" aria-label="Crescita verso ${nx.name.toLowerCase()}">${beanSVG(beanStage(n), 30)}<div class="bar"><i style="width:${pct}%"></i></div>${beanSVG(beanStage(nx.n), 30)}</div>` : ""}
+    <p class="brecord">Record: <b>${Math.max(st.best || 0, n)} ${Math.max(st.best || 0, n) === 1 ? "giorno" : "giorni"} di fila</b></p>
     <div class="bspray">${sprayerSVG(44)}<p><b>Spruzzini: ${st.lids} su ${SPRAY.max}</b>Salvano un giorno saltato. Nel Negozio.</p></div>
     <button class="btn" data-close="1">Ok</button>`);
 }
@@ -794,10 +792,14 @@ function modal(html){ const m = document.createElement("div"); m.className = "mo
   const vv = window.visualViewport;
   if (vv) { const fit = () => { if (!m.isConnected) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); return; }
       m.style.top = vv.offsetTop + "px"; m.style.height = vv.height + "px"; };
-    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true"><button class="grab" data-close="1" aria-label="Chiudi"></button>${html}</div>`; document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
+    vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); requestAnimationFrame(fit); } m.innerHTML = `<div class="panel" role="dialog" aria-modal="true"><button class="grab" data-close="1" aria-label="Chiudi"></button><div class="mbody">${html}</div><div class="mfoot"></div></div>`;
+  // Regola: i bottoni finali (le CTA) stanno sempre visibili in fondo, fuori dalla parte che scorre
+  const body = m.querySelector(".mbody"), foot = m.querySelector(".mfoot"), isCta = el => el.matches?.("button.btn") || (el.children?.length && [...el.children].every(c => c.matches("button.btn")));
+  const ctas = []; for (let el = body.lastElementChild; el && isCta(el); el = el.previousElementSibling) ctas.unshift(el);
+  ctas.forEach(el => foot.appendChild(el)); if (!ctas.length) foot.remove(); document.body.appendChild(m); m.addEventListener("click", e => { if (e.target === m || e.target.closest("[data-close]")) m.remove(); });
   // Trascina giù per chiudere: vale solo se il pannello è già in cima, altrimenti scorre normalmente
   const p = m.querySelector(".panel"); let y0 = null, x0 = 0, dy = 0;
-  p.addEventListener("touchstart", e => { y0 = p.scrollTop <= 0 && !e.target.closest(".fcar") ? e.touches[0].clientY : null; x0 = e.touches[0].clientX; dy = 0; }, { passive: true });
+  p.addEventListener("touchstart", e => { y0 = (p.querySelector(".mbody")?.scrollTop || 0) <= 0 && !e.target.closest(".fcar") ? e.touches[0].clientY : null; x0 = e.touches[0].clientX; dy = 0; }, { passive: true });
   p.addEventListener("touchmove", e => { if (y0 === null) return; dy = e.touches[0].clientY - y0;
     if (!p.classList.contains("drag") && Math.abs(e.touches[0].clientX - x0) > Math.abs(dy)) { y0 = null; return; }
     if (dy > 0) { e.preventDefault(); p.classList.add("drag"); p.style.transform = `translateY(${dy}px)`; } else y0 = null; }, { passive: false });

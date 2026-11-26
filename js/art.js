@@ -310,32 +310,33 @@ const ILL = {
   sun:`<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#FFAA1D">${[0,45,90,135,180,225,270,315].map(r => `<rect x="14" y="1" width="4" height="7" rx="2" transform="rotate(${r} 16 16)"/>`).join("")}</g><circle cx="16" cy="16" r="9" fill="#FFD43B"/><path d="M7.2 17.6a9 9 0 0 0 17.6 0 9 9 0 0 1-17.6 0z" fill="#F5B400"/><ellipse cx="12.6" cy="12.8" rx="2.6" ry="1.6" transform="rotate(-35 12.6 12.8)" fill="#fff" opacity=".7"/></svg>`
 };
 
-/* ---- Icone illustrate "piccole" e delle caselle ----
-   ILLUSTRATE_SMALL = false rimette le icone semplici di prima ovunque (un solo interruttore, per tornare indietro). */
-const ILLUSTRATE_SMALL = true;
-// Caselle del percorso: bianche con volume (ombra sotto e riflesso), da appoggiare sul cerchio colorato
-const sh = d => `<path d="${d}" fill="#000" opacity=".16" transform="translate(0 1.6)"/><path d="${d}" fill="#fff"/>`;
-const NODE_ILL = {
-  check:`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 16.5l6 6L25 10" stroke="#000" stroke-opacity=".16" stroke-width="5.4" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 1.6)"/><path d="M7 16.5l6 6L25 10" stroke="#fff" stroke-width="5.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  star:`<svg viewBox="0 0 32 32" aria-hidden="true">${sh("M16 3.5l3.8 7.8 8.6 1.2-6.2 6 1.5 8.5L16 23l-7.7 4 1.5-8.5-6.2-6 8.6-1.2z")}<path d="M16 3.5l3.8 7.8 8.6 1.2-6.2 6L16 16z" fill="#000" opacity=".08"/><ellipse cx="12.6" cy="13" rx="2.2" ry="1.2" transform="rotate(-30 12.6 13)" fill="#FFE27A"/></svg>`,
-  leaf:`<svg viewBox="0 0 32 32" aria-hidden="true">${sh("M27 4C14 4 6 10 6 19c0 2.6.8 4.8 1.8 6.2C10 18 15 13 21.5 10.4 15.8 13.8 11.6 19 9.8 26.6c1.2.6 2.6.9 4 .9C23 27.5 27 18 27 4z")}<path d="M24 7.5c-2 1-4 2.2-5.4 3.4" stroke="#BFEAC6" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  pot:`<svg viewBox="0 0 32 32" aria-hidden="true">${sh("M5 13h22v4H5zM7 17.5h18l-2.2 10.5H9.2z")}${sh("M16 13V8.5c0-3 2.4-4.5 5.4-4.5-.3 3-2.4 4.5-5.4 4.5zM16 10c0-2.4-2-3.8-4.6-3.8.3 2.4 2 3.8 4.6 3.8z")}<rect x="5" y="15.4" width="22" height="1.6" fill="#000" opacity=".08"/></svg>`,
-  drop:`<svg viewBox="0 0 32 32" aria-hidden="true">${sh("M16 3c5 6 9 10.6 9 15.4a9 9 0 0 1-18 0C7 13.6 11 9 16 3z")}<ellipse cx="12" cy="18" rx="2" ry="3.6" transform="rotate(18 12 18)" fill="#CBE9FF"/></svg>`,
-  sun:`<svg viewBox="0 0 32 32" aria-hidden="true">${sh([0,45,90,135,180,225,270,315].map(r => { const a = r * Math.PI / 180, x = 16 + Math.sin(a) * 11.5, y = 16 - Math.cos(a) * 11.5; return `M${(x - 1.8).toFixed(1)} ${(y).toFixed(1)}a1.8 1.8 0 1 0 3.6 0a1.8 1.8 0 1 0-3.6 0`; }).join("") + "M9 16a7 7 0 1 0 14 0a7 7 0 1 0-14 0")}<ellipse cx="13.4" cy="13.4" rx="2" ry="1.2" transform="rotate(-35 13.4 13.4)" fill="#FFE27A"/></svg>`,
-  lock:`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10.5 14v-3.5a5.5 5.5 0 0 1 11 0V14" stroke="#9BA39A" stroke-width="3.4" fill="none"/><rect x="7" y="13.5" width="18" height="14" rx="3.5" fill="#9BA39A"/><rect x="7" y="22" width="18" height="5.5" rx="2.5" fill="#868E85"/><circle cx="16" cy="19.5" r="2.2" fill="#6F776E"/></svg>`
+/* ---- Icone piccole e delle caselle: semplici, al massimo duotone ----
+   Due toni dello stesso colore (currentColor): la parte principale piena, quella secondaria al 40%.
+   Così seguono il colore del contesto (bianco sulle caselle, rosso sul regalo, grigio sui lucchetti). */
+const D2 = (sec, pri) => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g opacity=".4">${sec}</g>${pri}</svg>`;
+const DUO = {
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  star:D2('<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/>', '<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4z"/>'),
+  leaf:D2('<path d="M20 3C10 3 4 8 4 15c0 2 .6 3.6 1.4 4.6C7 14 11 10 16 8c-4.4 2.6-7.6 6.5-9 12.3.9.5 2 .7 3 .7 7 0 10-7 10-18z"/>', '<path d="M5.4 19.6C7 14 11 10 16 8c-4.4 2.6-7.6 6.5-9 12.3-.6-.2-1.1-.4-1.6-.7z"/>'),
+  pot:D2('<path d="M5.5 13h13l-1.6 8H7.1z"/>', '<path d="M4 9h16v3H4zM12 9V5c0-2 2-3 4-3-.2 2-1.8 3-4 3zM12 6c0-1.6-1.6-2.6-3.4-2.6.2 1.6 1.6 2.6 3.4 2.6z"/>'),
+  drop:D2('<path d="M12 2.5c3.6 4.5 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10.5 8.4 7 12 2.5z"/>', '<path d="M5.6 15a6.5 6.5 0 0 0 12.8 0c-.8 2.6-3.4 4.4-6.4 4.4S6.4 17.6 5.6 15z"/>'),
+  sun:D2('<path d="M11 1.5h2v4h-2zM11 18.5h2v4h-2zM1.5 11h4v2h-4zM18.5 11h4v2h-4zM4.2 5.6l1.4-1.4 2.8 2.8L7 8.4zM16.4 17.6l1.4-1.4 2.8 2.8-1.4 1.4zM4.2 18.4l2.8-2.8 1.4 1.4-2.8 2.8zM16.4 6.4l2.8-2.8 1.4 1.4-2.8 2.8z"/>', '<circle cx="12" cy="12" r="5"/>'),
+  lock:D2('<path d="M5 10h14v11H5z"/>', '<path d="M7 10V8a5 5 0 0 1 10 0v2h-2V8a3 3 0 0 0-6 0v2zM10.5 14.5a1.5 1.5 0 1 1 2 1.4V18h-1v-2.1a1.5 1.5 0 0 1-1-1.4z"/>'),
+  pencil:D2('<path d="M4 20l1-4L16 5l3 3L8 19z"/>', '<path d="M14.5 6.5L16 5l3 3-1.5 1.5zM4 20l1-4 3 3z"/>'),
+  gift:D2('<path d="M4 11h16v10H4z"/>', '<path d="M3 8h18v3.5H3zM10.7 8h2.6v13h-2.6zM12 8C10.6 4.8 6.6 4 6.6 6.6 6.6 8 9 8 12 8zM12 8c1.4-3.2 5.4-4 5.4-1.4C17.4 8 15 8 12 8z"/>'),
+  trash:D2('<path d="M6 8h12l-1 13H7z"/>', '<path d="M4 5h16v2.6H4zM9.5 3h5v2h-5zM9.5 11h1.6v7H9.5zM12.9 11h1.6v7h-1.6z"/>'),
+  alert:D2('<path d="M10.3 3.6a2 2 0 0 1 3.4 0l8 13.8a2 2 0 0 1-1.7 3H4a2 2 0 0 1-1.7-3z"/>', '<path d="M10.8 8.5h2.4v5.5h-2.4zM12 15.4a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8z"/>')
 };
-// Icone piccole dell'interfaccia, colorate
-const SMALL_ILL = {
-  pencil:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5l1-4.5L16 4.5l3.5 3.5L9 18.5z" fill="#FFC83D"/><path d="M16 4.5l3.5 3.5-2 2L14 6.5z" fill="#F7849A"/><path d="M5.5 15l3.5 3.5-4.5 1z" fill="#F3D9B1"/><path d="M4.5 19.5l1.4-.3-1.1-1.1z" fill="#3B3B3B"/><path d="M7 15.8l8.6-8.6" stroke="#E0A51F" stroke-width="1.4"/></svg>`,
-  gift:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="1.6" fill="#FF5A5F"/><rect x="3" y="8" width="18" height="4" rx="1.4" fill="#FF7A7E"/><rect x="10.6" y="8" width="2.8" height="13" fill="#FFC83D"/><path d="M12 8c-1.4-3.2-5.4-4-5.4-1.4C6.6 8 9 8 12 8zM12 8c1.4-3.2 5.4-4 5.4-1.4C17.4 8 15 8 12 8z" fill="#FFC83D"/><rect x="4" y="18" width="16" height="3" rx="1.2" fill="#E4454A"/></svg>`,
-  trash:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12.5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 20.5z" fill="#A9B2BC"/><path d="M6 8h12l-.2 2.6H6.2z" fill="#8F99A4"/><rect x="4" y="5" width="16" height="3.2" rx="1.4" fill="#C4CCD4"/><rect x="9.5" y="3" width="5" height="2.6" rx="1" fill="#C4CCD4"/><path d="M10 12v6.5M14 12v6.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/></svg>`,
-  lock:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="#B9C2B6" stroke-width="2.6" fill="none"/><rect x="5" y="10.5" width="14" height="11" rx="2.6" fill="#FFC83D"/><rect x="5" y="17" width="14" height="4.5" rx="2" fill="#E8A91F"/><circle cx="12" cy="15.2" r="1.7" fill="#9A6A12"/><rect x="7" y="12" width="5" height="1.4" rx=".7" fill="#fff" opacity=".55"/></svg>`,
-  alert:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.6a2 2 0 0 1 3.4 0l8 13.8a2 2 0 0 1-1.7 3H4a2 2 0 0 1-1.7-3z" fill="#FF9F2E"/><path d="M2.3 17.4h19.4a2 2 0 0 1-1.7 3H4a2 2 0 0 1-1.7-3z" fill="#E8851A"/><path d="M12 8.5v5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.4" fill="#fff"/></svg>`
-};
-const IC = name => ILLUSTRATE_SMALL && SMALL_ILL[name] ? SMALL_ILL[name] : ICON[name];
-const NODE_IC = name => ILLUSTRATE_SMALL && NODE_ILL[name] ? NODE_ILL[name] : ICON[name];
-// Distintivo di livello: il sole dentro una medaglia, colore per fascia (bronzo, argento, oro, viola)
-function levelBadge(n, got, cur){
-  const t = n <= 5 ? ["#F0B27A", "#C8763A"] : n <= 10 ? ["#C9D3DE", "#8D9BAA"] : n <= 15 ? ["#FFD66B", "#D9A21B"] : ["#B79BFF", "#7B5BE0"];
-  return `<svg viewBox="0 0 64 70" aria-hidden="true" class="lvbadge${got ? "" : " off"}${cur ? " cur" : ""}"><path d="M20 50l-6 18 9-4 5 6 4-16zM44 50l6 18-9-4-5 6-4-16z" fill="${t[1]}"/><circle cx="32" cy="32" r="27" fill="${t[1]}"/><circle cx="32" cy="30" r="27" fill="${t[0]}"/><circle cx="32" cy="30" r="20" fill="#fff" opacity=".55"/><g transform="translate(17 15) scale(.94)">${ILL.sun.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "")}</g><rect x="22" y="47" width="20" height="13" rx="6.5" fill="${t[1]}"/><text x="32" y="57.3" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="11" fill="#fff">${n}</text></svg>`;
+const IC = name => DUO[name] || ICON[name];
+const NODE_IC = name => DUO[name] || ICON[name];
+// Distintivo di livello: triangolo, rombo, pentagono... un lato in più ogni due livelli, finché diventa un cerchio con i raggi: il sole
+function badgeSides(n){ return n >= 15 ? 0 : 3 + Math.floor((n - 1) / 2); }   // 1-2: 3 lati, 3-4: 4 (rombo), ... 13-14: 9, dal 15: cerchio
+function levelBadge(n, size = 120){
+  const s = badgeSides(n), poly = (r, cy) => Array.from({ length:s }, (_, k) => { const a = -Math.PI / 2 + k * 2 * Math.PI / s; return `${(60 + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`; }).join(" ");
+  const shape = (r, cy, fill) => s ? `<polygon points="${poly(r, cy)}" fill="${fill}" stroke="${fill}" stroke-width="10" stroke-linejoin="round"/>` : `<circle cx="60" cy="${cy}" r="${r}" fill="${fill}"/>`;
+  const R = s === 3 ? 50 : 44, cy = s === 3 ? 66 : 60;   // il triangolo è più "basso": lo alzo e lo allargo un po'
+  const rays = s ? "" : `<g fill="#FFAA1D">${[0,30,60,90,120,150,180,210,240,270,300,330].map(r => `<rect x="56" y="4" width="8" height="16" rx="4" transform="rotate(${r} 60 60)"/>`).join("")}</g>`;
+  return `<svg class="lvbadge" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true">${rays}${shape(s ? R : 40, cy + 4, "#E39A14")}${shape(s ? R : 40, cy, "#FFC83D")}${shape(s ? R - 12 : 30, cy, "#FFD96B")}
+  <ellipse cx="${s ? 46 : 46}" cy="${cy - (s === 3 ? 8 : 16)}" rx="7" ry="4" transform="rotate(-35 46 ${cy - 12})" fill="#fff" opacity=".6"/>
+  <text x="60" y="${cy + 11}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="${n > 9 ? 30 : 34}" fill="#9A5B00">${n}</text></svg>`;
 }
