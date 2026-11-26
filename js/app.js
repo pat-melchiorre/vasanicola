@@ -188,12 +188,12 @@ function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
   return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div>
     <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
-    <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ICON.drop}${S.gocce}</div>
-    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ICON.sun}${lv}</button></header>`;
+    <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div>
+    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></header>`;
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
-  return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}${t("negozio","Negozio",ICON.shop)}</nav>`;
+  return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ILL.path)}${t("serra","Serra",ILL.serra, thirstyCount() > 0)}${t("erbario","Erbario",ILL.book)}${t("negozio","Negozio",ILL.shop)}</nav>`;
 }
 function render(){
   settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); settleStreak(); levelCheers(settleLevel()); save();
@@ -638,7 +638,7 @@ function openStreak(){
     <button class="btn" data-close="1">Ok</button>`);
 }
 // Riquadro delle gocce guadagnate: goccia grande, totale e da dove arrivano
-const dropBox = (g, parts) => `<div class="dropbox"><div class="dbicon">${ICON.drop}</div><div class="dbt"><b>+${g}</b><span>Gocce</span></div>
+const dropBox = (g, parts) => `<div class="dropbox"><div class="dbicon">${ILL.drop}</div><div class="dbt"><b>+${g}</b><span>Gocce</span></div>
   <ul class="dbparts">${parts.map(([t, v]) => `<li><span>${t}</span><b>+${v}</b></li>`).join("")}</ul></div>`;
 // Fine lezione: il numero delle gocce conta da 0, e con zero errori piovono foglie
 function celebrate(leaves){

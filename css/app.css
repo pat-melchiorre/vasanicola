@@ -462,3 +462,8 @@ i.lvsun{font-style:normal;color:inherit}
   @keyframes hello{20%{transform:rotate(-8deg)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}}
 }
 .zhead .zone{cursor:pointer}
+/* ---- Icone illustrate ---- */
+.tabs button svg{width:34px;height:34px}
+.tabs button:not([aria-current="page"]) svg{filter:saturate(.85)}
+.pill.water svg,.pill.sun svg{width:22px;height:22px}
+.dbicon svg{width:52px;height:52px}
