@@ -515,3 +515,4 @@ main.notop{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
 .xrow b{font-size:16px}.xrow .xnote{margin-top:4px}
 .xbadge{flex:none}
 .top{top:env(safe-area-inset-top,0px)}
+.corner{z-index:2}
