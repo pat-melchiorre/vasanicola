@@ -136,6 +136,11 @@ main{flex:1;padding:0 0 96px}
 .card{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:18px;font-size:17px;line-height:1.5;font-weight:700}
 .card .art{display:grid;place-items:center;margin:-6px 0 8px}
 .opts{display:flex;flex-direction:column;gap:10px}
+.ordans{list-style:none;margin:0 0 14px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:64px;border:2px dashed var(--line);border-radius:18px}
+.ordans:empty::before{content:"Tocca i passaggi qui sotto, nell’ordine giusto";color:var(--ink-2);font-size:14px;padding:8px}
+.ordans .opt{width:100%;display:flex;gap:10px;align-items:center;font-size:15px;padding:10px 12px}
+.ordans .opt b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-size:13px}
+.ordpool .opt{font-size:15px}
 .opt{text-align:left;padding:14px 16px;border-radius:16px;border:2px solid var(--line);box-shadow:0 4px 0 var(--line);font-size:17px;background:var(--bg);transition:transform .08s}
 .opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .opt[aria-pressed="true"]{border-color:var(--water);background:var(--water-bg);box-shadow:0 4px 0 var(--water)}
@@ -554,9 +559,17 @@ const EXTRA = {};
 const authored = st => [{ title:"Le basi", items: st.items }, ...(EXTRA[st.id] || [])];
 const lessonCount = st => authored(st).length + 1;
 const lessonTitle = (st, li) => li < authored(st).length ? authored(st)[li].title : (st.icon === "star" ? "Ripasso a sorpresa" : "Allenamento");
+// Chiave di una domanda (il testo), per ricordare quelle viste da poco
+const qKey = it => it.q || it.title || "";
+const RECENT_MAX = 80;
+function markSeen(it){ const k = qKey(it); if (!k) return; S.recent = [k, ...(S.recent || []).filter(x => x !== k)].slice(0, RECENT_MAX); }
 function practiceItems(st){
-  const pool = (st.icon === "star" ? STEPS.filter(x => x.zone === st.zone) : [st]).flatMap(x => authored(x).flatMap(l => l.items)).filter(it => it.t !== "card");
-  return shuffle(pool).slice(0, 6);
+  const nodes = st.icon === "star" ? STEPS.filter(x => x.zone === st.zone) : [st];
+  const pool = nodes.flatMap(x => [...authored(x).flatMap(l => l.items), ...(PRACTICE[x.id] || [])]).filter(it => it.t !== "card");
+  // Punteggio: le mai viste (o dimenticate) vincono; tra le altre, più è vecchia più sale.
+  // Un pizzico di caso (fino a 8 posizioni) evita che i giri si ripetano sempre identici.
+  const score = it => { const r = (S.recent || []).indexOf(qKey(it)); return (r < 0 ? RECENT_MAX : r) + Math.random() * 8; };
+  return pool.map(it => [it, score(it)]).sort((x, y) => y[1] - x[1]).slice(0, 6).map(x => x[0]);
 }
 const lessonItems = (st, li) => li < authored(st).length ? authored(st)[li].items : practiceItems(st);
 const progOf = st => S.prog[st.id] || (S.done.includes(st.id) ? lessonCount(st) : 0);
@@ -1208,6 +1221,148 @@ Object.assign(EXTRA, {
   ])}]
 });
 
+// ---------- Domande in più per Allenamento e Ripasso (zone 1-5) ----------
+// Non fanno parte delle lezioni: allargano il mazzo da cui l'Allenamento pesca, così le domande si ripetono meno.
+const PRACTICE = {
+  s1:[
+    { t:"tf", plant:"basilico", q:"Il basilico è una pianta annuale: dopo la fioritura tende a esaurirsi.", a:true, why:"Fa i fiori, poi i semi, poi saluta. Togliere i fiori allunga la festa." },
+    { t:"mc", plant:"basilico", q:"In cima al basilico spuntano i fiori bianchi. Che fai?", o:["Li togli: così continua a fare foglie","Li lasci: più fiori, più foglie","Lo annaffi il doppio"], a:0, why:"Quando fiorisce, il basilico mette le energie nei semi e le foglie diventano meno aromatiche." },
+    { t:"mc", plant:"basilico", q:"Basilico sul davanzale, in piena estate. Quanto beve?", o:["Spesso: la terra deve restare appena umida","Una volta al mese","Mai, vive di aria e di pesto"], a:0, why:"Foglie tenere e radici corte: con il caldo la terra si asciuga in fretta." },
+    { t:"tf", plant:"basilico", q:"Al Nord il basilico può stare fuori anche in pieno inverno.", a:false, why:"Sotto i 10 gradi soffre, con il gelo muore. Al Nord è una pianta da bella stagione." }
+  ],
+  s2:[
+    { t:"mc", plant:"pothos", q:"Il pothos variegato sta perdendo le striature chiare. Cosa gli manca?", o:["Luce","Acqua","Compagnia"], a:0, why:"Le parti chiare non fanno fotosintesi: con poca luce la pianta le riduce per sopravvivere." },
+    { t:"tf", plant:"sansevieria", q:"Se la sposti di colpo dall’angolo buio al sole del pomeriggio, la sansevieria può scottarsi.", a:true, why:"Al sole si abitua, ma per gradi. Il trasloco brusco lascia macchie chiare sulle foglie." },
+    { t:"mc", plant:"zamioculcas", q:"Quale di queste sopporta meglio l’angolo lontano dalla finestra?", o:["Zamioculcas","Basilico","Lavanda"], a:0, why:"La zamioculcas tollera la poca luce. Basilico e lavanda lì farebbero una brutta fine." },
+    { t:"tf", plant:"spatifillo", q:"Al sole diretto lo spatifillo fa foglie più belle e lucide.", a:false, why:"Il sole diretto gli ingiallisce e brucia le foglie: preferisce luce filtrata o mezz’ombra." }
+  ],
+  s3:[
+    { t:"mc", q:"Hai annaffiato e l’acqua è finita nel sottovaso. Dopo un quarto d’ora?", o:["Svuoti il sottovaso","La lasci lì, così beve dopo","Ne aggiungi altra"], a:0, why:"L’acqua ferma nel sottovaso tiene le radici a bagno. È così che marciscono." },
+    { t:"tf", plant:"menta", q:"La menta sopporta la terra umida meglio della sansevieria.", a:true, why:"La menta ama il fresco e l’umido. La sansevieria con la terra bagnata marcisce." },
+    { t:"mc", plant:"sansevieria", q:"D’inverno, in casa, ogni quanto annaffi la sansevieria?", o:["Ogni giorno","Circa una volta al mese, a terra asciutta","Ogni due giorni"], a:1, why:"Con poca luce e poco caldo beve pochissimo. L’acqua in più resta nella terra e marcisce la base." },
+    { t:"tf", q:"Meglio annaffiare poco e spesso, bagnando solo la superficie.", a:false, why:"Meglio bagnare bene tutta la terra quando serve, poi aspettare che si asciughi. Lo spruzzino in superficie non arriva alle radici." }
+  ],
+  s4:[
+    { t:"tf", q:"I fori sul fondo del vaso servono a far uscire l’acqua in più.", a:true, why:"Senza foro l’acqua si accumula in basso e le radici restano a mollo. Anche nel vaso più bello." },
+    { t:"mc", plant:"pothos", q:"La talea di pothos in acqua ha fatto radici di qualche centimetro. E adesso?", o:["La pianti nel terriccio e lo tieni umido i primi giorni","La lasci in acqua per sempre, senza cambiarla mai","La metti al sole forte"], a:0, why:"In acqua può vivere a lungo, ma l’acqua va cambiata spesso. Nel terriccio cresce meglio." },
+    { t:"mc", q:"Quando conviene rinvasare, di solito?", o:["In primavera, quando la pianta riparte","In pieno inverno","Il giorno stesso in cui la compri, sempre"], a:0, why:"In primavera le radici ripartono e si sistemano presto nella terra nuova." },
+    { t:"tf", plant:"menta", q:"La menta si moltiplica facilmente dividendo il cespo con le radici.", a:true, why:"Le sue radici striscianti fanno germogli ovunque: dividere un cespo è un attimo." }
+  ],
+  m1:[
+    { t:"tf", plant:"olivo", q:"L’olivo può stare tutto l’anno in casa, lontano dalle finestre.", a:false, why:"Vuole sole pieno e aria: in casa al buio perde le foglie e deperisce." },
+    { t:"mc", plant:"lavanda", q:"Quante ore di sole diretto vuole la lavanda per fiorire bene?", o:["Almeno 6","Una, di passaggio","Nessuna, le basta la lampada"], a:0, why:"È una pianta di sole pieno: con meno luce fiorisce poco e si allunga." },
+    { t:"tf", plant:"limone", q:"Il limone è sempreverde: tiene le foglie anche d’inverno.", a:true, why:"Se le perde d’inverno è un segnale: freddo, buio o acqua sbagliata." },
+    { t:"mc", plant:"salvia", q:"Dove sta meglio la salvia sul balcone?", o:["Al sole","Nell’angolo più buio","Dentro un mobile"], a:0, why:"Come le altre aromatiche mediterranee vuole tanto sole: le foglie restano più aromatiche." }
+  ],
+  m2:[
+    { t:"mc", plant:"rosmarino", q:"Rosmarino in vaso: aghi gialli dal basso e terra sempre bagnata. Cosa succede?", o:["Troppa acqua: le radici soffrono","Troppo poca acqua","Troppo sole"], a:0, why:"Il rosmarino teme i ristagni più della sete. Terra drenante e acqua solo quando è asciutta." },
+    { t:"tf", plant:"ficodindia", q:"D’inverno, all’aperto, il fico d’India va annaffiato regolarmente.", a:false, why:"D’inverno riposa: acqua e freddo insieme lo fanno marcire. Meglio lasciarlo quasi all’asciutto." },
+    { t:"tf", plant:"limone", q:"Il limone soffre l’acqua molto calcarea.", a:true, why:"Il calcare blocca l’assorbimento del ferro e le foglie ingialliscono. Meglio la piovana, quando si può." },
+    { t:"mc", plant:"salvia", q:"Prima di annaffiare la salvia in vaso controlli che...", o:["La terra in superficie sia asciutta","Il sottovaso sia pieno","Sia passata esattamente una settimana"], a:0, why:"Meglio il dito del calendario: con il caldo beve di più, con il fresco molto meno." }
+  ],
+  m3:[
+    { t:"tf", plant:"lavanda", q:"Dopo la fioritura si accorciano gli steli della lavanda, restando sulla parte con le foglie.", a:true, why:"Così resta compatta. Più in basso, sul legno spoglio, spesso non ricaccia." },
+    { t:"mc", plant:"olivo", q:"Perché si sfoltisce la chioma dell’olivo?", o:["Per far entrare luce e aria tra i rami","Per farlo crescere più in fretta in altezza","Perché le foglie sono troppe da annaffiare"], a:0, why:"Luce e aria dentro la chioma vogliono dire meno malattie e più rametti buoni." },
+    { t:"tf", plant:"rosmarino", q:"Tagliare spesso le punte del rosmarino per la cucina lo aiuta a restare folto.", a:true, why:"Tagliare le punte fa spuntare rametti laterali. Più arrosti, più rosmarino." },
+    { t:"mc", plant:"ficodindia", q:"Per maneggiare le pale del fico d’India conviene...", o:["Usare guanti spessi o una pinza","Usare le mani: le spine sono finte","Bagnarle prima"], a:0, why:"Oltre alle spine grandi ha i glochidi: ciuffetti di spine minuscole che si staccano e restano nella pelle." }
+  ],
+  m4:[
+    { t:"tf", plant:"olivo", q:"L’olivo in vaso soffre il gelo più di quello piantato in terra.", a:true, why:"In vaso le radici non sono protette dal terreno: il freddo le raggiunge da tutti i lati." },
+    { t:"mc", plant:"limone", q:"Il limone in casa d’inverno, vicino al termosifone, perde le foglie. Perché?", o:["Aria calda e secca","Troppo freddo","Troppe attenzioni"], a:0, why:"Il caldo secco lo stressa: meglio un posto luminoso e fresco, sopra lo zero." },
+    { t:"tf", plant:"lavanda", q:"D’inverno la lavanda in vaso teme più la terra bagnata del freddo.", a:true, why:"Il freddo lo sopporta bene. Le radici fradice d’inverno, invece, no." },
+    { t:"mc", q:"D’inverno, il sottovaso delle piante mediterranee in balcone...", o:["Meglio toglierlo o tenerlo sempre vuoto","Meglio tenerlo pieno","Va riempito di ghiaccio, per abituarle"], a:0, why:"Con il freddo l’acqua ferma non evapora e le radici restano a bagno per giorni." }
+  ],
+  j1:[
+    { t:"mc", plant:"monstera", q:"Le foglie nuove della monstera escono piccole e senza tagli. Cosa serve, di solito?", o:["Più luce","Più acqua","Meno luce"], a:0, why:"Con poca luce fa foglie piccole e intere. I tagli arrivano con luce buona e pianta adulta." },
+    { t:"tf", plant:"calathea", q:"La calathea sta bene in un punto luminoso, ma senza sole diretto.", a:true, why:"In natura vive sotto gli alberi: il sole diretto sbiadisce e brucia i disegni delle foglie." },
+    { t:"mc", plant:"ficus", q:"Il ficus elastica variegato, rispetto a quello verde scuro, vuole...", o:["Più luce","Meno luce","La stessa, è uguale"], a:0, why:"Le parti chiare fanno meno fotosintesi: per restare colorato gli serve più luce." },
+    { t:"tf", plant:"monstera", q:"La monstera si piega verso la finestra: ruotare il vaso ogni tanto la tiene più dritta.", a:true, why:"Le foglie cercano la luce. Un quarto di giro ogni tanto e cresce in modo più uniforme." }
+  ],
+  j2:[
+    { t:"mc", plant:"calathea", q:"Come alzi davvero l’umidità intorno a una calathea?", o:["Un umidificatore, o un sottovaso con argilla espansa bagnata sotto il vaso","Un bicchiere d’acqua in un’altra stanza","Accendendo il termosifone"], a:0, why:"L’acqua che evapora vicino alla pianta aiuta un po’, l’umidificatore aiuta davvero. Il vaso però non deve toccare l’acqua." },
+    { t:"tf", plant:"felce", q:"La felce sta bene accanto al termosifone.", a:false, why:"Aria calda e secca: le fronde si seccano e perde fogliette ovunque." },
+    { t:"tf", plant:"tillandsia", q:"Dopo il bagno la tillandsia va fatta asciugare bene, a testa in giù.", a:true, why:"Se l’acqua resta al centro, tra le foglie, la base marcisce." },
+    { t:"mc", plant:"calathea", q:"Che acqua preferisce la calathea?", o:["Poco calcarea, a temperatura ambiente","Fredda di frigo","Acqua di mare"], a:0, why:"Calcare e cloro le macchiano le punte delle foglie. Piovana o filtrata è meglio." }
+  ],
+  j3:[
+    { t:"tf", plant:"orchidea", q:"Le radici dell’orchidea sono verdi quando sono bagnate e argentate quando sono asciutte.", a:true, why:"È il velamen, uno strato spugnoso: il colore ti dice quando ha bisogno d’acqua." },
+    { t:"mc", plant:"orchidea", q:"Le radici dell’orchidea sono marroni e molli. Cosa vuol dire?", o:["Sono marce: troppa acqua o substrato vecchio","Stanno benissimo","Hanno freddo"], a:0, why:"Le radici sane sono sode, verdi o argentate. Quelle molli si tagliano e si cambia il substrato." },
+    { t:"tf", plant:"monstera", q:"Le radici aeree della monstera vanno tagliate tutte, sennò la pianta soffre.", a:false, why:"Si possono guidare verso il tutore o nella terra. Tagliarne qualcuna non la uccide, ma non serve." },
+    { t:"mc", plant:"tillandsia", q:"Cosa vuol dire che una pianta è epifita?", o:["Vive appoggiata su altre piante, senza rubare nutrimento","È un parassita","Vive sott’acqua"], a:0, why:"Usa gli alberi come appoggio per stare più vicina alla luce. Non è una parassita." }
+  ],
+  j4:[
+    { t:"mc", plant:"orchidea", q:"Lo stelo dei fiori dell’orchidea è secco e marrone. Che fai?", o:["Lo tagli alla base","Lo annaffi","Lo lasci: rifiorirà da lì"], a:0, why:"Uno stelo secco non rifiorisce più. Se è ancora verde, invece, a volte riparte da un nodo." },
+    { t:"tf", plant:"felce", q:"La felce si moltiplica dividendo il cespo in primavera.", a:true, why:"Ogni pezzo con le sue radici diventa una felce nuova. Con le spore è tutta un’altra storia, molto più lunga." },
+    { t:"tf", plant:"ficus", q:"D’inverno il ficus beve meno che d’estate.", a:true, why:"Con meno luce cresce più piano e beve meno: la terra resta umida più a lungo." },
+    { t:"mc", plant:"tillandsia", q:"Quante volte fiorisce una tillandsia?", o:["Una volta sola, poi fa i figli","Ogni settimana","Mai"], a:0, why:"Dopo la fioritura la madre fa i figli e piano piano declina." }
+  ],
+  f1:[
+    { t:"tf", plant:"petunia", q:"La petunia fiorisce bene anche all’ombra.", a:false, why:"Vuole sole: all’ombra fa fusti lunghi e pochi fiori." },
+    { t:"mc", plant:"bouganville", q:"La bouganville fa tante foglie e pochi fiori. Cosa controlli per primo?", o:["Che prenda abbastanza sole","Che il sottovaso sia sempre pieno","Che stia all’ombra"], a:0, why:"Sole e caldo sono il suo motore. Anche troppa acqua e troppo concime azotato spingono le foglie al posto dei fiori." },
+    { t:"tf", plant:"ortensia", q:"Il sole forte del pomeriggio può bruciare le foglie dell’ortensia.", a:true, why:"Meglio il sole del mattino: d’estate, nel pomeriggio, le foglie grandi perdono acqua troppo in fretta." },
+    { t:"mc", plant:"geranio", q:"Il geranio messo all’ombra...", o:["Fiorisce poco e si allunga","Fiorisce il doppio","Cambia colore"], a:0, why:"È una pianta da sole: con poca luce fa fusti lunghi e pochi fiori." }
+  ],
+  f2:[
+    { t:"tf", plant:"petunia", q:"D’estate alla petunia in vaso fa bene un concime per fioriture, dato con regolarità.", a:true, why:"Fiorisce senza sosta, e il poco terriccio del vaso si esaurisce presto." },
+    { t:"mc", plant:"geranio", q:"Geranio con le foglie basse gialle e la terra sempre bagnata. Cosa sbagli?", o:["Troppa acqua","Troppo sole","Poca acqua"], a:0, why:"Il geranio teme i ristagni: lascia asciugare la superficie tra un’annaffiatura e l’altra." },
+    { t:"tf", plant:"ortensia", q:"L’ortensia si annaffia meglio la mattina presto o la sera, non sotto il sole di mezzogiorno.", a:true, why:"Con il fresco l’acqua arriva alle radici invece di evaporare subito." },
+    { t:"mc", plant:"bouganville", q:"Cosa fa fiorire di meno la bouganville?", o:["Troppa acqua e troppo concime azotato","Sole e caldo","Un po’ di sete"], a:0, why:"Coccolata troppo fa solo foglie. Un po’ di vita dura la fa fiorire." }
+  ],
+  f3:[
+    { t:"mc", plant:"ortensia", q:"In terra calcarea, col tempo, un’ortensia blu tende a diventare...", o:["Rosa","Bianca","Nera"], a:0, why:"Senza acidità l’alluminio della terra non arriva al fiore, e il blu vira al rosa." },
+    { t:"tf", plant:"ortensia", q:"Le ortensie bianche non cambiano colore con la terra.", a:true, why:"Il cambio di colore riguarda le varietà rosa e blu. Le bianche restano bianche." },
+    { t:"tf", plant:"bouganville", q:"Le brattee della bouganville sono sottili come carta.", a:true, why:"In inglese la chiamano anche paper flower. I fiori veri sono i tubicini bianchi al centro." },
+    { t:"mc", plant:"geranio", q:"Strofini una foglia di geranio tra le dita. Cosa senti?", o:["Un odore forte e particolare","Niente di niente","Sempre odore di basilico"], a:0, why:"Le foglie hanno ghiandole con oli profumati. Alcune varietà sanno di rosa o di limone." }
+  ],
+  f4:[
+    { t:"tf", plant:"geranio", q:"A fine inverno si accorciano i rami del geranio per farlo ripartire più folto.", a:true, why:"Una potatura leggera prima della ripresa lo fa ramificare. Via anche i rami secchi." },
+    { t:"mc", plant:"bouganville", q:"Arriva l’inverno al Nord. La bouganville in vaso...", o:["Va riparata dal gelo, in un posto luminoso e fresco","Resta fuori come d’estate","Va in cantina al buio, con il sottovaso pieno"], a:0, why:"Sotto lo zero soffre. Al riparo, con poca acqua, passa l’inverno e riparte in primavera." },
+    { t:"tf", plant:"ortensia", q:"D’inverno l’ortensia perde le foglie: è normale.", a:true, why:"Perde le foglie in autunno, riposa e le rifà in primavera." },
+    { t:"mc", plant:"geranio", q:"Quando si fanno le talee di geranio?", o:["A fine estate o in primavera","In pieno inverno, al gelo","Mai, non mette radici"], a:0, why:"Un rametto di una decina di centimetri, senza fiori e senza le foglie in basso, radica in qualche settimana." }
+  ],
+  c1:[
+    { t:"tf", plant:"dionea", q:"Le piante carnivore vivono in terreni poveri, dove mancano soprattutto azoto e minerali.", a:true, why:"Paludi e torbiere: per questo gli insetti sono il loro integratore." },
+    { t:"mc", plant:"dionea", q:"Cosa serve, di solito, perché la trappola della dionea si chiuda?", o:["Due tocchi sui peli in pochi secondi","Un tocco solo","Niente, si chiude a caso"], a:0, why:"Il doppio tocco evita i falsi allarmi: una goccia di pioggia non basta." },
+    { t:"tf", plant:"drosera", q:"La drosera piega i tentacoli, e a volte tutta la foglia, intorno all’insetto catturato.", a:true, why:"I tentacoli si piegano verso la preda per digerirla meglio. In alcune specie si arrotola tutta la foglia." },
+    { t:"mc", plant:"nepenthes", q:"Da dove viene la nepenthes?", o:["Dalle foreste tropicali del Sud-est asiatico","Dalle paludi della Carolina","Dal deserto"], a:0, why:"Clima caldo e umido tutto l’anno: per questo non va in letargo." }
+  ],
+  c2:[
+    { t:"mc", plant:"sarracenia", q:"Perché l’acqua del rubinetto fa male alle carnivore?", o:["Ha sali e calcare che si accumulano nella torba","È troppo fredda","Non fa male"], a:0, why:"Vivono in acque povere di sali: il calcare si accumula e rovina le radici." },
+    { t:"tf", plant:"drosera", q:"L’acqua piovana è una buona scelta per la drosera.", a:true, why:"È povera di sali, come quella delle torbiere. Purché raccolta in un contenitore pulito." },
+    { t:"mc", plant:"dionea", q:"D’estate, quanta acqua lasci nel sottovaso della dionea?", o:["Un paio di centimetri, rabboccati spesso","Niente, mai","Tanta da coprire la pianta"], a:0, why:"Il sottovaso imita la palude: la torba resta sempre umida dal basso." },
+    { t:"tf", plant:"nepenthes", q:"Se le anfore della nepenthes sono vuote, conviene riempirle con l’acqua del rubinetto.", a:false, why:"Il liquido delle anfore lo produce la pianta. Di solito non serve aggiungere niente, e il rubinetto men che meno." }
+  ],
+  c3:[
+    { t:"tf", plant:"sarracenia", q:"La sarracenia cresce bene in casa, lontana dalla finestra.", a:false, why:"Vuole sole pieno: al buio fa trappole molli e pallide." },
+    { t:"mc", plant:"dionea", q:"La dionea ha trappole tutte verdi e foglie lunghe e sottili. Cosa le manca?", o:["Luce","Acqua","Insetti"], a:0, why:"Con poca luce si allunga e perde il rosso. Al sole torna compatta e colorata." },
+    { t:"tf", plant:"nepenthes", q:"La nepenthes vuole luce intensa, ma non il sole cocente di mezzogiorno.", a:true, why:"Viene dalla foresta: tanta luce filtrata. Il sole d’estate dietro il vetro le brucia le foglie." },
+    { t:"mc", plant:"drosera", q:"Le goccioline sui tentacoli della drosera sono...", o:["Colla e succhi digestivi","Rugiada del mattino","Acqua da bere"], a:0, why:"Il nome viene dal greco per rugiada, ma è colla: l’insetto resta attaccato e viene digerito." }
+  ],
+  c4:[
+    { t:"mc", plant:"dionea", q:"Quanto dura il riposo invernale della dionea?", o:["Circa 3-4 mesi, al fresco","Una notte","Non riposa mai"], a:0, why:"Con il freddo e meno luce si ferma. Saltare il riposo la indebolisce anno dopo anno." },
+    { t:"tf", plant:"sarracenia", q:"Molte sarracenie passano l’inverno fuori e reggono anche qualche gelata leggera.", a:true, why:"Il freddo dell’inverno è il loro riposo: le serve per ripartire forti in primavera." },
+    { t:"mc", plant:"nepenthes", q:"D’inverno la nepenthes...", o:["Resta al caldo e alla luce, senza letargo","Va in frigo","Va lasciata al gelo"], a:0, why:"È tropicale: sotto i 15 gradi circa inizia a soffrire. Altro che letargo." },
+    { t:"tf", plant:"dionea", q:"Tagliare presto lo stelo dei fiori aiuta la dionea a restare forte.", a:true, why:"Fiori e semi consumano tante energie. Se i semi non ti servono, tagliarlo aiuta le trappole." }
+  ]
+};
+// ---------- Tipi di domanda nuovi per le zone difficili ----------
+// "order": metti in ordine i passaggi. "err": trova l'errore in una lista.
+const HARD_NEW = {
+  d1:{ t:"err", lv:3, plant:"calathea", q:"Una di queste diagnosi è sbagliata. Quale?", o:["Pothos con foglie piccole e tutte verdi: poca luce","Spatifillo afflosciato e terra asciutta: sete","Monstera con foglie gialle e terra sempre fradicia: troppa acqua","Calathea con foglie arrotolate e terra asciutta: troppo concime"], a:3, why:"Foglie arrotolate con la terra asciutta vogliono dire sete, o aria troppo secca. Il concime non c’entra." },
+  d2:{ t:"order", lv:3, plant:"orchidea", q:"Annaffiare un’orchidea in corteccia.", steps:["Controlli che le radici siano argentate","Immergi il vaso in acqua per 10-15 minuti","Lo lasci scolare bene","Lo rimetti nel coprivaso, senza acqua sul fondo"], why:"Prima si guarda, poi si bagna, poi si scola. Un coprivaso pieno d’acqua annulla tutto il resto." },
+  d3:{ t:"err", lv:3, plant:"calathea", q:"Una di queste piante è nel posto sbagliato. Quale?", o:["Zamioculcas nell’angolo del soggiorno, lontano dalla finestra","Maranta dietro una tenda leggera","Calathea sul davanzale a sud, al sole del pomeriggio","Spatifillo in mezz’ombra"], a:2, why:"Il sole diretto del pomeriggio sbiadisce e brucia le foglie della calathea. Le altre sono sistemate bene." },
+  d4:{ t:"order", lv:3, plant:"calathea", q:"Hai trovato il ragnetto rosso sulla calathea.", steps:["Allontani la pianta dalle altre","Lavi bene le foglie, anche sotto, con acqua tiepida","Alzi l’umidità intorno alla pianta","Ricontrolli le foglie nei giorni seguenti"], why:"Prima eviti il contagio, poi lavi via gli acari. L’aria umida li scoraggia, ma tornano se non controlli." },
+  g1:{ t:"order", lv:3, plant:"echeveria", q:"Portare un’echeveria dal negozio al sole pieno del balcone.", steps:["La metti in luce intensa, senza sole diretto","Le dai qualche ora di sole del mattino","Allunghi le ore di sole giorno dopo giorno","La lasci al sole pieno"], why:"Anche le grasse si scottano se passano di colpo dall’ombra al sole. Abituarle per gradi evita le macchie." },
+  g2:{ t:"err", lv:3, plant:"zamioculcas", q:"Una di queste abitudini è sbagliata. Quale?", o:["Haworthia: acqua quando la terra è asciutta del tutto","Sansevieria: d’inverno quasi niente acqua","Zamioculcas: un po’ d’acqua ogni due giorni, per sicurezza","Limone: acqua quando i primi centimetri sono asciutti"], a:2, why:"I rizomi della zamioculcas fanno da riserva: annaffiarla spesso vuol dire farla marcire." },
+  g3:{ t:"order", lv:3, plant:"mammillaria", q:"Rinvasare una mammillaria senza farsi male.", steps:["Aspetti che la terra sia asciutta","Avvolgi il cactus in una fascia di carta piegata","Lo sfili dal vaso e controlli le radici","Lo metti nel terriccio per cactus e aspetti una settimana prima di annaffiare"], why:"Terra asciutta e niente acqua subito: le radici rovinate nel rinvaso hanno il tempo di cicatrizzare." },
+  g4:{ t:"err", lv:3, plant:"lithops", q:"Una di queste regole sui lithops è sbagliata. Quale?", o:["Mentre le foglie vecchie si seccano, niente acqua","Terriccio minerale, che drena benissimo","Se le foglie si raggrinziscono, è sempre il momento di dare tanta acqua","Tanta luce, anche sole"], a:2, why:"Durante il cambio delle foglie le nuove si nutrono delle vecchie, che si raggrinziscono apposta. L’acqua in quel momento fa danni." },
+  h1:{ t:"order", lv:3, plant:"gardenia", q:"La gardenia ha le foglie gialle con le venature verdi.", steps:["Riconosci la clorosi: manca ferro","Controlli l’acqua: se è calcarea, passi a piovana o demineralizzata","Dai un concime per acidofile con ferro","Aspetti le foglie nuove, che escono verdi"], why:"Le foglie già gialle spesso restano così: il segno che hai risolto sono quelle nuove." },
+  h2:{ t:"err", lv:3, plant:"kumquat", q:"Una di queste cose sul kumquat è sbagliata. Quale?", o:["Si mangia intero, buccia compresa","Vuole tanto sole","Sopporta il freddo un po’ meglio del limone","D’inverno va annaffiato tutti i giorni"], a:3, why:"D’inverno cresce poco e beve poco: l’acqua di troppo fa marcire le radici." },
+  h3:{ t:"err", lv:3, plant:"cephalotus", q:"Uno di questi consigli sul cephalotus è sbagliato. Quale?", o:["Torba con tanta perlite, in un vaso alto","Luce intensa, che arrossa le anfore","Sottovaso sempre pieno, come per la dionea","Solo acqua piovana o demineralizzata"], a:2, why:"Il cephalotus vuole la torba umida ma ariosa: con le radici sempre a bagno rischia di marcire." },
+  h4:{ t:"order", lv:3, plant:"vanda", q:"Il bagno della vanda a radici nude.", steps:["Immergi le radici in acqua per 15-20 minuti","Le tiri fuori e le lasci sgocciolare","La riappendi in un punto molto luminoso","Aspetti che le radici tornino argentate prima del bagno dopo"], why:"Le radici nude devono bagnarsi e asciugarsi in fretta. Se restano umide a lungo, marciscono." }
+};
+// Le domande nuove entrano nella seconda lezione di ogni casella (prima dell'Allenamento)
+Object.entries(HARD_NEW).forEach(([id, it]) => { const l = (EXTRA[id] || [])[0]; if (l) l.items.push(it); });
 const ZONES = [
   { id:"z1", color:"#d9692a", shade:"#a84f1c", title:"Casa tua", desc:"Il davanzale, dove tutto ha inizio. E dove tutto, finora, è morto." },
   { id:"z2", color:"#2284cf", shade:"#1764a0", title:"Mediterraneo", desc:"Sole, sassi e poca acqua. Piante che d’estate non si lamentano. Si vive sul balcone." },
@@ -1318,7 +1473,7 @@ const VERSION = "2026-11-25.3";
 // Strumenti per il test (salto dei giorni, emergenza forzata): nascosti sul sito pubblico,
 // visibili aggiungendo ?test all'indirizzo, e sempre visibili fuori da vercel.app (artifact, file locale)
 const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.test(location.hostname);
-const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false });
+const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false, recent:[] });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
 S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -1869,6 +2024,10 @@ function showItem(){
   if (it.t === "mc") { kind = "Scegli la risposta"; inner = `<div class="q">${esc(it.q)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
   if (it.t === "tf") { kind = "Vero o falso?"; inner = `<div class="q">${esc(it.q)}</div><div class="tf"><button class="opt" data-k="true" aria-pressed="false">Vero</button><button class="opt" data-k="false" aria-pressed="false">Falso</button></div>`; }
   if (it.t === "id") { kind = "Riconosci la pianta"; inner = `<div class="q">${esc(it.q)}</div><div class="ids">${it.o.map(p => `<button class="opt" data-k="${p}" aria-pressed="false" aria-label="Pianta ${["A","B","C","D"][it.o.indexOf(p)]}">${plantSVG(p, 92)}</button>`).join("")}</div>`; }
+  if (it.t === "err") { kind = "Trova l’errore"; inner = `<div class="q">${esc(it.q)}</div><div class="opts">${it.o.map((o, k) => `<button class="opt" data-k="${k}" aria-pressed="false">${esc(o)}</button>`).join("")}</div>`; }
+  if (it.t === "order") { kind = "Metti in ordine"; let mix; do { mix = shuffle(it.steps.map((_, k) => k)); } while (mix.every((v, k) => v === k));
+    inner = `<div class="q">${esc(it.q)}</div><ol class="ordans" aria-label="La tua sequenza"></ol><div class="opts ordpool">${mix.map(k => `<button class="opt" data-o="${k}">${esc(it.steps[k])}</button>`).join("")}</div>`; }
+  if (it.t !== "card") markSeen(it);
   if (it.t === "match") { kind = "Abbina le coppie"; const L1 = shuffle(it.pairs.map(p => p[0])), R1 = shuffle(it.pairs.map(p => p[1]));
     inner = `<div class="q">${esc(it.q)}</div><div class="match">${L1.map((l, k) => `<button class="opt" data-side="l" data-v="${esc(l)}">${esc(l)}</button><button class="opt" data-side="r" data-v="${esc(R1[k])}">${esc(R1[k])}</button>`).join("")}</div>`; }
   app.innerHTML = `<section class="lesson"><div class="lhead"><button id="quit" aria-label="Esci dalla lezione">${ICON.x}</button><div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
@@ -1880,13 +2039,31 @@ function showItem(){
   const check = document.getElementById("check");
   if (it.t === "card") { check.onclick = next; return; }
   if (it.t === "match") return setupMatch(it, check);
+  if (it.t === "order") return setupOrder(it, check);
   let sel = null;
   app.querySelectorAll(".qbody .opt").forEach(b => b.onclick = () => { app.querySelectorAll(".qbody .opt").forEach(x => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); sel = b.dataset.k; check.disabled = false; });
   check.onclick = () => {
-    const ok = it.t === "mc" ? +sel === it.a : it.t === "tf" ? (sel === "true") === it.a : sel === it.a;
+    const ok = it.t === "mc" || it.t === "err" ? +sel === it.a : it.t === "tf" ? (sel === "true") === it.a : sel === it.a;
     app.querySelectorAll(".qbody .opt").forEach(x => { x.disabled = true; const k = x.dataset.k;
-      const right = it.t === "mc" ? +k === it.a : it.t === "tf" ? (k === "true") === it.a : k === it.a;
+      const right = it.t === "mc" || it.t === "err" ? +k === it.a : it.t === "tf" ? (k === "true") === it.a : k === it.a;
       if (right) x.classList.add("ok"); else if (k === sel) x.classList.add("ko"); });
+    feedback(ok, it.why, it.plant, it.lv || 1);
+  };
+}
+// Metti in ordine: tocchi i passaggi nell'ordine giusto; toccandone uno già messo, torna giù
+function setupOrder(it, check){
+  const ans = app.querySelector(".ordans"), pool = app.querySelector(".ordpool");
+  const sync = () => { check.disabled = ans.children.length !== it.steps.length;
+    [...ans.children].forEach((li, n) => li.querySelector("b").textContent = n + 1); };
+  pool.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const li = document.createElement("li"); li.innerHTML = `<button class="opt" data-o="${b.dataset.o}"><b></b>${b.innerHTML}</button>`;
+    li.firstChild.onclick = () => { li.remove(); b.hidden = false; sync(); };
+    ans.appendChild(li); b.hidden = true; sync(); });
+  check.onclick = () => {
+    const got = [...ans.querySelectorAll(".opt")].map(x => +x.dataset.o), ok = got.every((v, k) => v === k);
+    // Dopo il controllo si vede sempre la sequenza giusta: verde dove avevi indovinato il posto, rosso dove no
+    ans.innerHTML = it.steps.map((t, k) => `<li><button class="opt ${got[k] === k ? "ok" : "ko"}" disabled><b>${k + 1}</b>${esc(t)}</button></li>`).join("");
+    pool.remove();
     feedback(ok, it.why, it.plant, it.lv || 1);
   };
 }
