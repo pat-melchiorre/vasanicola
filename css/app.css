@@ -387,3 +387,14 @@ button.pill{border:0;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .nodewrap:has(.bubble){margin-top:22px}
 .node.done + .nodelabel{margin-top:14px}
 .fcard.lock{display:flex;flex-direction:column;gap:6px;color:var(--ink-2)}.fcard.lock p{margin:0}
+/* ---- Ritocchi ---- */
+.lvsun{color:inherit}
+.corner{color:var(--bad);border-color:var(--bad);background:var(--bad-bg)}
+.dropbox{width:100%;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:4px 14px;align-items:center;padding:14px 16px;border-radius:20px;background:var(--water-bg);border:2px solid var(--water);box-shadow:0 4px 0 var(--water-dark);text-align:left}
+.dbicon{grid-row:1/3;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--water);color:#fff;box-shadow:0 3px 0 var(--water-dark)}
+.dbicon svg{width:32px;height:32px}
+.dbt{display:flex;align-items:baseline;gap:8px;color:var(--water-dark)}
+.dbt b{font-family:var(--display);font-size:32px;line-height:1}
+.dbt span{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.dbparts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--ink-2);font-weight:700}
+.dbparts li{display:flex;gap:4px}.dbparts b{color:var(--water-dark)}

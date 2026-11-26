@@ -397,7 +397,9 @@ function showItem(){
   if (it.t === "match") return setupMatch(it, check);
   if (it.t === "order") return setupOrder(it, check);
   let sel = null;
-  app.querySelectorAll(".qbody .opt").forEach(b => b.onclick = () => { app.querySelectorAll(".qbody .opt").forEach(x => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); sel = b.dataset.k; check.disabled = false; });
+  // Vero/falso, scelta multipla, trova l'errore, riconosci: il tocco sulla risposta è già la risposta (niente "Controlla")
+  check.closest(".lfoot").hidden = true;
+  app.querySelectorAll(".qbody .opt").forEach(b => b.onclick = () => { if (sel !== null) return; b.setAttribute("aria-pressed", "true"); sel = b.dataset.k; check.onclick(); });
   check.onclick = () => {
     const ok = it.t === "mc" || it.t === "err" ? +sel === it.a : it.t === "tf" ? (sel === "true") === it.a : sel === it.a;
     app.querySelectorAll(".qbody .opt").forEach(x => { x.disabled = true; const k = x.dataset.k;
@@ -478,11 +480,10 @@ function feedback(ok, why, plant, lvl = 1){
   const sh = document.getElementById("sheet");
   sh.className = "sheet " + (ok ? "ok" : "ko");
   const title = (ok ? OK_TITLES : KO_TITLES)[Math.floor(Math.random() * 4)];
-  sh.innerHTML = `<h3>${ok ? ICON.check.replace("<svg", '<svg width="26" height="26"') : ICON.x.replace("<svg", '<svg width="24" height="24"')}${title}</h3><p>${hl(esc(why || ""))}</p>${discovery}<button class="btn ${ok ? "" : "bad"}" id="cont">Continua</button>`;
+  sh.innerHTML = `<h3>${ok ? ICON.check.replace("<svg", '<svg width="26" height="26"') : ICON.x.replace("<svg", '<svg width="24" height="24"')}${title}</h3><p>${esc(why || "")}</p>${discovery}<button class="btn ${ok ? "" : "bad"}" id="cont">Continua</button>`;
   requestAnimationFrame(() => sh.classList.add("show"));
   setTimeout(() => sh.querySelectorAll(".disc .bar i").forEach(i => i.style.width = i.dataset.to + "%"), 300);
   document.getElementById("check").style.visibility = "hidden";
-  sh.querySelectorAll(".term").forEach(b => { S.terms[b.dataset.term] = (S.terms[b.dataset.term] || 0) + 1; b.onclick = e => { e.stopPropagation(); openHint(b); }; });
   document.getElementById("cont").onclick = next;
 }
 function next(){ L.idx++; if (L.idx >= L.items.length) finishLesson(); else showItem(); }
@@ -548,8 +549,7 @@ function openLevel(){
   const { n, L, from, to } = levelInfo(S.xp), nx = levelReward(n + 1), nxName = levelInfo(to).L.name;
   modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">${lvTxt(n)}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
     <div class="bar lvbar"><i style="width:${Math.round((S.xp - from) / (to - from) * 100)}%"></i></div>
-    <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p>
-    <p class="pnote" style="margin:12px 0 0">L’esperienza non si spende: misura quanto hai imparato. Si paga tutto in gocce.</p></div><button class="btn" data-close="1">Ok</button>`);
+    <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p></div><button class="btn" data-close="1" style="margin-top:20px">Ok</button>`);
 }
 /* =========================================================
    Giorni di fila: il fagiolo nel cotone. Cresce a ogni giorno con almeno un quiz finito.
@@ -613,7 +613,7 @@ function showStreak(info, done){
     <h1><span class="snum">${n}</span> ${n === 1 ? "giorno" : "giorni"} di fila</h1>
     ${b ? `<div class="kind" style="margin:-6px 0 0">${b.name}</div>` : ""}
     <p class="sub">${sub}</p>
-    ${b && b.g ? `<div class="rewards"><div class="reward water"><b>+${b.g}</b><span>Gocce</span></div></div><p class="sub" style="margin:0">E una bella spinta di esperienza.</p>` : ""}
+    ${b && b.g ? dropBox(b.g, [["Premio del fagiolo", b.g]]) + `<p class="sub" style="margin:0">E una bella spinta di esperienza.</p>` : ""}
     ${weekRow()}
     <div style="width:100%;margin-top:auto"><button class="btn" id="sgo">Continua</button></div></section>`;
   document.getElementById("sgo").onclick = done;
@@ -637,6 +637,9 @@ function openStreak(){
     </div>
     <button class="btn" data-close="1">Ok</button>`);
 }
+// Riquadro delle gocce guadagnate: goccia grande, totale e da dove arrivano
+const dropBox = (g, parts) => `<div class="dropbox"><div class="dbicon">${ICON.drop}</div><div class="dbt"><b>+${g}</b><span>Gocce</span></div>
+  <ul class="dbparts">${parts.map(([t, v]) => `<li><span>${t}</span><b>+${v}</b></li>`).join("")}</ul></div>`;
 function finishLesson(){
   const perfect = L.mistakes === 0;
   // Ricompense: l'Allenamento (domande già viste) vale metà esperienza; le zone difficili (dalla 6) valgono di più
@@ -661,9 +664,8 @@ function finishLesson(){
   const readyNow = Object.keys(L.gained).some(p => canPlant(p) && !inGarden(p));
   const lines = perfect ? ["Zero errori. Hai studiato botanica di nascosto? (Ammettilo.)","Perfetto. Vasanicola piange (di gioia) (forse)."] : ["Fatto. Qualche foglia persa per strada (e qualche neurone).","Completato. Gli errori sono concime. (Lo diciamo per consolarti.)"];
   app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
-    <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div></div>
+    ${dropBox(g, L.replay ? [["Ripasso", g]] : [["Lezione", RULES.stepGocce], perfect && ["Zero errori", RULES.perfectBonusGocce], hardZone && ["Zona difficile", 2]].filter(Boolean))}
     ${lvBar}
-    ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
     ${ups.map(n => `<div class="lvup"><b>${lvTxt(n)} ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
     <div style="width:100%;margin-top:auto;display:flex;flex-direction:column;gap:12px">
