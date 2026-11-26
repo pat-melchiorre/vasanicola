@@ -206,7 +206,6 @@ function render(){
   app.innerHTML = (tab === "path" ? topbar() : "") + `<main class="${tab === "path" ? "" : "notop"}">${body}</main>` + tabbar();
   streakNotice();
   const bar = app.querySelector(".top"); if (bar) document.documentElement.style.setProperty("--toph", (bar.offsetHeight + 8) + "px");   // +8: lo spazio sopra la barra
-  markStuck();
 }
 
 /* --- Bentornato: si vede una volta a ogni apertura, dopo l’onboarding --- */
@@ -769,7 +768,7 @@ function renderNegozio(){
 }
 function renderSerra(){
   const empty = !S.garden.length;
-  return `<section class="sec"><h1>La tua serra</h1><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
+  return `<section class="sec"><div class="sechead"><h1>La tua serra</h1><div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div></div><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
     ${testTools()}`;
 }
 let pickArea = "casa";
@@ -905,10 +904,6 @@ function splashWater(i, perk){
   art.appendChild(box); setTimeout(() => box.remove(), 1200);
 }
 // Tocco sull'intestazione della zona: torna all'inizio di quella zona; se ci sei già, all'inizio del percorso
-// L'intestazione della zona agganciata in alto si "salda" alla barra: angoli dritti in alto
-function markStuck(){ if (tab !== "path") return; const y = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--toph")) || 62) + (parseFloat(getComputedStyle(document.querySelector(".top") || document.body).top) || 0) - 8;
-  document.querySelectorAll(".zhead").forEach(z => z.classList.toggle("stuck", Math.abs(z.getBoundingClientRect().top - y) < 2)); }
-addEventListener("scroll", markStuck, { passive:true });
 function zoneTop(el){
   const sec = el.closest(".zsec"), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--toph")) || 62;
   const y = sec.getBoundingClientRect().top + scrollY - bar, smooth = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
