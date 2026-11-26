@@ -336,3 +336,8 @@ main{flex:1;padding:0 0 96px}
 .sweek i{opacity:.25;filter:grayscale(1)}.sweek i.on{opacity:1;filter:none}
 @media (prefers-reduced-motion: reduce){.sfall{animation:none;opacity:0}.kind.isnew::after{animation:none}}
 .shoph{font-size:18px;margin:18px 0 10px}
+/* ---- Livelli ---- */
+button.pill{border:0;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.lvup{width:100%;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:16px;background:var(--sun-bg);border:2px solid var(--sun);color:var(--sun-dark)}
+.lvup b{font-size:16px}.lvup span{font-size:14px;color:var(--ink-2)}
+.lvbar{height:14px}

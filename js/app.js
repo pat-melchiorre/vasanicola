@@ -9,6 +9,11 @@ const DEV = new URLSearchParams(location.search).has("test") || !/vercel\.app$/.
 const fresh = () => ({ onboarded:false, gocce:0, xp:0, done:[], prog:{}, expert:{}, pots:[], slots:1, balcSlots:0, garden:[], knowledge:{}, discovered:[], offset:0, tutorialPlanted:false, recent:[], terms:{}, streak:{ n:0, last:null, best:0, lids:0 } });
 let S = (() => { try { return { ...fresh(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) { return fresh(); } })();
 S.garden.forEach(g => { if (!g.area) g.area = "casa"; if (!g.bornAt) g.bornAt = Date.now() + S.offset; });
+// Prima dei livelli l'esperienza si spendeva: la restituiamo (posti comprati, vasi, piante in serra)
+if (!S.lv) { const cost = (arr, n) => arr.slice(0, n).reduce((a, b) => a + b, 0);
+  S.xp += cost(RULES.slotCosts.casa, S.slots) + cost(RULES.slotCosts.balcone, S.balcSlots)
+    + S.pots.reduce((a, mo) => a + (({ coprivaso:80, appeso:110, balconiera:120, terracotta:150, autoirrigante:180 })[mo] || 0), 0)
+    + S.garden.reduce((a, g) => a + (PLANTS[g.plant]?.cost || 0), 0); }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const now = () => Date.now() + S.offset;
 let tab = "path";
@@ -183,14 +188,14 @@ function topbar(){
   return `<header class="top"><div class="brand">${mascot(30)}<b>Vasanicola</b></div>
     <div class="pill streak${streakToday() ? "" : " off"}" aria-label="${S.streak.n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${vesselSVG(tierOf(Math.max(1, S.streak.n)).t.k, S.streak.n ? streakLevel(S.streak.n) : 0, 22)}${S.streak.n}</div>
     <div class="pill water" id="pGocce" aria-label="Gocce">${ICON.drop}${S.gocce}</div>
-    <div class="pill sun" id="pXp" aria-label="Esperienza">${ICON.sun}${S.xp}</div></header>`;
+    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${levelInfo(S.xp).n}, ${S.xp} punti esperienza">${ICON.sun}${S.xp}</button></header>`;
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
   return `<nav class="tabs" aria-label="Sezioni">${t("path","Percorso",ICON.path)}${t("serra","Serra",ICON.serra, thirstyCount() > 0)}${t("erbario","Erbario",ICON.book)}${t("negozio","Negozio",ICON.shop)}</nav>`;
 }
 function render(){
-  settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); settleStreak(); save();
+  settleDeaths(); settleGrowth(); settleEmergencies(); settleMilestones(); settleStreak(); levelCheers(settleLevel()); save();
   if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
   if (!S.onboarded) return renderOnboarding(0);
   if (!welcomed) { welcomed = true; return renderWelcome(); }
@@ -240,7 +245,7 @@ function renderWelcome(){
 /* --- Onboarding --- */
 const ONB = [
   { h:"Ciao. Sono Vasanicola.", p:"In abruzzese vuol dire basilico. Sì, quello del supermercato, morto in due settimane sul tuo davanzale (riposi in pace) (non è colpa tua) (un po’ sì).", mood:"sad" },
-  { h:"Qui si studia. Poco alla volta.", p:"Ogni lezione ti dà gocce ed esperienza. Le gocce tengono vive le piante, l’esperienza ti fa piantare quelle nuove. Tipo un videogioco, ma con più sensi di colpa.", mood:"happy" },
+  { h:"Qui si studia. Poco alla volta.", p:"Ogni lezione ti dà gocce ed esperienza. Con le gocce annaffi e compri semi e vasi, l’esperienza ti fa salire di livello e apre posti in serra. Tipo un videogioco, ma con più sensi di colpa.", mood:"happy" },
   { h:"Si parte dal davanzale.", p:"Poi il balcone, poi il mondo. E stavolta il basilico sopravvive. (Promesso.) (Più o meno.) (Non ci contare troppo.)", mood:"happy" }
 ];
 function renderOnboarding(i){
@@ -480,6 +485,61 @@ function feedback(ok, why, plant, lvl = 1){
 }
 function next(){ L.idx++; if (L.idx >= L.items.length) finishLesson(); else showItem(); }
 
+
+/* =========================================================
+   Livelli: l'esperienza non si spende, sale e basta.
+   Ogni livello apre qualcosa (un posto in serra o un premio in gocce).
+   ========================================================= */
+const LEVELS = [
+  { xp:0,    name:"Seme",                  line:"Tutto da scrivere. E da annaffiare." },
+  { xp:40,   name:"Germoglio",             line:"Qualcosa spunta. Speriamo non sia muffa.",     casa:1 },
+  { xp:100,  name:"Piantina",              line:"Fragile, ma ci siamo.",                        casa:1 },
+  { xp:180,  name:"Talea con le radici",   line:"Hai messo radici. Letteralmente.",             gocce:30 },
+  { xp:280,  name:"Pollice verdino",       line:"Le piante iniziano a fidarsi.",                balcone:1 },
+  { xp:380,  name:"Pollice verde",         line:"Ti chiedono consigli al bar.",                 balcone:1 },
+  { xp:500,  name:"Mani da vivaio",        line:"Terra sotto le unghie, con orgoglio.",         casa:1 },
+  { xp:640,  name:"Sussurro alle felci",   line:"Loro rispondono. Tu fai finta di niente.",     balcone:1 },
+  { xp:800,  name:"Terrore dei parassiti", line:"Le cocciniglie si passano la voce.",           casa:1 },
+  { xp:980,  name:"Botanica da divano",    line:"Sai i nomi latini. Li usi alle cene.",         balcone:1 },
+  { xp:1180, name:"Magia del sottovaso",   line:"Mai più acqua ferma. Quasi mai.",              casa:1 },
+  { xp:1400, name:"Domatura di carnivore", line:"La dionea ti saluta. Con prudenza.",           balcone:1 },
+  { xp:1650, name:"Serra da rivista",      line:"I vicini fotografano il tuo balcone.",         balcone:1 },
+  { xp:1950, name:"Giungla domestica",     line:"Il divano ormai è un supporto per il pothos.", gocce:60 },
+  { xp:2300, name:"Mito del davanzale",    line:"Ne parleranno i basilici del futuro.",         gocce:100 }
+];
+const LEVEL_STEP = 400;   // dopo l'ultimo, un livello ogni 400 XP, con 60 gocce di premio
+function levelInfo(xp){
+  const last = LEVELS.length - 1;
+  if (xp >= LEVELS[last].xp) { const extra = Math.floor((xp - LEVELS[last].xp) / LEVEL_STEP);
+    return { n:last + 1 + extra, L:{ ...LEVELS[last], name: extra ? `${LEVELS[last].name} +${extra}` : LEVELS[last].name }, from:LEVELS[last].xp + extra * LEVEL_STEP, to:LEVELS[last].xp + (extra + 1) * LEVEL_STEP }; }
+  const i = LEVELS.findIndex((l, k) => xp < (LEVELS[k + 1] || { xp:Infinity }).xp);
+  return { n:i + 1, L:LEVELS[i], from:LEVELS[i].xp, to:LEVELS[i + 1].xp };
+}
+const levelReward = n => n <= LEVELS.length ? LEVELS[n - 1] : { gocce:60 };
+const rewardText = r => r.casa ? "Si apre un posto in casa." : r.balcone ? "Si apre un posto sul balcone." : r.gocce ? `+${r.gocce} gocce.` : "";
+// Posti in serra dovuti al livello n (la casa ne ha 1 di partenza)
+const slotsAt = n => LEVELS.slice(0, n).reduce((a, l) => ({ casa:a.casa + (l.casa || 0), balcone:a.balcone + (l.balcone || 0) }), { casa:1, balcone:0 });
+// Prossimo livello che apre un posto in quell'area (per il posto bloccato in serra)
+const nextSlotLevel = a => { const k = LEVELS.findIndex((l, i) => l[a] && i + 1 > S.lv); return k < 0 ? null : { n:k + 1, L:LEVELS[k] }; };
+function settleLevel(){
+  const n = levelInfo(S.xp).n;
+  if (!S.lv) {   // salvataggi di prima: niente premi arretrati in gocce, ma i posti dovuti sì
+    S.lv = n; const sl = slotsAt(Math.min(n, LEVELS.length)); S.slots = Math.max(S.slots, sl.casa); S.balcSlots = Math.max(S.balcSlots, sl.balcone); return [];
+  }
+  const ups = [];
+  while (S.lv < n) { S.lv++; const r = levelReward(S.lv);
+    if (r.casa) S.slots++; if (r.balcone) S.balcSlots++; if (r.gocce) S.gocce += r.gocce;
+    ups.push(S.lv); }
+  return ups;
+}
+function levelCheers(ups){ ups.forEach(n => cheers.push(`Livello ${n}: ${levelInfo(LEVELS[n - 1]?.xp ?? S.xp).L.name}. ${rewardText(levelReward(n))}`)); }
+function openLevel(){
+  const { n, L, from, to } = levelInfo(S.xp), nx = levelReward(n + 1), nxName = levelInfo(to).L.name;
+  modal(`<div style="text-align:center">${mascot(90)}<div class="kind" style="margin-top:8px">Livello ${n}</div><h2>${L.name}</h2><p style="color:var(--ink-2);margin:4px 0 14px">${L.line}</p>
+    <div class="bar lvbar"><i style="width:${Math.round((S.xp - from) / (to - from) * 100)}%"></i></div>
+    <p class="pnote" style="margin:8px 0 0">${S.xp} XP. Ancora ${to - S.xp} per ${nxName}: ${rewardText(nx).toLowerCase()}</p>
+    <p class="pnote" style="margin:12px 0 0">L’esperienza non si spende: misura quanto hai imparato. Si paga tutto in gocce.</p></div><button class="btn" data-close="1">Ok</button>`);
+}
 /* =========================================================
    Giorni di fila: una goccia al giorno, al primo quiz finito
    ========================================================= */
@@ -554,7 +614,7 @@ function finishLesson(){
   const g = L.replay ? RULES.replayGocce : RULES.stepGocce + (perfect ? RULES.perfectBonusGocce : 0) + (hardZone ? 2 : 0);
   const x = L.replay ? RULES.replayXp : Math.round((RULES.stepXp + (perfect ? RULES.perfectBonusXp : 0)) / (practice ? 2 : 1)) + (hardZone ? 5 : 0);
   S.gocce += g; S.xp += x;
-  const day = bumpStreak();
+  const day = bumpStreak(), ups = settleLevel();
   const before = L.before;
   L.seen.forEach(p => { if (!S.discovered.includes(p)) S.discovered.push(p); });
   if (!L.replay) S.prog[L.step.id] = L.li + 1;
@@ -570,6 +630,7 @@ function finishLesson(){
   app.innerHTML = `<section class="result">${mascot(130)}<div class="kind" style="margin:0">${esc(L.step.title)}: ${esc(L.title)}</div><h1>${L.replay ? "Ripasso fatto!" : nodeDone ? "Casella completata!" : "Lezione completata!"}</h1><p class="sub">${lines[Math.floor(Math.random() * 2)]}</p>
     <div class="rewards"><div class="reward water"><b>+${g}</b><span>Gocce</span></div><div class="reward sun"><b>+${x}</b><span>Esperienza</span></div></div>
     ${perfect && !L.replay ? `<p class="sub" style="margin:0">Bonus senza errori incluso.</p>` : ""}
+    ${ups.map(n => `<div class="lvup"><b>Livello ${n}: ${levelInfo(n <= LEVELS.length ? LEVELS[n - 1].xp : S.xp).L.name}</b><span>${rewardText(levelReward(n))}</span></div>`).join("")}
     ${rows ? `<div class="kl"><div class="kind" style="margin:6px 0 0">Conoscenza</div>${rows}</div>` : ""}
     <div style="width:100%;margin-top:auto;display:flex;flex-direction:column;gap:12px">
       ${unblocked.length ? `<p class="sub" style="margin:0">Ora sai cosa fare: puoi riprovare a curare ${unblocked.map(x => esc(nameOf(x))).join(" e ")}.</p><button class="btn bad" id="toSerra">Torna a curarla</button>` : readyNow ? `<button class="btn sun" id="toSerra">Vai a piantarla</button>` : ""}
@@ -612,8 +673,8 @@ function renderArea(a){
   const slots = [];
   S.garden.forEach((g, i) => { if (g.area === a) slots.push(slotCard(g, i)); });
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
-  const nextCost = RULES.slotCosts[a][slotsOf(a)];
-  if (nextCost !== undefined) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Più spazio, più piante da far sopravvivere.</span><button class="btn small sun" data-buy="${a}" ${S.xp < nextCost ? "disabled" : ""}>Sblocca ${nextCost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button></div>`);
+  const nx = nextSlotLevel(a);
+  if (nx) slots.push(`<div class="slot locked">${ICON.lock.replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}, ${esc(nx.L.name)}. Mancano ${nx.L.xp - S.xp} XP.</span></div>`);
   return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
@@ -645,7 +706,7 @@ function renderNegozio(){
     const names = known.length ? known.slice(0, 3).map(id => PLANTS[id].name).join(", ") + (ok.length > 3 && known.length ? ` e altre ${ok.length - Math.min(3, known.length)}` : "") : `${ok.length} piante da scoprire`;
     return `<div class="shopcard${owned ? " owned" : ""}"><div class="sart">${plantSVG(P.show, 96, "sana", "adulta", mo)}</div><div class="t"><h3>${P.name}</h3><span class="tag ptag ${P.tag === "Solo bellezza" ? "study" : "planted"}">${P.tag}</span><p>${P.desc}</p>
       <p class="pnote">Per: ${names}</p>
-      ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small sun" style="width:auto" data-buypot="${mo}" ${S.xp < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.sun.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
+      ${owned ? '<span class="tag planted">Tuo. Lo cambi dalla serra</span>' : `<button class="btn small water" style="width:auto" data-buypot="${mo}" ${S.gocce < P.cost ? "disabled" : ""}>Compra ${P.cost}${ICON.drop.replace("<svg", '<svg width="16" height="16"')}</button>`}</div></div>`;
   }).join("");
   const lids = S.streak.lids, full = lids >= LID.max;
   const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${lidSVG(80)}</div><div class="t"><h3>Coperchio</h3><span class="tag ptag study">Salva la serie</span><p>Se salti un giorno, copre la goccia e i giorni di fila non evaporano. Si usa da solo.</p>
@@ -667,7 +728,7 @@ function openPicker(a){
     if (!fitsIn(id, a)) return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><span style="font-size:13px;color:var(--ink-2)">Vuole pieno sole: in casa non ce la fa.</span></div><span class="tag study">Solo balcone</span></div>`;
     if (ready && !gateOk(id)) return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><span style="font-size:13px;color:var(--ink-2)">Pianta rara: prima diventa esperto della sua cugina facile.</span></div><span class="tag study">${gateText(id)}</span></div>`;
     return `<div class="krow">${plantSVG(id, 46)}<div class="t"><b>${PLANTS[id].name}</b><div class="bar ${ready ? "full" : ""}"><i style="width:${k / RULES.knowledgeMax * 100}%"></i></div></div>
-    ${ready ? `<button class="btn small sun" style="width:auto" data-sow="${id}" ${S.xp < cost ? "disabled" : ""}>${cost ? `Pianta ${cost}` : "Gratis"}</button>` : `<span class="tag study">Studiala ancora</span>`}</div>`; }).join("");
+    ${ready ? `<button class="btn small water" style="width:auto" data-sow="${id}" ${S.gocce < cost ? "disabled" : ""}>${cost ? `Pianta ${cost}${ICON.drop.replace("<svg", '<svg width="14" height="14"')}` : "Gratis"}</button>` : `<span class="tag study">Studiala ancora</span>`}</div>`; }).join("");
   modal(`<h2>Cosa piantiamo ${a === "casa" ? "in casa" : "sul balcone"}?</h2><p class="lead" style="color:var(--ink-2);margin:6px 0 0;font-size:15px">Puoi piantare solo le piante con la barra della conoscenza piena. Niente scorciatoie: qui si studia.</p>
     <div class="pick">${rows || `<p style="color:var(--ink-2)">Non hai ancora scoperto piante da piantare. Fai il primo step del percorso.</p>`}</div><button class="btn ghost" data-close="1">Chiudi</button>`);
 }
@@ -748,8 +809,8 @@ app.addEventListener("click", e => {
       S.garden.splice(S.garden.indexOf(g), 1); render(); toast(g.dead ? "Posto libero. Si ricomincia." : "Regalata. Chi l’ha ricevuta non sa cosa l’aspetta."); }, "Tienila"); }
   if (t.dataset.buylid) { if (S.gocce < LID.cost || S.streak.lids >= LID.max) return;
     S.gocce -= LID.cost; S.streak.lids++; render(); bump("#pGocce"); toast("Coperchio in scorta. Ora puoi anche dimenticarti di noi per un giorno (uno)."); return; }
-  if (t.dataset.buypot) { const mo = t.dataset.buypot, c = POT_SHOP[mo].cost; if (S.xp < c || S.pots.includes(mo)) return;
-    S.xp -= c; S.pots.push(mo); render(); bump("#pXp"); toast(`${POT_SHOP[mo].name}: tuo. Ora vai in serra a sfoggiarlo.`); return; }
+  if (t.dataset.buypot) { const mo = t.dataset.buypot, c = POT_SHOP[mo].cost; if (S.gocce < c || S.pots.includes(mo)) return;
+    S.gocce -= c; S.pots.push(mo); render(); bump("#pGocce"); toast(`${POT_SHOP[mo].name}: tuo. Ora vai in serra a sfoggiarlo.`); return; }
   if (t.dataset.em !== undefined) return openEmergency(S.garden[+t.dataset.em]);
   if (t.dataset.unlock) { unlockZone(t.dataset.unlock); tab = "path"; render(); window.scrollTo(0, 0); toast(t.dataset.unlock === "all" ? "Percorso finito. Tutte le piante sono piantabili." : "Zone precedenti completate: si parte da qui."); return; }
   if (t.id === "addRes") { S.gocce += 200; S.xp += 200; render(); bump("#pGocce"); bump("#pXp"); return; }
@@ -763,7 +824,8 @@ app.addEventListener("click", e => {
     return;
   }
   if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
-  if (t.dataset.buy) { const a = t.dataset.buy, c = RULES.slotCosts[a][slotsOf(a)]; if (S.xp < c) return; S.xp -= c; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
+  if (t.dataset.level) return openLevel();
+  if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
   if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
   if (t.id === "reset") return ask("Ricominciare da zero?", "Si perde tutto: piante, gocce, esperienza. Anche la dignità.", "Ricomincia", () => { S = fresh(); tab = "path"; render(); }, "Annulla");
@@ -837,10 +899,10 @@ document.addEventListener("click", e => {
   const id = t.dataset.sow, free = id === "basilico" && !S.tutorialPlanted, cost = free ? 0 : PLANTS[id].cost;
   if (!fitsIn(id, pickArea) || !canPlant(id)) return;
   if (freeSlots(pickArea) <= 0) { toast("Nessun posto libero. La serra è piena come un monolocale in sei."); return; }
-  if (S.xp < cost) return;
-  S.xp -= cost; if (free) S.tutorialPlanted = true;
+  if (S.gocce < cost) return;
+  S.gocce -= cost; if (free) S.tutorialPlanted = true;
   S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), mile: 0, dead:false });
-  document.querySelector(".modal")?.remove(); render(); bump("#pXp");
+  document.querySelector(".modal")?.remove(); render(); bump("#pGocce");
   toast(id === "basilico" ? "Il basilico è in serra. Stavolta va diversamente. (Diciamo sempre così.)" : `${PLANTS[id].name} ${gen(id, "piantato", "piantata")}. ${gen(id, "Benvenuto", "Benvenuta")} nella tua famiglia disfunzionale.`);
 });
 render();

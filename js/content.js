@@ -3,6 +3,7 @@
    Dati: piante, step, regole
    ========================================================= */
 const DAY = 86400000;
+// slotCosts: prezzi dei posti di quando l’esperienza si spendeva; servono solo a restituirla ai salvataggi vecchi
 const RULES = { waterCost:10, replantCost:20, stepGocce:10, stepXp:20, perfectBonusGocce:4, perfectBonusXp:5, replayGocce:6, replayXp:8, knowledgeMax:3, slotCosts:{ casa:[0,30,50,80,150,220], balcone:[60,60,90,90,170,240] } };
 const PLANTS = {
   basilico:{ name:"Basilico", g:"m", indoor:true, sci:"Ocimum basilicum, in abruzzese vasanicola", cost:0,
