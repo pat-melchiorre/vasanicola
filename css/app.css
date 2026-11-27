@@ -523,3 +523,15 @@ main.notop{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
 .fcard{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
 /* ---- Negozio: vaso già tuo, grigio come "disabilitato" ---- */
 .shopcard.owned{border-color:var(--line);box-shadow:0 4px 0 var(--line);background:#F3F4F1;filter:grayscale(.6);opacity:.75}
+
+/* Barra in alto: mascotte più grande, le tre pillole distribuite uguali nello spazio rimasto */
+.brand{margin-right:0;flex:none}
+.brand svg{width:58px;margin:-6px 0}
+.tstats{flex:1;display:flex;align-items:center;justify-content:space-evenly;gap:6px}
+/* Vaso già comprato: card grigia piena e tag "disabilitati" come i bottoni, non solo sbiaditi */
+.shopcard.owned{--off-bg:#f3f4f1;--off-chip:#e3e6e1;--off-ink:#8f998c;filter:none;opacity:1;background:var(--off-bg);border-color:var(--off-chip);box-shadow:0 4px 0 var(--off-chip)}
+.shopcard.owned .sart{filter:grayscale(1);opacity:.5}
+.shopcard.owned h3,.shopcard.owned p{color:var(--off-ink)}
+.shopcard.owned .tag{background:var(--off-chip);color:var(--off-ink)}
+:root[data-theme="dark"] .shopcard.owned{--off-bg:#151c17;--off-chip:#232b25;--off-ink:#6f7a71}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .shopcard.owned{--off-bg:#151c17;--off-chip:#232b25;--off-ink:#6f7a71} }

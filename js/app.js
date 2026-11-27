@@ -186,10 +186,10 @@ function bump(sel){ const el = document.querySelector(sel); if (el) { el.classLi
 
 function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
-  return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div>
+  return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div><div class="tstats">
     <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
     <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div>
-    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></header>`;
+    <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></div></header>`;
 }
 function tabbar(){
   const t = (id, label, icon, dot) => `<button data-tab="${id}" aria-label="${label}${dot ? ", ci sono piante che hanno bisogno di te" : ""}" ${tab === id ? 'aria-current="page"' : ""}>${dot ? '<span class="dot"></span>' : ""}${icon}</button>`;
