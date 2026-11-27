@@ -547,3 +547,6 @@ button.brand{padding:0;border:0;background:none;cursor:pointer}
 .zhead{padding-top:12px}
 /* Navbar in basso: la sezione attiva ha solo lo sfondo, niente contorno */
 .tabs button[aria-current="page"]{border-color:transparent}
+/* Piante che si piegano da sole (il disegno cambia con la sete): niente rotazione CSS, resta solo il colore */
+.own.p-assetata .leaves,.own.p-appassita .leaves{transform:none}
+@media (prefers-reduced-motion: no-preference){ .slot .own.p-assetata .leaves,.slot .own.p-appassita .leaves{transform-origin:50% 90%;animation:sway 5s ease-in-out infinite alternate} }

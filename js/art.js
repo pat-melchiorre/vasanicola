@@ -18,8 +18,16 @@ const ICON = {
   shop:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 10h18l-1.6 13H6.6z"/><path d="M10 10V8a4 4 0 0 1 8 0v2" stroke-linecap="round"/></svg>',
   book:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M5 5h7a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H5zM23 5h-6a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5H23z"/></svg>'
 };
-const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#e8649a", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644", dionea:"#6d597a", sarracenia:"#355070", drosera:"#b56576", nepenthes:"#e9c46a", alocasia:"#264653", fittonia:"#f28482", maranta:"#84a59d", begonia:"#2b2d42", echeveria:"#e5989b", haworthia:"#6d6875", mammillaria:"#d4a373", lithops:"#bc6c25", gardenia:"#457b9d", kumquat:"#2a9d8f", cephalotus:"#7b2cbf", vanda:"#a47148" };
+const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", menta:"#fe5d84", olivo:"#2fae9e", rosmarino:"#d9534f", lavanda:"#f2a541", ficodindia:"#7d6bd6", monstera:"#c98b5a", calathea:"#3a6ea5", orchidea:"#bcd9ea", felce:"#8a5a44", zamioculcas:"#d1495b", spatifillo:"#5bc0be", limone:"#e07a5f", salvia:"#8d99ae", ficus:"#f4a261", geranio:"#2a9d8f", petunia:"#f6bd60", ortensia:"#f7f7f2", bouganville:"#9c6644", dionea:"#6d597a", sarracenia:"#355070", drosera:"#b56576", nepenthes:"#e9c46a", alocasia:"#264653", fittonia:"#f28482", maranta:"#84a59d", begonia:"#2b2d42", echeveria:"#e5989b", haworthia:"#6d6875", mammillaria:"#d4a373", lithops:"#bc6c25", gardenia:"#457b9d", kumquat:"#2a9d8f", cephalotus:"#7b2cbf", vanda:"#a47148" };
 // Disegno del vaso: "back" va dietro alla pianta (corde del vaso appeso), "front" davanti
+// Vaso di base: stessa forma per tutte le piante, cambia solo il colore.
+// Bordo largo e arrotondato, due fasce più scure, terriccio come lunetta sul bordo.
+const shade = (hex, k = .72) => "#" + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * k).toString(16).padStart(2, "0")).join("");
+function floraPot(c, wet){
+  const d = shade(c);
+  return `<path d="M30 97H90V111C90 121 84 126.7 74 126.7H46C36 126.7 30 121 30 111z" fill="${c}"/><path d="M32.8 120.5H87.2C85 124.6 80 126.7 74 126.7H46C40 126.7 35 124.6 32.8 120.5z" fill="${d}"/><rect x="30" y="99" width="60" height="3.4" fill="${d}"/><rect x="26.6" y="82" width="66.8" height="17.4" rx="3.6" fill="${c}"/><path d="M27 82.5A33 2.8 0 0 0 93 82.5z" fill="${wet ? "#1d140c" : "#272727"}"/>` +
+    (wet ? '<ellipse cx="68" cy="83.4" rx="11" ry="1" fill="#8fcaff" opacity=".85"/>' : "");
+}
 function potDrawing(id, model, color, wet){
   const soilC = wet ? "#33200f" : "#5a3b22";
   const soil = (rx = 30) => `<ellipse cx="60" cy="86" rx="${rx}" ry="3.5" fill="${soilC}" opacity=".9"/>${wet ? '<ellipse cx="66" cy="85.5" rx="13" ry="1.8" fill="#8fcaff" opacity=".85"/>' : ""}`;
@@ -32,22 +40,24 @@ function potDrawing(id, model, color, wet){
   if (model === "balconiera") return { back:"", front:`<rect x="12" y="86" width="96" height="40" rx="4" fill="#b07a4a"/><path d="M12 99h96M12 112h96" stroke="#8b5a32" stroke-width="2"/><rect x="10" y="82" width="100" height="8" rx="3" fill="#9c6a3e"/>` + soil(46) };
   if (model === "coprivaso") return { back:"", front: body("#f7f4ee") + `<rect x="26" y="88" width="68" height="3" fill="#3b6ea5"/>` +
     [[46,108],[60,112],[74,108]].map(([x, y]) => [0,72,144,216,288].map(r => `<ellipse cx="${x}" cy="${y - 3}" rx="1.8" ry="3" transform="rotate(${r} ${x} ${y})" fill="#3b6ea5"/>`).join("") + `<circle cx="${x}" cy="${y}" r="1.4" fill="#f2c230"/>`).join("") + soil() };
-  return { back:"", front: body(color) + soil() };
+  return { back:"", front: floraPot(color, wet) };
 }
 function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
-  // Le piante con illustrazione dettagliata (FLORA) usano il loro vaso quando è quello di base
+  // Le piante con illustrazione dettagliata (FLORA) hanno il vaso dietro: le foglie ricadono sul bordo
   const fl = typeof FLORA !== "undefined" && FLORA[id];
-  const pd = fl && !model ? { back: fl.pot + (wet ? '<ellipse cx="66" cy="84" rx="13" ry="1.6" fill="#8fcaff" opacity=".85"/>' : ""), front: "" } : potDrawing(id, model, pot, wet), potSvg = pd.front;
+  const pd = fl && !model ? { back: floraPot(pot, wet), front: "" } : potDrawing(id, model, pot, wet), potSvg = pd.front;
+  // Chi sa piegarsi da solo (draw) non usa la rotazione CSS degli stati di sete
+  const droop = { assetata: .45, appassita: 1 }[state] || 0, own = fl && fl.draw ? " own" : "";
   if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
   if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
   // Seme e germoglio sono uguali per tutte le piante; la piantina è la pianta adulta in piccolo
   const wrap = inner => `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${pd.back}<g class="leaves">${inner}</g>${potSvg}</svg>`;
-  if (stage === "seme") return wrap(`<ellipse cx="60" cy="83" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 81l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
+  if (stage === "seme") return wrap(`<ellipse cx="60" cy="80" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 78l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
   if (stage === "germoglio") return wrap(`<path d="M60 86V68" stroke="#3f8f4e" stroke-width="3" stroke-linecap="round"/><ellipse cx="53" cy="66" rx="7" ry="4" transform="rotate(-25 53 66)" fill="#5cc875"/><ellipse cx="67" cy="66" rx="7" ry="4" transform="rotate(25 67 66)" fill="#4fb867"/>`);
   let leaves = "", over = "";
-  if (fl) leaves = fl.leaves;
+  if (fl) leaves = fl.draw ? fl.draw(droop) : fl.leaves;
   else if (id === "basilico") {
     const pairs = [[60,40,0],[47,52,-28],[73,52,28],[44,66,-35],[76,66,35],[60,26,0]];
     leaves = `<path d="M60 86V30M60 70l-14-10M60 70l14-10M60 56l-12-8M60 56l12-8" stroke="#2c7d3f" stroke-width="3" stroke-linecap="round" fill="none"/>` +
@@ -60,7 +70,6 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
     const blade = (x, h, r, w = 11) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x - w / 2} 86C${x - w / 2 - 2} ${86 - h * .6} ${x - 2} ${86 - h} ${x} ${86 - h}C${x + 2} ${86 - h} ${x + w / 2 + 2} ${86 - h * .6} ${x + w / 2} 86z" fill="#2e6b3a" stroke="#e1c84a" stroke-width="2.4"/><path d="M${x - 2} 80l4-6M${x - 2} 66l4-6M${x - 2} 52l4-6" stroke="#4f9a5c" stroke-width="2"/></g>`;
     leaves = blade(60,70,0,13) + blade(46,56,-12) + blade(74,60,12) + blade(38,42,-22,10) + blade(82,46,22,10);
   } else if (id === "menta") {
-    leaves = fl.leaves;
   } else if (id === "olivo") {
     // tronco nodoso + chioma di foglie strette, verdi sopra e argentate sotto, qualche oliva
     const lf = (x, y, r, c) => `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="7.5" transform="rotate(${r} ${x} ${y})" fill="${c}"/>`;
