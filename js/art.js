@@ -266,30 +266,35 @@ const mascot = (size = 150, mood = "happy") => {
 
 /* ---- Il fagiolo nel cotone (giorni di fila): 8 fasi, più la versione secca ---- */
 function beanSVG(stage = 0, size = 120, dry = false){
-  const leaf = (x, y, r, flip) => `<path d="M0 0C5-8 17-9 23-2C17 6 6 7 0 0z" transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1) rotate(${r})" fill="${dry ? "#a68b5b" : "#43b05c"}" stroke="${dry ? "#7a6340" : "#2e8b48"}" stroke-width="1.5"/><path d="M0 0L18 -2" transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1) rotate(${r})" stroke="${dry ? "#7a6340" : "#2e8b48"}" stroke-width="1" opacity=".6"/>`;
-  const stemC = dry ? "#9b7e4f" : "#3f9d52";
+  // Stile icone della navbar: forme piene, un lato più scuro, un riflesso bianco, niente contorni
+  const C = dry
+    ? { leaf:"#CDB57E", leafD:"#AE9660", stem:"#B8945A", cot:"#F1E8D8", cotD:"#DDD0B8", bean:"#9C7550", beanD:"#7B5636" }
+    : { leaf:"#6BD678", leafD:"#43B05C", stem:"#3FA14C", cot:"#FFFFFF", cotD:"#E3EAF0", bean:"#B27A43", beanD:"#8C5A2C" };
+  const leaf = (x, y, r, flip) => { const tr = `translate(${x} ${y}) scale(${flip ? -1 : 1} 1) rotate(${r})`;
+    return `<path d="M0 0C5-9 18-10 24-2C18 6 6 7 0 0z" transform="${tr}" fill="${C.leaf}"/><path d="M0 0C5-9 18-10 24-2z" transform="${tr}" fill="${C.leafD}"/>`; };
   const top = [96, 92, 54, 42, 22, 8, 8, -4][stage];
-  // Fusto: da dentro il cotone fino a "top"; da secco si piega di lato
-  const stem = stage < 2 ? "" : dry
-    ? `<path d="M50 72C50 60 52 54 60 52S70 58 72 64" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`
-    : stage === 2 ? `<path d="M50 72C50 62 50 56 46 52" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`
-    : `<path d="M50 72C46 ${(72 + top) / 2 + 10} 56 ${(72 + top) / 2 - 6} 50 ${top}" fill="none" stroke="${stemC}" stroke-width="4" stroke-linecap="round"/>`;
-  let extra = "";
+  let back = "", front = "";
+  // Fusto
+  if (stage >= 2) front += dry
+    ? `<path d="M50 70C50 60 52 54 60 52S70 58 72 64" fill="none" stroke="${C.stem}" stroke-width="4.5" stroke-linecap="round"/>`
+    : stage === 2 ? `<path d="M50 70C50 62 50 56 46 52" fill="none" stroke="${C.stem}" stroke-width="4.5" stroke-linecap="round"/>`
+    : `<path d="M50 70C46 ${(70 + top) / 2 + 10} 56 ${(70 + top) / 2 - 6} 50 ${top}" fill="none" stroke="${C.stem}" stroke-width="4.5" stroke-linecap="round"/>`;
   if (!dry) {
-    if (stage === 2) extra = `<ellipse cx="44" cy="52" rx="6" ry="4" fill="#b98a4e"/><ellipse cx="52" cy="54" rx="5" ry="3.5" fill="#c99a5e"/>`;
-    if (stage >= 3) extra += leaf(50, top + 2, -20, true) + leaf(50, top + 2, 20, false);
-    if (stage >= 4) extra = `<rect x="58" y="6" width="6" height="72" rx="3" fill="#e9c98f" stroke="#c9a66a" stroke-width="1.5"/>` + extra + leaf(52, 46, -30, true) + leaf(48, 34, 30, false);
-    if (stage >= 5) extra = `<rect x="6" y="4" width="34" height="44" rx="3" fill="#e2f4fc" stroke="#9cc3e0" stroke-width="3"/><path d="M23 4v44M6 26h34" stroke="#9cc3e0" stroke-width="3"/>` + extra + leaf(50, 58, 25, false) + leaf(50, 22, -35, true);
-    if (stage >= 6) extra += [[44, 30], [56, 18], [46, 48]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#f7a8c8" stroke="#d6488d" stroke-width="1.5"/><circle cx="${x}" cy="${y}" r="1.8" fill="#fff"/>`).join("");
-    if (stage >= 7) extra += `<g fill="#fff" stroke="#9cc3e0" stroke-width="2.5"><path d="M14 22a12 12 0 0 1 20-10a16 16 0 0 1 30 0a12 12 0 0 1 22 12a8 8 0 0 1-4 10H18a10 10 0 0 1-4-12z"/></g>`;
+    if (stage === 2) front += `<ellipse cx="43" cy="52" rx="6.5" ry="4.2" fill="#D9A866"/><path d="M36.5 52a6.5 4.2 0 0 0 13 0z" fill="#B98546"/><ellipse cx="53" cy="54" rx="5.5" ry="3.6" fill="#D9A866"/><path d="M47.5 54a5.5 3.6 0 0 0 11 0z" fill="#B98546"/>`;
+    if (stage >= 3) front += leaf(50, top + 2, -20, true) + leaf(50, top + 2, 20, false);
+    if (stage >= 4) { back += `<rect x="58" y="6" width="7" height="66" rx="3.5" fill="#F0D29B"/><rect x="61.5" y="6" width="3.5" height="66" rx="1.75" fill="#D9B47A"/>`; front += leaf(52, 46, -30, true) + leaf(48, 34, 30, false); }
+    if (stage >= 5) { back = `<rect x="4" y="2" width="38" height="48" rx="5" fill="#fff"/><rect x="8" y="6" width="13" height="18" rx="2" fill="#BFE6F5"/><rect x="25" y="6" width="13" height="18" rx="2" fill="#A6DCF0"/><rect x="8" y="28" width="13" height="18" rx="2" fill="#BFE6F5"/><rect x="25" y="28" width="13" height="18" rx="2" fill="#A6DCF0"/><path d="M10 20l8-12h3L13 20z" fill="#fff" opacity=".7"/>` + back; front += leaf(50, 58, 25, false) + leaf(50, 22, -35, true); }
+    if (stage >= 6) front += [[44, 30], [56, 18], [46, 48]].map(([x, y]) => `<g transform="translate(${x} ${y})">${[0, 72, 144, 216, 288].map(r => `<ellipse cx="0" cy="-4" rx="3.2" ry="4.2" transform="rotate(${r})" fill="#FF8FB8"/>`).join("")}<circle r="2.4" fill="#FFD43B"/></g>`).join("");
+    if (stage >= 7) front += `<path d="M12 26a12 12 0 0 1 20-11 16 16 0 0 1 30-1 12 12 0 0 1 24 10 9 9 0 0 1-2 14H16a10 10 0 0 1-4-12z" fill="#fff"/><path d="M14 36h70a9 9 0 0 1-2 2H16a10 10 0 0 1-2-2z" fill="#E3EEF5"/><path d="M12 38h74" stroke="#E3EEF5" stroke-width="4" stroke-linecap="round"/>`;
   }
-  return `<svg class="bean" width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" aria-hidden="true">
-  ${stem}${extra}
-  <path d="M24 66h52l-6 48a4 4 0 0 1-4 4H34a4 4 0 0 1-4-4z" fill="${dry ? "#f1ece2" : "#eaf6ff"}" stroke="#9cc3e0" stroke-width="3" opacity=".95"/>
-  <path d="M27 72c4-8 10-2 14-6s10 2 14-2 10 4 14 0 6 4 4 8v6H28z" fill="${dry ? "#ddd3c2" : "#fff"}" stroke="${dry ? "#c4b69c" : "#dfe8ef"}" stroke-width="2"/>
-  ${stage === 1 && !dry ? `<path d="M52 77c3 5-3 7 1 12" fill="none" stroke="#c9a66a" stroke-width="3.5" stroke-linecap="round"/>` : ""}
-  <ellipse cx="50" cy="73" rx="9" ry="6" fill="${dry ? "#8a6a45" : "#a8743f"}" stroke="#7a4f24" stroke-width="2"/><ellipse cx="47" cy="71" rx="3" ry="1.6" fill="#fff" opacity=".35"/>
-  </svg>`;
+  // Bicchiere di plastica trasparente, cotone, fagiolo
+  const cup = `<rect x="21" y="62" width="58" height="7" rx="3.5" fill="${dry ? "#E6EDF0" : "#C6EAF8"}"/><path d="M24 66h52l-5.6 45a6 6 0 0 1-6 5.2H35.6a6 6 0 0 1-6-5.2z" fill="${dry ? "#E4ECEF" : "#D6F1FB"}"/><path d="M58 66h18l-5.6 45a6 6 0 0 1-6 5.2H58.6c3 0 5-2 5.3-5z" fill="${dry ? "#CFD9DD" : "#B4E2F4"}"/>
+    <rect x="31" y="74" width="5" height="34" rx="2.5" fill="#fff" opacity=".7"/>
+    <g transform="translate(0 -5)"><path d="M27 70c1-7 8-8 12-4 3-6 11-6 14 0 3-5 11-5 13 1 5-3 9 1 8 6l-.6 3H27.4z" fill="${C.cot}"/><path d="M27.4 73.5c3 2 8 2 11-.5 4 3 10 3 14 0 4 3 10 3 14 0 3 2 6 2 7.6.5l-.4 2.5H27.6z" fill="${C.cotD}"/></g>
+`;
+  const root = stage === 1 && !dry ? `<path d="M53 74c3 4-2 6 1 10" fill="none" stroke="#E9CF9C" stroke-width="3.4" stroke-linecap="round"/>` : "";
+  const bean = `<ellipse cx="50" cy="69" rx="10" ry="6.5" fill="${C.bean}"/><path d="M40 69a10 6.5 0 0 0 20 0c-2 3-6 4.5-10 4.5S42 72 40 69z" fill="${C.beanD}"/><ellipse cx="46" cy="66.5" rx="3.4" ry="1.7" fill="#fff" opacity=".45"/>`;
+  return `<svg class="bean" width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" aria-hidden="true">${back}${front}${cup}<g transform="translate(0 -4)">${root}${bean}</g></svg>`;
 }
 // Lo spruzzino: tiene umido il cotone per un giorno saltato. Stile icone navbar: forme piene, lato in ombra, riflesso.
 // Con la faccia di chi sa che ti sta salvando la serie (e te lo farà pesare).
@@ -308,7 +313,7 @@ Object.assign(ICON, {
   gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v7.5h14V13M12 9v11.5"/><path d="M12 9c-1.5-3.5-6-4.5-6-1.6C6 9 9 9 12 9zM12 9c1.5-3.5 6-4.5 6-1.6C18 9 15 9 12 9z"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>'
 });
-const beanIcon = (size = 26) => `<svg class="beanicon" width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15C16 11 15 8 12 6" fill="none" stroke="#3f9d52" stroke-width="2.4" stroke-linecap="round"/><path d="M16 11c1-4 5-6 9-5c-1 4-5 6-9 5z" fill="#43b05c" stroke="#2e8b48" stroke-width="1.4"/><path d="M7 20c0-4 4-6 8-5s4 2 7 1 4 2 3 5-5 6-10 5-8-2-8-6z" fill="#a8743f" stroke="#7a4f24" stroke-width="2"/><ellipse cx="11" cy="20" rx="2.6" ry="1.4" fill="#fff" opacity=".35"/></svg>`;
+const beanIcon = (size = 26) => `<svg class="beanicon" width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15C16 11 15 8 12 6" fill="none" stroke="#3FA14C" stroke-width="2.6" stroke-linecap="round"/><path d="M16 11c1-4 5-6 9-5c-1 4-5 6-9 5z" fill="#6BD678"/><path d="M16 11c1-4 5-6 9-5z" fill="#43B05C"/><path d="M6.5 20.5c0-4.4 4.2-6.6 8.6-5.5 3.6.9 4.4 2 7.6 1.1 3.4-.9 4.8 2.2 3.4 5.6-1.6 3.6-5.8 6.4-11 5.4-5-1-8.6-2.6-8.6-6.6z" fill="#B27A43"/><path d="M6.6 21.4c.6 3.4 4 4.8 8.5 5.7 5.2 1 9.4-1.8 11-5.4.2-.4.3-.8.4-1.2-1.8 3.4-6 5.6-11 4.6-4.4-.9-7.6-1.8-8.9-3.7z" fill="#8C5A2C"/><ellipse cx="11.5" cy="19.5" rx="2.8" ry="1.4" fill="#fff" opacity=".45"/></svg>`;
 
 /* ---- Icone illustrate (stile Duolingo): forme piene, un lato in ombra, un riflesso bianco. Niente contorni. ---- */
 const ILL = {

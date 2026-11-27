@@ -521,3 +521,5 @@ main.notop{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
 .kcar:has(.kcard:nth-child(2):last-child) .kcard{flex-basis:calc(50% - 5px)}
 /* ---- Curiosità centrate ---- */
 .fcard{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+/* ---- Negozio: vaso già tuo, grigio come "disabilitato" ---- */
+.shopcard.owned{border-color:var(--line);box-shadow:0 4px 0 var(--line);background:#F3F4F1;filter:grayscale(.6);opacity:.75}
