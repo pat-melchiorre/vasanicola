@@ -220,9 +220,9 @@ const GREETINGS = [
 // Il "personaggio" del giorno dipende dallo stato della serra: il primo che corrisponde vince
 function todayCharacter(st){
   if (!S.garden.length) return ["Erborista da Divano", "Sa tutto sulle piante. Non ne ha neanche una."];
-  if (st.em) return ["Custode in Allarme Rosso", "Una pianta ha un problema e tu stai leggendo questa frase."];
+  if (st.em) return ["Custode in Allarme Rosso", st.em === 1 ? "Una pianta ha un problema e tu stai leggendo questa frase." : `${["", "", "Due", "Tre", "Quattro"][st.em] || st.em} piante hanno un problema e tu stai leggendo questa frase.`];
   if (st.dead > st.alive) return ["Negromante del Davanzale", "Le piante le ha. Vive, è un altro discorso."];
-  if (st.thirsty) return ["Custode della Siccità", "Le piante hanno sete. Tu, evidentemente, hai altro da fare."];
+  if (st.thirsty) return ["Custode della Siccità", st.thirsty === 1 ? "Una pianta ha sete. Tu, evidentemente, hai altro da fare." : "Le piante hanno sete. Tu, evidentemente, hai altro da fare."];
   if (st.wet) return ["Alluvione Ambulante", "Ama le piante. Troppo. Fisicamente."];
   if (st.alive >= 4) return ["Entità del Pollice Verde", "Tutte vive. Nessuna emergenza. Sospetto."];
   return ["Apprendista del Davanzale", "Poche piante, ma vive. Si parte da qui (si spera)."];
