@@ -294,13 +294,14 @@ function beanSVG(stage = 0, size = 120, dry = false){
 // Lo spruzzino: tiene umido il cotone per un giorno saltato. Stile icone navbar: forme piene, lato in ombra, riflesso.
 // Con la faccia di chi sa che ti sta salvando la serie (e te lo farà pesare).
 const sprayerSVG = (size = 80) => `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
-  <g fill="#9ED8FA"><circle cx="86" cy="18" r="5"/><circle cx="94" cy="28" r="3.6"/><circle cx="84" cy="32" r="3"/><circle cx="92" cy="10" r="2.6"/></g>
-  <path d="M38 18h26l12 7-3 6H62v8H40v-8z" fill="#FF9F2E"/><path d="M62 31h11l3-6-2-1-3 4H62z" fill="#E8851A"/><rect x="73" y="22" width="8" height="6" rx="3" fill="#E8851A"/>
-  <path d="M42 34h18l5 10H37z" fill="#FFB44D"/><path d="M38 43h26c4 0 7 3 7 7v36a8 8 0 0 1-8 8H39a8 8 0 0 1-8-8V50c0-4 3-7 7-7z" fill="#4AB0F5"/>
-  <path d="M60 43h4c4 0 7 3 7 7v36a8 8 0 0 1-8 8h-3z" fill="#2589D6"/><rect x="36" y="50" width="6" height="28" rx="3" fill="#fff" opacity=".55"/>
-  <path d="M31 72h40v14a8 8 0 0 1-8 8H39a8 8 0 0 1-8-8z" fill="#3A9BE3" opacity=".6"/>
-  <ellipse cx="45" cy="62" rx="5" ry="5.6" fill="#fff"/><ellipse cx="58" cy="62" rx="5" ry="5.6" fill="#fff"/><circle cx="47" cy="63" r="2.6" fill="#173B26"/><circle cx="60" cy="63" r="2.6" fill="#173B26"/>
-  <path d="M40.5 55.5l8-1.5M53.5 54l8 1.8" stroke="#173B26" stroke-width="2.4" stroke-linecap="round"/><path d="M46 73c4 3 9 2 12-2" stroke="#173B26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <g fill="#9ED8FA"><circle cx="86" cy="16" r="5"/><circle cx="94" cy="26" r="3.6"/><circle cx="83" cy="29" r="3"/><circle cx="93" cy="8" r="2.6"/></g>
+  <path d="M40 14h24l12 7-3 6H62v7H42v-7z" fill="#FF9F2E"/><path d="M62 27h11l3-6-2-1-3 4H62z" fill="#E8851A"/><rect x="73" y="18" width="8" height="6" rx="3" fill="#E8851A"/>
+  <path d="M45 33h14v6H45z" fill="#FFB44D"/>
+  <path d="M46 39h12c2 0 3.6 1.2 4.3 3L82 85c1.6 4-1.4 9-6 9H28c-4.6 0-7.6-5-6-9l19.7-43c.7-1.8 2.3-3 4.3-3z" fill="#4AB0F5"/>
+  <path d="M55 39h3c2 0 3.6 1.2 4.3 3L82 85c1.6 4-1.4 9-6 9H64c4 0 6-4 4.6-8z" fill="#2589D6"/>
+  <path d="M44 50l-12 27c-.8 1.8.5 3.4 2.2 3.4h0c1.2 0 2.2-.7 2.6-1.8L48 52c.6-1.6-.4-3.2-2-3.2-.9 0-1.6.4-2 1.2z" fill="#fff" opacity=".55"/>
+  <ellipse cx="46" cy="66" rx="5" ry="5.6" fill="#fff"/><ellipse cx="59" cy="66" rx="5" ry="5.6" fill="#fff"/><circle cx="48" cy="67" r="2.6" fill="#173B26"/><circle cx="61" cy="67" r="2.6" fill="#173B26"/>
+  <path d="M41.5 59.5l8-1.5M54.5 58l8 1.8" stroke="#173B26" stroke-width="2.4" stroke-linecap="round"/><path d="M47 78c4 3 9 2 12-2" stroke="#173B26" stroke-width="2.6" fill="none" stroke-linecap="round"/>
 </svg>`;
 // Icone aggiunte: regalo, fagiolo fisso per la barra in alto
 Object.assign(ICON, {

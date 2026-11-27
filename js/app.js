@@ -945,7 +945,7 @@ function openEmergency(g){
     m.querySelector("#emOut").innerHTML = ok
       ? `<div class="card" style="margin-top:14px;font-size:15px"><b style="color:var(--leaf-dark)">Salvata.</b> ${esc(e.why)} <b style="color:var(--water)">+${EM.cureGocce} gocce</b>, e un po’ di esperienza.</div>`
       : `<div class="card" style="margin-top:14px;font-size:15px;background:var(--bad-bg);border-color:var(--bad)"><b style="color:var(--bad)">Non era la cura giusta.</b> Riprova domani, oppure ripassa lo step “${esc(step.title)}” e riprova subito.</div>`;
-    m.querySelector("[data-close]").textContent = "Torna alla serra";
+    m.querySelector(".btn[data-close]").textContent = "Torna alla serra";
     m.addEventListener("click", ev => { if (ev.target.closest("[data-close]") || ev.target === m) render(); });
   });
 }
