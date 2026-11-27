@@ -200,7 +200,8 @@ function render(){
   if (cheers.length && S.onboarded) { const msg = cheers.join(" "); cheers = []; setTimeout(() => toast(msg), 300); }
   if (lvToast && S.onboarded) { const msg = lvToast; lvToast = ""; setTimeout(() => toast(msg, true), cheers.length ? 2500 : 300); }
   if (!S.onboarded) return renderOnboarding(0);
-  if (!welcomed) { welcomed = true; return renderWelcome(); }
+  // All'apertura la schermata di Vasanicola compare solo se c'è un'emergenza
+  if (!welcomed) { welcomed = true; if (emPlants().length) return renderWelcome(true); }
   const body = tab === "path" ? renderPath() : tab === "serra" ? renderSerra() : tab === "negozio" ? renderNegozio() : renderErbario();
   // La barra in alto (fagiolo, gocce, livello) c'è solo nel Percorso, attaccata all'intestazione della zona
   app.innerHTML = (tab === "path" ? topbar() : "") + `<main class="${tab === "path" ? "" : "notop"}">${body}</main>` + tabbar();
@@ -226,23 +227,30 @@ function todayCharacter(st){
   if (st.alive >= 4) return ["Entità del Pollice Verde", "Tutte vive. Nessuna emergenza. Sospetto."];
   return ["Apprendista del Davanzale", "Poche piante, ma vive. Si parte da qui (si spera)."];
 }
-function renderWelcome(){
+// Schermata di Vasanicola. Si apre in due modi:
+// - toccando la mascotte (alert = false): solo il personaggio di oggi e un bottone, niente riepiloghi;
+// - all'apertura dell'app, ma solo se ci sono emergenze (alert = true): mostra soltanto le piante
+//   in emergenza, e toccandone una si va dritti in serra con l'emergenza aperta.
+const emPlants = () => S.garden.map((g, i) => ({ g, i })).filter(({ g }) => !g.dead && g.em);
+function renderWelcome(alert = false){
   const alive = S.garden.filter(g => !g.dead), states = alive.map(plantState);
   const st = { alive: alive.length, dead: S.garden.length - alive.length, em: alive.filter(g => g.em).length,
     thirsty: states.filter(x => x === "assetata" || x === "appassita").length, wet: states.filter(x => x === "zuppa" || x === "fradicia").length };
   const [title, sub] = todayCharacter(st);
-  const trouble = st.em || st.thirsty || st.dead;
-  const chip = (n, label, cls) => `<span class="wchip ${cls}"><b>${n}</b>${label}</span>`;
-  const chips = S.garden.length ? `<div class="wchips">${chip(st.alive, st.alive === 1 ? "viva" : "vive", "")}${st.thirsty ? chip(st.thirsty, "con sete", "water") : ""}${st.em ? chip(st.em, st.em === 1 ? "emergenza" : "emergenze", "bad") : ""}${st.dead ? chip(st.dead, st.dead === 1 ? "da ripiantare" : "da ripiantare", "dead") : ""}</div>` : "";
+  const ems = alert ? emPlants() : [];
+  const rows = ems.length ? `<div class="wems">${ems.map(({ g, i }) => {
+    const left = Math.max(1, EM.deadline - Math.floor((now() - g.em.at) / DAY));
+    return `<button class="wem" data-wem="${i}">${plantSVG(g.plant, 48, plantState(g), stageOf(g), g.pot)}<span><b>${esc(nameOf(g))}</b>${esc(EMERG[g.em.id].title)}<small>${left === 1 ? "Ultimo giorno" : `Ancora ${left} giorni`}</small></span>${IC("alert")}</button>`;
+  }).join("")}</div>` : "";
   app.innerHTML = `<section class="welcome">
     <div class="wsay">${esc(GREETINGS[Math.floor(Math.random() * GREETINGS.length)])}</div>
-    ${mascot(150, trouble ? "sad" : "happy")}
+    ${mascot(150, ems.length ? "sad" : "happy")}
     <div class="wlabel">Il tuo personaggio di oggi:</div>
     <h1>${title}</h1><p class="wsub">(${sub})</p>
-    ${chips}
-    <div class="wacts"><button class="btn ${trouble ? "bad" : ""}" data-go="${trouble ? "serra" : "path"}">${trouble ? "Corri in serra" : "Continua il percorso"}</button>
-    <button class="btn ghost" data-go="${trouble ? "path" : "serra"}">${trouble ? "Prima una lezione" : "Passa dalla serra"}</button></div></section>`;
-  app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { tab = b.dataset.go; render(); });
+    ${rows}
+    <div class="wacts"><button class="btn ${ems.length ? "bad" : ""}" data-go="${ems.length ? "serra" : "path"}">${ems.length ? "Corri in serra" : "Continua il percorso"}</button></div></section>`;
+  app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { tab = b.dataset.go; render(); scrollTo(0, 0); });
+  app.querySelectorAll("[data-wem]").forEach(b => b.onclick = () => { tab = "serra"; render(); openEmergency(S.garden[+b.dataset.wem]); });
 }
 
 /* --- Onboarding --- */
