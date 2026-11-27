@@ -186,7 +186,7 @@ function bump(sel){ const el = document.querySelector(sel); if (el) { el.classLi
 
 function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
-  return `<header class="top"><div class="brand" aria-label="Vasanicola">${mascot(34)}</div><div class="tstats">
+  return `<header class="top"><button class="brand" data-welcome="1" aria-label="Vasanicola: il tuo personaggio di oggi">${mascot(34)}</button><div class="tstats">
     <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
     <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div>
     <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></div></header>`;
@@ -889,6 +889,7 @@ app.addEventListener("click", e => {
   if (t.dataset.ztop !== undefined) return zoneTop(t);
   if (t.dataset.level) return openLevel();
   if (t.dataset.streak) return openStreak();
+  if (t.dataset.welcome) { scrollTo(0, 0); return renderWelcome(); }
   if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
   if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }

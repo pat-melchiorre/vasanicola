@@ -535,3 +535,15 @@ main.notop{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
 .shopcard.owned .tag{background:var(--off-chip);color:var(--off-ink)}
 :root[data-theme="dark"] .shopcard.owned{--off-bg:#151c17;--off-chip:#232b25;--off-ink:#6f7a71}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .shopcard.owned{--off-bg:#151c17;--off-chip:#232b25;--off-ink:#6f7a71} }
+
+/* Mascotte cliccabile (apre il personaggio di oggi); il sole chiude la riga sul bordo destro,
+   allineato all'intestazione della zona. Il ::before è un elemento vuoto: con space-between
+   gli spazi mascotte-fagiolo, fagiolo-gocce e gocce-sole vengono tutti uguali */
+button.brand{padding:0;border:0;background:none;cursor:pointer}
+.tstats{justify-content:space-between;gap:0}
+.tstats::before{content:""}
+.top{padding-left:12px;padding-right:12px}
+/* Più aria tra la barra in alto e l'intestazione della zona */
+.zhead{padding-top:12px}
+/* Navbar in basso: la sezione attiva ha solo lo sfondo, niente contorno */
+.tabs button[aria-current="page"]{border-color:transparent}
