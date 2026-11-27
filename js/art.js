@@ -47,14 +47,19 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
   const wet = ["zuppa","fradicia","marcita"].includes(state);
   // Le piante con illustrazione dettagliata (FLORA) hanno il vaso dietro: le foglie ricadono sul bordo
   const fl = typeof FLORA !== "undefined" && FLORA[id];
-  const pd = fl && !model ? { back: floraPot(pot, wet), front: "" } : potDrawing(id, model, pot, wet), potSvg = pd.front;
+  const pd = fl && !model ? { back: floraPot(pot, wet), front: "" } : potDrawing(id, model, pot, wet);
+  // Il vaso sta sempre DIETRO alla pianta: foglie e rami che ricadono passano davanti al bordo, mai dietro.
+  // Unica eccezione la vanda, che sta dentro un cestino a listelli (le foglie escono dalle fessure).
+  // I disegni vecchi nascevano a y 86: li alziamo di 2 così il fusto parte dal terriccio e non dal bordo.
+  const behind = id !== "vanda", potBack = pd.back + (behind ? pd.front : ""), potSvg = behind ? "" : pd.front;
+  const lift = s => fl ? s : `<g transform="translate(0 -2)">${s}</g>`;
   // Chi sa piegarsi da solo (draw) non usa la rotazione CSS degli stati di sete
   const droop = { assetata: .45, appassita: 1 }[state] || 0, own = fl && fl.draw ? " own" : "";
-  if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
-  if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
+  if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potBack}${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
+  if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potBack}${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
   // Seme e germoglio sono uguali per tutte le piante; la piantina è la pianta adulta in piccolo
-  const wrap = inner => `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${pd.back}<g class="leaves">${inner}</g>${potSvg}</svg>`;
-  if (stage === "seme") return wrap(`<ellipse cx="60" cy="80" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 78l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
+  const wrap = inner => `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${potBack}<g class="leaves">${lift(inner)}</g>${potSvg}</svg>`;
+  if (stage === "seme") return wrap(`<ellipse cx="60" cy="83" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 81l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
   if (stage === "germoglio") return wrap(`<path d="M60 86V68" stroke="#3f8f4e" stroke-width="3" stroke-linecap="round"/><ellipse cx="53" cy="66" rx="7" ry="4" transform="rotate(-25 53 66)" fill="#5cc875"/><ellipse cx="67" cy="66" rx="7" ry="4" transform="rotate(25 67 66)" fill="#4fb867"/>`);
   let leaves = "", over = "";
   if (fl) leaves = fl.draw ? fl.draw(droop) : fl.leaves;
@@ -263,7 +268,7 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
   const tray = PLANTS[id]?.care?.bog ? `<path d="M22 124h76l-3 8H25z" fill="#8fcaff" opacity=".9"/><path d="M28 126h64" stroke="#ffffff" stroke-width="1.5" opacity=".7"/>` : "";
   // L’orchidea ha il vaso trasparente: si vedono le radici argentate dentro
   const roots = id === "orchidea" ? `<path d="M44 100c4 8 2 16 6 24M56 98c-2 10 4 16 2 26M68 98c4 8 0 16 4 24M78 100c-4 8-2 14-6 22" stroke="#b8cbb0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>` : "";
-  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${pd.back}<g class="leaves">${stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g>${tray}</svg>`;
+  return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}${own}">${potBack}<g class="leaves">${lift(stage === "piantina" ? `<g transform="translate(60 86) scale(.55) translate(-60 -86)">${leaves}</g>` : leaves)}</g>${potSvg}${roots}<g class="leaves">${stage === "piantina" ? "" : over}</g>${tray}</svg>`;
 }
 const mascot = (size = 150, mood = "happy") => {
   const mouth = mood === "sad" ? '<path d="M50 72q10-8 20 0" stroke="#173b26" stroke-width="3.5" fill="none" stroke-linecap="round"/>' : '<path d="M48 68q12 12 24 0" stroke="#173b26" stroke-width="3.5" fill="#173b26" stroke-linecap="round"/>';

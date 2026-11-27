@@ -561,3 +561,13 @@ button.brand{padding:0;border:0;background:none;cursor:pointer}
 .wem b{font-size:16px;color:var(--bad)}
 .wem small{font-size:13px;color:var(--ink-2);font-weight:800}
 .wem > svg:last-child{flex:none;width:22px;height:22px;color:var(--bad)}
+
+/* Schermata di Vasanicola: il bottone resta fisso in basso, il resto si centra nello spazio sopra */
+.welcome{justify-content:flex-start;padding-bottom:0}
+.wbody{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-bottom:12px}
+.welcome .wacts{position:sticky;bottom:0;margin-top:0;max-width:none;padding:14px 0 calc(16px + env(safe-area-inset-bottom,0px));background:var(--bg)}
+/* Mascotte preoccupata nella barra: un piccolo tremolio ogni tanto, così si nota senza urlare */
+@media (prefers-reduced-motion: no-preference){
+  .brand.worried svg{animation:worry 3.2s ease-in-out infinite;transform-origin:50% 90%}
+  @keyframes worry{0%,82%,100%{transform:rotate(0)}86%{transform:rotate(-6deg)}90%{transform:rotate(5deg)}94%{transform:rotate(-3deg)}}
+}

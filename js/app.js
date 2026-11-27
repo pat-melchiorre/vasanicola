@@ -186,7 +186,7 @@ function bump(sel){ const el = document.querySelector(sel); if (el) { el.classLi
 
 function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
-  return `<header class="top"><button class="brand" data-welcome="1" aria-label="Vasanicola: il tuo personaggio di oggi">${mascot(34)}</button><div class="tstats">
+  return `<header class="top"><button class="brand${emPlants().length ? " worried" : ""}" data-welcome="1" aria-label="Vasanicola: il tuo personaggio di oggi${emPlants().length ? ", ci sono emergenze" : ""}">${mascot(34, emPlants().length ? "sad" : "happy")}</button><div class="tstats">
     <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
     <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div>
     <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></div></header>`;
@@ -211,21 +211,23 @@ function render(){
 
 /* --- Bentornato: si vede una volta a ogni apertura, dopo l’onboarding --- */
 let welcomed = false;
-const GREETINGS = [
-  "Oh, ci sei. Le piante avevano iniziato a parlare male di te.",
-  "Eccoti. Il davanzale ti aspettava (il davanzale no, le piante sì).",
-  "Ciao. Ti ho sognato. Avevi un annaffiatoio in mano. Era un incubo?",
-  "Finalmente. Temevo avessi ripiegato sulle piante finte."
-];
 // Il "personaggio" del giorno dipende dallo stato della serra: il primo che corrisponde vince
+// Il personaggio di oggi: titolo, sottotitolo e cosa dice Vasanicola nella nuvoletta (una a caso tra tre)
 function todayCharacter(st){
-  if (!S.garden.length) return ["Erborista da Divano", "Sa tutto sulle piante. Non ne ha neanche una."];
-  if (st.em) return ["Custode in Allarme Rosso", st.em === 1 ? "Una pianta ha un problema e tu stai leggendo questa frase." : `${["", "", "Due", "Tre", "Quattro"][st.em] || st.em} piante hanno un problema e tu stai leggendo questa frase.`];
-  if (st.dead > st.alive) return ["Negromante del Davanzale", "Le piante le ha. Vive, è un altro discorso."];
-  if (st.thirsty) return ["Custode della Siccità", st.thirsty === 1 ? "Una pianta ha sete. Tu, evidentemente, hai altro da fare." : "Le piante hanno sete. Tu, evidentemente, hai altro da fare."];
-  if (st.wet) return ["Alluvione Ambulante", "Ama le piante. Troppo. Fisicamente."];
-  if (st.alive >= 4) return ["Entità del Pollice Verde", "Tutte vive. Nessuna emergenza. Sospetto."];
-  return ["Apprendista del Davanzale", "Poche piante, ma vive. Si parte da qui (si spera)."];
+  if (!S.garden.length) return ["Erborista da Divano", "Sa tutto sulle piante. Non ne ha neanche una.",
+    ["Tanta teoria, zero vasi. Il davanzale ti aspetta.", "Sai già più cose di metà dei fiorai. Ora prova a tenerne viva una.", "Le piante finte non contano. Lo dico per il tuo bene."]];
+  if (st.em) return ["Custode in Allarme Rosso", st.em === 1 ? "Una pianta ha un problema e tu stai leggendo questa frase." : `${["", "", "Due", "Tre", "Quattro"][st.em] || st.em} piante hanno un problema e tu stai leggendo questa frase.`,
+    ["C’è un’emergenza. Non è un’esercitazione. Ripeto: non è un’esercitazione.", "Sono un vaso parlante e sono preoccupato. Pensa tu.", "In serra c’è chi ha bisogno di te. Adesso, non dopo la lezione."]];
+  if (st.dead > st.alive) return ["Negromante del Davanzale", "Le piante le ha. Vive, è un altro discorso.",
+    ["Il davanzale sembra un campo di battaglia. Con affetto.", "Ho visto cose. Cose secche.", "Ripiantare non è arrendersi. È avere ancora speranza (e gocce)."]];
+  if (st.thirsty) return ["Custode della Siccità", st.thirsty === 1 ? "Una pianta ha sete. Tu, evidentemente, hai altro da fare." : "Le piante hanno sete. Tu, evidentemente, hai altro da fare.",
+    ["Le senti? Sono foglie che si accartocciano.", "Un bicchiere d’acqua. Non chiedono altro. Per ora.", "Il dito nella terra non morde. Provare per credere."]];
+  if (st.wet) return ["Alluvione Ambulante", "Ama le piante. Troppo. Fisicamente.",
+    ["L’acqua è vita. Troppa acqua è palude.", "Le radici sanno nuotare poco. Pochissimo.", "Posa l’annaffiatoio. Lentamente. Mani dove posso vederle."]];
+  if (st.alive >= 4) return ["Entità del Pollice Verde", "Tutte vive. Nessuna emergenza. Sospetto.",
+    ["Tutte vive. Sto controllando se è un bug.", "Mi fai quasi paura. Continua così.", "Il davanzale ti applaude. In silenzio, per fotosintesi."]];
+  return ["Apprendista del Davanzale", "Poche piante, ma vive. Si parte da qui (si spera).",
+    ["Poche ma buone. Come le amicizie vere.", "Si comincia così. Poi un giorno ti ritrovi una giungla in salotto.", "Oggi ce la facciamo. Me lo sento nelle radici."]];
 }
 // Schermata di Vasanicola. Si apre in due modi:
 // - toccando la mascotte (alert = false): solo il personaggio di oggi e un bottone, niente riepiloghi;
@@ -236,18 +238,18 @@ function renderWelcome(alert = false){
   const alive = S.garden.filter(g => !g.dead), states = alive.map(plantState);
   const st = { alive: alive.length, dead: S.garden.length - alive.length, em: alive.filter(g => g.em).length,
     thirsty: states.filter(x => x === "assetata" || x === "appassita").length, wet: states.filter(x => x === "zuppa" || x === "fradicia").length };
-  const [title, sub] = todayCharacter(st);
+  const [title, sub, says] = todayCharacter(st);
   const ems = alert ? emPlants() : [];
   const rows = ems.length ? `<div class="wems">${ems.map(({ g, i }) => {
     const left = Math.max(1, EM.deadline - Math.floor((now() - g.em.at) / DAY));
     return `<button class="wem" data-wem="${i}">${plantSVG(g.plant, 48, plantState(g), stageOf(g), g.pot)}<span><b>${esc(nameOf(g))}</b>${esc(EMERG[g.em.id].title)}<small>${left === 1 ? "Ultimo giorno" : `Ancora ${left} giorni`}</small></span>${IC("alert")}</button>`;
   }).join("")}</div>` : "";
-  app.innerHTML = `<section class="welcome">
-    <div class="wsay">${esc(GREETINGS[Math.floor(Math.random() * GREETINGS.length)])}</div>
+  app.innerHTML = `<section class="welcome"><div class="wbody">
+    <div class="wsay">${esc(says[Math.floor(Math.random() * says.length)])}</div>
     ${mascot(150, ems.length ? "sad" : "happy")}
     <div class="wlabel">Il tuo personaggio di oggi:</div>
     <h1>${title}</h1><p class="wsub">(${sub})</p>
-    ${rows}
+    ${rows}</div>
     <div class="wacts"><button class="btn ${ems.length ? "bad" : ""}" data-go="${ems.length ? "serra" : "path"}">${ems.length ? "Corri in serra" : "Continua il percorso"}</button></div></section>`;
   app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { tab = b.dataset.go; render(); scrollTo(0, 0); });
   app.querySelectorAll("[data-wem]").forEach(b => b.onclick = () => { tab = "serra"; render(); openEmergency(S.garden[+b.dataset.wem]); });
@@ -897,7 +899,7 @@ app.addEventListener("click", e => {
   if (t.dataset.ztop !== undefined) return zoneTop(t);
   if (t.dataset.level) return openLevel();
   if (t.dataset.streak) return openStreak();
-  if (t.dataset.welcome) { scrollTo(0, 0); return renderWelcome(); }
+  if (t.dataset.welcome) { scrollTo(0, 0); return renderWelcome(emPlants().length > 0); }
   if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
   if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
   if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
