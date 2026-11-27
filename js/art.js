@@ -47,7 +47,8 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
   if (stage === "seme") return wrap(`<ellipse cx="60" cy="83" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 81l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
   if (stage === "germoglio") return wrap(`<path d="M60 86V68" stroke="#3f8f4e" stroke-width="3" stroke-linecap="round"/><ellipse cx="53" cy="66" rx="7" ry="4" transform="rotate(-25 53 66)" fill="#5cc875"/><ellipse cx="67" cy="66" rx="7" ry="4" transform="rotate(25 67 66)" fill="#4fb867"/>`);
   let leaves = "", over = "";
-  if (id === "basilico") {
+  if (fl) leaves = fl.leaves;
+  else if (id === "basilico") {
     const pairs = [[60,40,0],[47,52,-28],[73,52,28],[44,66,-35],[76,66,35],[60,26,0]];
     leaves = `<path d="M60 86V30M60 70l-14-10M60 70l14-10M60 56l-12-8M60 56l12-8" stroke="#2c7d3f" stroke-width="3" stroke-linecap="round" fill="none"/>` +
       pairs.map(([x,y,r]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="15" transform="rotate(${r} ${x} ${y})" fill="#43b05c"/><path d="M${x} ${y - 11}v22" stroke="#2c8a45" stroke-width="1.4" transform="rotate(${r} ${x} ${y})"/>`).join("");
