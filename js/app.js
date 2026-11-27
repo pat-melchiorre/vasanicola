@@ -125,7 +125,7 @@ const growFrac = g => g.growAt ? (now() - g.growAt) / (growDays(g) * DAY) : 1;
 function stageOf(g){ const f = growFrac(g); const st = STAGES.find(([t]) => f < t); return st ? st[1] : "adulta"; }
 const stageLabel = g => (STAGES.find(([, k]) => k === stageOf(g)) || [,, "Adulta"])[2];
 function settleGrowth(){
-  S.garden.forEach(g => { if (!g.dead && g.growAt && growFrac(g) >= 1) { delete g.growAt; cheers.push(`${nameOf(g)}: di nuovo pianta adulta. Il ciclo della vita, versione vaso.`); } });
+  S.garden.forEach(g => { if (!g.dead && g.growAt && growFrac(g) >= 1) { delete g.growAt; cheers.push(g.again ? `${nameOf(g)}: di nuovo pianta adulta. Il ciclo della vita, versione vaso.` : `${nameOf(g)}: pianta adulta. Da seme a così, e senza tutorial su YouTube.`); delete g.again; } });
 }
 function kill(g, cause, note, at){ delete g.growAt; g.diedAt = Math.min(at || now(), now()); g.dead = true; g.cause = cause; g.note = note || null; delete g.em; if (g.nick) { g.rip = g.nick; delete g.nick; } }
 // Ogni giorno passato, ogni pianta sana senza emergenze ha una probabilità di averne una.
@@ -895,7 +895,7 @@ app.addEventListener("click", e => {
       el.classList.add("fade"); setTimeout(() => { el.innerHTML = restLine(g, i); el.classList.remove("fade"); }, 300); }, FEEL_MS + 50);
     return;
   }
-  if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
+  if (t.dataset.replant !== undefined) { const g = S.garden[+t.dataset.replant]; S.gocce -= RULES.replantCost; g.dead = false; g.cause = null; g.note = null; g.rip = null; g.bornAt = now(); g.growAt = now(); g.again = true; g.mile = 0; g.diedAt = null; g.wet = 0; g.wateredAt = now(); render(); toast(`Il seme è a terra. Ci vorranno circa ${growDays(g)} giorni per tornare adulta. Seconda vita, stessa persona responsabile.`); return; }
   if (t.dataset.ztop !== undefined) return zoneTop(t);
   if (t.dataset.level) return openLevel();
   if (t.dataset.streak) return openStreak();
@@ -994,9 +994,10 @@ document.addEventListener("click", e => {
   if (freeSlots(pickArea) <= 0) { toast("Nessun posto libero. La serra è piena come un monolocale in sei."); return; }
   if (S.gocce < cost) return;
   S.gocce -= cost; if (free) S.tutorialPlanted = true;
-  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), mile: 0, dead:false });
+  // Ogni pianta nuova parte dal seme, anche quella "presa dal fioraio": la crescita la vedi tu, fase per fase
+  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), growAt: now(), mile: 0, dead:false });
   document.querySelector(".modal")?.remove(); render(); bump("#pGocce");
-  toast(id === "basilico" ? "Il basilico è in serra. Stavolta va diversamente. (Diciamo sempre così.)" : `${PLANTS[id].name} ${gen(id, "piantato", "piantata")}. ${gen(id, "Benvenuto", "Benvenuta")} nella tua famiglia disfunzionale.`);
+  toast(id === "basilico" ? "Seme di basilico piantato. Stavolta va diversamente. (Diciamo sempre così.)" : `${PLANTS[id].name}: seme piantato. ${gen(id, "Benvenuto", "Benvenuta")} nella tua famiglia disfunzionale.`);
 });
 render();
 /* --- Aggiornamenti: quando l'app torna in primo piano, controlla se online c'è una versione nuova ---
