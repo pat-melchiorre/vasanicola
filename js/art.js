@@ -37,11 +37,13 @@ function potDrawing(id, model, color, wet){
 function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
-  const pd = potDrawing(id, model, pot, wet), potSvg = pd.front;
-  if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
-  if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
+  // Le piante con illustrazione dettagliata (FLORA) usano il loro vaso quando è quello di base
+  const fl = typeof FLORA !== "undefined" && FLORA[id];
+  const pd = fl && !model ? { back: fl.pot + (wet ? '<ellipse cx="66" cy="84" rx="13" ry="1.6" fill="#8fcaff" opacity=".85"/>' : ""), front: "" } : potDrawing(id, model, pot, wet), potSvg = pd.front;
+  if (state === "secca") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<ellipse cx="60" cy="80" rx="7" ry="5" fill="#8a5a2b"/><path d="M60 76c0-6 4-9 8-9-1 5-4 8-8 9z" fill="#9db86a" opacity=".85"/></svg>`;
+  if (state === "marcita") return `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true">${pd.back}${potSvg}<path d="M60 84c-1-6-6-9-14-9" stroke="#5e5130" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="80" rx="11" ry="4" transform="rotate(-12 44 80)" fill="#6f6a35"/><ellipse cx="74" cy="81" rx="10" ry="3.5" transform="rotate(10 74 81)" fill="#5f5a2e"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#8a5a2b"/></svg>`;
   // Seme e germoglio sono uguali per tutte le piante; la piantina è la pianta adulta in piccolo
-  const wrap = inner => `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}"><g class="leaves">${inner}</g>${potSvg}</svg>`;
+  const wrap = inner => `<svg width="${size}" height="${size * 1.1}" viewBox="0 0 120 132" aria-hidden="true" class="p-${state}">${pd.back}<g class="leaves">${inner}</g>${potSvg}</svg>`;
   if (stage === "seme") return wrap(`<ellipse cx="60" cy="83" rx="5" ry="3.6" fill="#8a5a2b"/><path d="M58 81l2 2 2-3" stroke="#c99a5b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`);
   if (stage === "germoglio") return wrap(`<path d="M60 86V68" stroke="#3f8f4e" stroke-width="3" stroke-linecap="round"/><ellipse cx="53" cy="66" rx="7" ry="4" transform="rotate(-25 53 66)" fill="#5cc875"/><ellipse cx="67" cy="66" rx="7" ry="4" transform="rotate(25 67 66)" fill="#4fb867"/>`);
   let leaves = "", over = "";
@@ -57,9 +59,7 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
     const blade = (x, h, r, w = 11) => `<g transform="rotate(${r} ${x} 86)"><path d="M${x - w / 2} 86C${x - w / 2 - 2} ${86 - h * .6} ${x - 2} ${86 - h} ${x} ${86 - h}C${x + 2} ${86 - h} ${x + w / 2 + 2} ${86 - h * .6} ${x + w / 2} 86z" fill="#2e6b3a" stroke="#e1c84a" stroke-width="2.4"/><path d="M${x - 2} 80l4-6M${x - 2} 66l4-6M${x - 2} 52l4-6" stroke="#4f9a5c" stroke-width="2"/></g>`;
     leaves = blade(60,70,0,13) + blade(46,56,-12) + blade(74,60,12) + blade(38,42,-22,10) + blade(82,46,22,10);
   } else if (id === "menta") {
-    const leaf = (x, y, r) => `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M0-12l3 3 2-1 1 4 2 1-1 4 2 2-3 3 0 3-3 1-3-1 0-3-3-3 2-2-1-4 2-1 1-4 2 1z" fill="#6fc77f"/><path d="M0-9v18" stroke="#3f9a52" stroke-width="1.4"/></g>`;
-    leaves = `<path d="M48 86V40M60 86V28M72 86V44" stroke="#3f8f4e" stroke-width="3.2" stroke-linecap="round"/>` +
-      [[48,44,-30],[48,60,30],[60,32,0],[60,48,-35],[60,64,35],[72,48,30],[72,64,-30],[40,70,-50],[80,72,50]].map(a => leaf(...a)).join("");
+    leaves = fl.leaves;
   } else if (id === "olivo") {
     // tronco nodoso + chioma di foglie strette, verdi sopra e argentate sotto, qualche oliva
     const lf = (x, y, r, c) => `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="7.5" transform="rotate(${r} ${x} ${y})" fill="${c}"/>`;
