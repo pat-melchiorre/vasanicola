@@ -178,22 +178,30 @@ function feelKind(g){
 }
 const FEEL_HEAD = { fango:"Fango.", umida:"Umida.", asciutta:"Asciutta.", secca:"Secca." };
 function fingerScene(g){
-  const kind = feelKind(g), text = soilFeel(g), color = POTS[g.plant] || "#e0773a";
-  const dirt = kind === "fango" ? "#5a3b22" : kind === "umida" ? "#7a5634" : "#b08a5e";
-  // il dito: mano a pugno in alto, indice verso il basso, punta a (76, 92); la punta si sporca alla fine
-  const glove = `<g clip-path="url(#fxSoil)"><g class="fx-finger">
-    <rect x="59" y="-50" width="38" height="11" rx="3" fill="#e9e2cf"/><rect x="59" y="-42" width="38" height="3" fill="#d4ccb4"/>
-    <path d="M52 -26c0-5 4-8 8-7l6 2v20l-7 2c-4 1-7-2-7-6z" fill="#d9952b"/>
-    <rect x="58" y="-40" width="40" height="46" rx="13" fill="#f4b942"/>
-    <rect x="84" y="-24" width="17" height="10" rx="5" fill="#f4b942"/><rect x="84" y="-14" width="17" height="10" rx="5" fill="#f4b942"/><rect x="84" y="-4" width="16" height="10" rx="5" fill="#f4b942"/>
-    <path d="M87 -14h12M87 -4h12" stroke="#d9952b" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M70 0h13v86a6.5 6.5 0 0 1-13 0z" fill="#f4b942"/><path d="M78.5 0h4.5v86a6.5 6.5 0 0 1-2.5 5.1z" fill="#d9952b"/>
-    <path d="M72.5 34h7M72.5 60h7" stroke="#d9952b" stroke-width="1.6" stroke-linecap="round"/>
-    <path class="fx-dirt" d="M70 78h13v8a6.5 6.5 0 0 1-13 0z" fill="${dirt}"/></g></g>`;
-  // il dito è ritagliato sulla linea del terriccio: la parte sotto non si vede, così sembra entrarci dentro
-  const clip = `<clipPath id="fxSoil"><path d="M-60-200H180V82.5H93A33 2.8 0 0 1 27 82.5H-60z"/></clipPath>`;
-  const crumbs = [[68,80],[73,77],[80,78],[85,81],[76,75]].map(([x, y], k) => `<circle class="fx-crumb" style="--k:${k}" cx="${x}" cy="${y}" r="1.6" fill="${dirt}"/>`).join("");
-  const art = plantSVG(g.plant, 300, plantState(g), stageOf(g), g.pot).replace(/<\/svg>$/, `${clip}${glove}${crumbs}</svg>`).replace(/viewBox="0 0 120 132"/, 'viewBox="0 0 120 132" overflow="visible"');
+  const kind = feelKind(g), text = soilFeel(g), color = POTS[g.plant] || "#e0773a", dk = shade(color);
+  // Inquadratura sul solo vaso, visto un po' dall'alto: si vede l'apertura ovale con la terra.
+  // Il colore della terra anticipa già il risultato.
+  const soil = { fango:"#3a2617", umida:"#5b3d26", asciutta:"#8a6a48", secca:"#a9845a" }[kind];
+  const pot = `<path d="M38 98H162V148Q162 172 138 172H62Q38 172 38 148z" fill="${color}"/>
+    <path d="M42.5 158H157.5Q153 172 138 172H62Q47 172 42.5 158z" fill="${dk}"/><rect x="38" y="99" width="124" height="5" fill="${dk}"/>
+    <rect x="30" y="62" width="140" height="38" rx="9" fill="${color}"/>
+    <ellipse cx="100" cy="72" rx="62" ry="8.5" fill="${dk}"/>
+    <ellipse cx="100" cy="74.5" rx="57" ry="5.5" fill="${soil}"/>` +
+    (kind === "fango" ? `<ellipse cx="80" cy="74" rx="14" ry="1.6" fill="#8fcaff" opacity=".7"/>` : "") +
+    (kind === "secca" ? `<path d="M70 73l6 2-3 2M120 72l-5 3 4 2" stroke="#7d5f3d" stroke-width="1.2" fill="none" stroke-linecap="round"/>` : "");
+  // Il dito: entra in diagonale dall'alto a destra (asse a 40°). È ritagliato sulla superficie della terra,
+  // quindi la punta "sparisce" quando affonda. Guanto da giardinaggio con la punta in gomma al posto dell'unghia.
+  const finger = `<g clip-path="url(#fxSoil)"><g transform="translate(97 75) rotate(-40)"><g class="fx-finger">
+    <path d="M0-16H230V16H0A16 16 0 0 1 0-16z" fill="#f4b942"/><path d="M0 6H230V16H0A16 16 0 0 1-10.6 12z" fill="#d9952b"/>
+    <path d="M20-16H0A16 16 0 0 0 0 16H20Q26 0 20-16z" fill="#e0a43a"/>
+    <path class="fx-dirt" d="M20-16H0A16 16 0 0 0 0 16H20Q26 0 20-16z" fill="${soil}"/>
+    <path d="M58-12v24M104-12v24" stroke="#d9952b" stroke-width="2" stroke-linecap="round"/></g></g></g>`;
+  // gobbe di terra che si sollevano dove entra il dito
+  // le gobbe sono un po' più chiare della terra (la terra smossa prende luce), con una lunetta d'ombra sotto
+  const lite = "#" + [1, 3, 5].map(i => Math.round(parseInt(soil.slice(i, i + 2), 16) * .7 + 255 * .3).toString(16).padStart(2, "0")).join("");
+  const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${lite}"/>`).join("");
+  const clip = `<clipPath id="fxSoil"><path d="M-200-300H400V75.5H-200z"/></clipPath>`;
+  const art = `<svg viewBox="0 0 200 190" overflow="visible" aria-hidden="true">${clip}${pot}${finger}${bumps}</svg>`;
   const fx = document.createElement("div");
   fx.className = `fx-feel k-${kind}`; fx.setAttribute("role", "dialog"); fx.setAttribute("aria-label", `Prova del dito: ${FEEL_HEAD[kind]} ${text}`);
   fx.innerHTML = `<div class="fx-scene">${art}</div><div class="fx-result"><span>Prova del dito</span><h2>${FEEL_HEAD[kind]}</h2><p>${esc(text)}</p></div>`;
