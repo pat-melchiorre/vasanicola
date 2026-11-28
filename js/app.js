@@ -167,7 +167,7 @@ function soilFeel(g){
 /* --- Prova del dito: scena a tutto schermo (per ora solo basilico) ---
    1. compare il vaso della pianta in grande; 2. un dito col guanto da giardinaggio scende e affonda nel terriccio;
    3. risale (sporco di terra se è bagnata); 4. al suo posto il verdetto in grande, il tempo di leggerlo, poi sparisce tutto.
-   Il guanto evita di scegliere un colore di pelle e sta bene col tema. Un tocco chiude subito. */
+   Il guanto evita di scegliere un colore di pelle e sta bene col tema. */
 const FINGER_PLANTS = new Set(["basilico"]);
 function feelKind(g){
   const c = care(g), st = plantState(g);
@@ -182,8 +182,10 @@ function fingerScene(g){
   // Inquadratura sul solo vaso, visto un po' dall'alto: si vede l'apertura ovale con la terra.
   // Il colore della terra anticipa già il risultato.
   const soil = { fango:"#3a2617", umida:"#5b3d26", asciutta:"#8a6a48", secca:"#a9845a" }[kind];
-  const pot = `<path d="M38 98H162V148Q162 172 138 172H62Q38 172 38 148z" fill="${color}"/>
-    <path d="M42.5 158H157.5Q153 172 138 172H62Q47 172 42.5 158z" fill="${dk}"/><rect x="38" y="99" width="124" height="5" fill="${dk}"/>
+  // la fascia scura in fondo è ritagliata sulla sagoma del corpo, così combacia con la curva (niente doppia ombra)
+  const body = "M38 98H162V148Q162 172 138 172H62Q38 172 38 148z";
+  const pot = `<clipPath id="fxPot"><path d="${body}"/></clipPath><path d="${body}" fill="${color}"/>
+    <rect x="30" y="158" width="140" height="20" fill="${dk}" clip-path="url(#fxPot)"/><rect x="38" y="99" width="124" height="5" fill="${dk}"/>
     <rect x="30" y="62" width="140" height="38" rx="9" fill="${color}"/>
     <ellipse cx="100" cy="72" rx="62" ry="8.5" fill="${dk}"/>
     <ellipse cx="100" cy="74.5" rx="57" ry="5.5" fill="${soil}"/>` +
@@ -199,11 +201,11 @@ function fingerScene(g){
   // gobbe di terra che si sollevano dove entra il dito
   const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${soil}"/>`).join("");
   const clip = `<clipPath id="fxSoil"><path d="M-200-300H400V75.5H-200z"/></clipPath>`;
-  // La pianta c'è, dietro al dito: è il suo disegno normale, ritagliato sopra il terriccio (y 83) e ingrandito
+  // La pianta c'è, davanti al dito (il dito passa tra le foglie e affonda nella terra): è il suo disegno senza vaso, ingrandito
   // perché il suo bordo (largo 66.8) coincida con quello del vaso grande (largo 140).
-  const k = 140 / 66.8, plant = plantSVG(g.plant, 100, plantState(g), stageOf(g), g.pot)
-    .replace(/<svg [^>]*?viewBox="0 0 120 132"/, `<svg x="${r1(30 - 26.6 * k)}" y="${r1(74.5 - 83 * k)}" width="${r1(120 * k)}" height="${r1(83 * k)}" viewBox="0 0 120 83"`);
-  const art = `<svg viewBox="0 0 200 190" overflow="visible" aria-hidden="true">${clip}${pot}${plant}${finger}${bumps}</svg>`;
+  const k = 140 / 66.8, plant = plantSVG(g.plant, 100, plantState(g), stageOf(g), g.pot, true)
+    .replace(/<svg [^>]*?viewBox="0 0 120 132"/, `<svg x="${r1(30 - 26.6 * k)}" y="${r1(74.5 - 83 * k)}" width="${r1(120 * k)}" height="${r1(132 * k)}" viewBox="0 0 120 132" overflow="visible"`);
+  const art = `<svg viewBox="0 0 200 190" overflow="visible" aria-hidden="true">${clip}${pot}${finger}${bumps}${plant}</svg>`;
   const fx = document.createElement("div");
   fx.className = `fx-feel k-${kind}`; fx.setAttribute("role", "dialog"); fx.setAttribute("aria-label", `Prova del dito: ${FEEL_HEAD[kind]} ${text}`);
   fx.innerHTML = `<div class="fx-scene">${art}</div><div class="fx-result"><span>Prova del dito</span><h2>${FEEL_HEAD[kind]}</h2><p>${esc(text)}</p></div>`;
@@ -212,7 +214,6 @@ function fingerScene(g){
   const read = Math.max(2400, text.length * 70), timers = [];
   const close = () => { timers.forEach(clearTimeout); fx.classList.add("out"); document.documentElement.classList.remove("locked"); setTimeout(() => fx.remove(), 260); };
   timers.push(setTimeout(() => fx.classList.add("show-result"), 2100), setTimeout(close, 2100 + read));
-  fx.onclick = close;
 }
 
 const kOf = id => S.knowledge[id] || 0;

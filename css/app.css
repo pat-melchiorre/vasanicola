@@ -576,7 +576,8 @@ button.brand{padding:0;border:0;background:none;cursor:pointer}
 .fx-feel{position:fixed;inset:0;z-index:90;background:var(--bg);display:grid;place-items:center;animation:fxIn .2s ease-out}
 .fx-feel.out{animation:fxOut .25s ease-in forwards}
 .fx-scene,.fx-result{grid-area:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
-.fx-scene svg{width:min(86vw,380px);height:auto;overflow:visible}
+.fx-scene > svg{width:min(86vw,380px);height:auto;overflow:visible}
+.fx-scene svg svg{overflow:visible}
 .fx-finger{animation:fxPoke 2s cubic-bezier(.5,0,.3,1) forwards}
 .fx-dirt{opacity:0;animation:fxShow .2s 1.1s forwards}
 .fx-crumb{opacity:0;animation:fxCrumb .3s calc(.65s + var(--k) * .06s) cubic-bezier(.3,1.6,.6,1) forwards}

@@ -42,7 +42,8 @@ function potDrawing(id, model, color, wet){
     [[46,108],[60,112],[74,108]].map(([x, y]) => [0,72,144,216,288].map(r => `<ellipse cx="${x}" cy="${y - 3}" rx="1.8" ry="3" transform="rotate(${r} ${x} ${y})" fill="#3b6ea5"/>`).join("") + `<circle cx="${x}" cy="${y}" r="1.4" fill="#f2c230"/>`).join("") + soil() };
   return { back:"", front: floraPot(color, wet) };
 }
-function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null){
+// bare = true: solo la pianta, senza vaso (serve alla scena della prova del dito, che ha il suo vaso grande)
+function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null, bare = false){
   const pot = POTS[id] || "#e0773a";
   const wet = ["zuppa","fradicia","marcita"].includes(state);
   // Le piante con illustrazione dettagliata (FLORA) hanno il vaso dietro: le foglie ricadono sul bordo
@@ -51,7 +52,7 @@ function plantSVG(id, size = 120, state = "sana", stage = "adulta", model = null
   // Il vaso sta sempre DIETRO alla pianta: foglie e rami che ricadono passano davanti al bordo, mai dietro.
   // Unica eccezione la vanda, che sta dentro un cestino a listelli (le foglie escono dalle fessure).
   // I disegni vecchi nascevano a y 86: li alziamo di 2 così il fusto parte dal terriccio e non dal bordo.
-  const behind = id !== "vanda", potBack = pd.back + (behind ? pd.front : ""), potSvg = behind ? "" : pd.front;
+  const behind = id !== "vanda", potBack = bare ? "" : pd.back + (behind ? pd.front : ""), potSvg = bare || behind ? "" : pd.front;
   const lift = s => fl ? s : `<g transform="translate(0 -2)">${s}</g>`;
   // Chi sa piegarsi da solo (draw) non usa la rotazione CSS degli stati di sete
   const droop = { assetata: .45, appassita: 1 }[state] || 0, own = fl && fl.draw ? " own" : "";
