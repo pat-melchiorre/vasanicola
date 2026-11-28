@@ -190,16 +190,14 @@ function fingerScene(g){
     (kind === "fango" ? `<ellipse cx="80" cy="74" rx="14" ry="1.6" fill="#8fcaff" opacity=".7"/>` : "") +
     (kind === "secca" ? `<path d="M70 73l6 2-3 2M120 72l-5 3 4 2" stroke="#7d5f3d" stroke-width="1.2" fill="none" stroke-linecap="round"/>` : "");
   // Il dito: entra in diagonale dall'alto a destra (asse a 40°). È ritagliato sulla superficie della terra,
-  // quindi la punta "sparisce" quando affonda. Guanto da giardinaggio con la punta in gomma al posto dell'unghia.
+  // quindi la punta "sparisce" quando affonda. Pelle rosata, unghia sul lato in vista.
   const finger = `<g clip-path="url(#fxSoil)"><g transform="translate(97 75) rotate(-40)"><g class="fx-finger">
-    <path d="M0-16H230V16H0A16 16 0 0 1 0-16z" fill="#f4b942"/><path d="M0 6H230V16H0A16 16 0 0 1-10.6 12z" fill="#d9952b"/>
-    <path d="M20-16H0A16 16 0 0 0 0 16H20Q26 0 20-16z" fill="#e0a43a"/>
+    <path d="M0-16H230V16H0A16 16 0 0 1 0-16z" fill="#e3a18c"/><path d="M0 6H230V16H0A16 16 0 0 1-10.6 12z" fill="#c9836f"/>
+    <path d="M4-13.5H22Q26-8 22-3H6Q1-3 0.5-8Q1-13 4-13.5z" fill="#f3cabd"/><path d="M22-13.5Q26-8 22-3" stroke="#d99b88" stroke-width="1.4" fill="none"/>
     ${kind === "fango" ? `<path class="fx-dirt" d="M26-16H0A16 16 0 0 0 0 16H26Q20 8 28 2Q22-6 26-16z" fill="${soil}"/>` : kind === "umida" ? `<path class="fx-dirt" d="M9-14H0A16 16 0 0 0 0 14H9Q5 0 9-14z" fill="${soil}" opacity=".45"/>` : ""}
-    <path d="M58-12v24M104-12v24" stroke="#d9952b" stroke-width="2" stroke-linecap="round"/></g></g></g>`;
+    <path d="M62-6q4 3 0 6M66-6q4 3 0 6M112-7q4 3 0 6" stroke="#c9836f" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></g></g>`;
   // gobbe di terra che si sollevano dove entra il dito
-  // le gobbe sono un po' più chiare della terra (la terra smossa prende luce), con una lunetta d'ombra sotto
-  const lite = "#" + [1, 3, 5].map(i => Math.round(parseInt(soil.slice(i, i + 2), 16) * .7 + 255 * .3).toString(16).padStart(2, "0")).join("");
-  const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${lite}"/>`).join("");
+  const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${soil}"/>`).join("");
   const clip = `<clipPath id="fxSoil"><path d="M-200-300H400V75.5H-200z"/></clipPath>`;
   // La pianta c'è, dietro al dito: è il suo disegno normale, ritagliato sopra il terriccio (y 83) e ingrandito
   // perché il suo bordo (largo 66.8) coincida con quello del vaso grande (largo 140).
@@ -942,8 +940,9 @@ app.addEventListener("click", e => {
   if (t.id === "forceEm") { const g = S.garden.find(x => !x.dead && !x.em); if (!g) return toast("Nessuna pianta viva senza emergenze."); rollEmergency(g, now()); if (!g.em) return toast("Prima fai lo step dove si impara a curarla."); render(); return; }
   if (t.dataset.feel !== undefined) {
     const i = +t.dataset.feel, g = S.garden[i];
+    // Con la scena a tutto schermo il risultato si legge lì: niente riga "Prova del dito" sulla card
+    if (FINGER_PLANTS.has(g.plant) && !matchMedia("(prefers-reduced-motion: reduce)").matches) return fingerScene(g);
     felt.set(g, Date.now() + FEEL_MS); render();
-    if (FINGER_PLANTS.has(g.plant) && !matchMedia("(prefers-reduced-motion: reduce)").matches) fingerScene(g);
     // allo scadere, sfuma la riga e rimette la frase normale (solo se la riga è ancora a schermo)
     setTimeout(() => { const el = document.getElementById("line-" + i); if (!el || feltNow(g)) return;
       el.classList.add("fade"); setTimeout(() => { el.innerHTML = restLine(g, i); el.classList.remove("fade"); }, 300); }, FEEL_MS + 50);
