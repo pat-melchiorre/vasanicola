@@ -596,3 +596,21 @@ button.brand{padding:0;border:0;background:none;cursor:pointer}
 @keyframes fxPoke{0%{transform:translateX(170px)}35%{transform:translateX(-16px)}45%{transform:translateX(-11px)}52%{transform:translateX(-17px)}60%{transform:translateX(-16px)}100%{transform:translateX(170px)}}
 @keyframes fxCrumb{from{opacity:1;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
 .fx-crumb{transform-box:fill-box;transform-origin:50% 100%}
+
+/* Annaffia: si tiene premuto. Il bottone si riempie mentre premi; niente menu del tasto lungo su iPhone */
+.btn.water{position:relative;overflow:hidden;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.btn.water::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.32);transform:scaleX(0);transform-origin:left;pointer-events:none}
+.btn.water.holding::before{transform:scaleX(1);transition:transform .55s linear}
+.btn.water > *{position:relative}
+
+/* Modale delle gocce */
+button.pill.water{cursor:pointer;border:0;font:inherit}
+.canhero{display:flex;justify-content:center;margin-bottom:4px}
+.drows{list-style:none;margin:6px 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+.drows li{display:flex;align-items:center;gap:12px;background:var(--water-bg);border-radius:14px;padding:8px 12px;text-align:left}
+.drows b{min-width:56px;text-align:center;color:var(--water-dark);font-size:17px}
+.drows span{font-weight:700;color:var(--ink)}
+@media (prefers-reduced-motion: no-preference){
+  .cdrop{animation:cdrop 1.4s calc(var(--i) * .35s) ease-in infinite}
+  @keyframes cdrop{0%{transform:translateY(-6px);opacity:0}20%{opacity:1}100%{transform:translateY(26px);opacity:0}}
+}

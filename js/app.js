@@ -164,11 +164,12 @@ function soilFeel(g){
   if (st === "assetata" || st === "appassita") return c.feelDry || "Secca e dura, anche più in fondo. Acqua, e in fretta.";
   return c.feelReady || "Asciutta nei primi centimetri. È il momento giusto per annaffiare.";
 }
-/* --- Prova del dito: scena a tutto schermo (per ora solo basilico) ---
+/* --- Prova del dito: scena a tutto schermo (per ora basilico e menta) ---
    1. compare il vaso della pianta in grande; 2. un dito col guanto da giardinaggio scende e affonda nel terriccio;
    3. risale (sporco di terra se è bagnata); 4. al suo posto il verdetto in grande, il tempo di leggerlo, poi sparisce tutto.
    Il guanto evita di scegliere un colore di pelle e sta bene col tema. */
-const FINGER_PLANTS = new Set(["basilico"]);
+// pianta -> punto (x) dove entra il dito: dove le foglie lasciano scoperta la terra
+const FINGER_AT = { basilico: 97, menta: 146 }, FINGER_PLANTS = new Set(Object.keys(FINGER_AT));
 function feelKind(g){
   const c = care(g), st = plantState(g);
   if (wetLevel(g) > 0) return "fango";
@@ -178,7 +179,7 @@ function feelKind(g){
 }
 const FEEL_HEAD = { fango:"Fango.", umida:"Umida.", asciutta:"Asciutta.", secca:"Secca." };
 function fingerScene(g){
-  const kind = feelKind(g), text = soilFeel(g), color = POTS[g.plant] || "#e0773a", dk = shade(color);
+  const kind = feelKind(g), text = soilFeel(g), color = POTS[g.plant] || "#e0773a", dk = shade(color), ex = FINGER_AT[g.plant] || 97;
   // Inquadratura sul solo vaso, visto un po' dall'alto: si vede l'apertura ovale con la terra.
   // Il colore della terra anticipa già il risultato.
   const soil = { fango:"#3a2617", umida:"#5b3d26", asciutta:"#8a6a48", secca:"#a9845a" }[kind];
@@ -193,13 +194,13 @@ function fingerScene(g){
     (kind === "secca" ? `<path d="M70 73l6 2-3 2M120 72l-5 3 4 2" stroke="#7d5f3d" stroke-width="1.2" fill="none" stroke-linecap="round"/>` : "");
   // Il dito: entra in diagonale dall'alto a destra (asse a 40°). È ritagliato sulla superficie della terra,
   // quindi la punta "sparisce" quando affonda. Pelle rosata, unghia sul lato in vista.
-  const finger = `<g clip-path="url(#fxSoil)"><g transform="translate(97 75) rotate(-40)"><g class="fx-finger">
+  const finger = `<g clip-path="url(#fxSoil)"><g transform="translate(${ex} 75) rotate(-40)"><g class="fx-finger">
     <path d="M0-16H230V16H0A16 16 0 0 1 0-16z" fill="#e3a18c"/><path d="M0 6H230V16H0A16 16 0 0 1-10.6 12z" fill="#c9836f"/>
     <path d="M4-13.5H22Q26-8 22-3H6Q1-3 0.5-8Q1-13 4-13.5z" fill="#f3cabd"/><path d="M22-13.5Q26-8 22-3" stroke="#d99b88" stroke-width="1.4" fill="none"/>
     ${kind === "fango" ? `<path class="fx-dirt" d="M26-16H0A16 16 0 0 0 0 16H26Q20 8 28 2Q22-6 26-16z" fill="${soil}"/>` : kind === "umida" ? `<path class="fx-dirt" d="M9-14H0A16 16 0 0 0 0 14H9Q5 0 9-14z" fill="${soil}" opacity=".45"/>` : ""}
     <path d="M62-6q4 3 0 6M66-6q4 3 0 6M112-7q4 3 0 6" stroke="#c9836f" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></g></g>`;
   // gobbe di terra che si sollevano dove entra il dito
-  const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${soil}"/>`).join("");
+  const bumps = [[9,6.5],[21,5],[30.5,4],[-9,4.5],[-16.5,3]].map(([x, r]) => [ex + x, r]).filter(([x, r]) => x + r < 156 && x - r > 44).map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${soil}"/>`).join("");
   const clip = `<clipPath id="fxSoil"><path d="M-200-300H400V75.5H-200z"/></clipPath>`;
   // La pianta c'è, davanti al dito (il dito passa tra le foglie e affonda nella terra): è il suo disegno senza vaso, ingrandito
   // perché il suo bordo (largo 66.8) coincida con quello del vaso grande (largo 140).
@@ -240,7 +241,7 @@ function topbar(){
   const n = S.streak.n, lv = levelInfo(S.xp).n;
   return `<header class="top"><button class="brand${emPlants().length ? " worried" : ""}" data-welcome="1" aria-label="Vasanicola: il tuo personaggio di oggi${emPlants().length ? ", ci sono emergenze" : ""}">${mascot(34, emPlants().length ? "sad" : "happy")}</button><div class="tstats">
     <button class="pill streak${streakToday() ? "" : " off"}" data-streak="1" aria-label="${n} giorni di fila${streakToday() ? "" : ", oggi ancora da fare"}">${beanIcon(24)}${n}</button>
-    <div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div>
+    <button class="pill water" id="pGocce" data-drops="1" aria-label="${S.gocce} gocce: cosa sono">${ILL.drop}${S.gocce}</button>
     <button class="pill sun" id="pXp" data-level="1" aria-label="Livello ${lv}">${ILL.sun}${lv}</button></div></header>`;
 }
 function tabbar(){
@@ -823,13 +824,13 @@ function renderNegozio(){
   const lids = S.streak.lids, full = lids >= SPRAY.max;
   const lid = `<div class="shopcard${full ? " owned" : ""}"><div class="sart">${sprayerSVG(80)}</div><div class="t"><h3>Spruzzino</h3><span class="tag ptag study">Salva il fagiolo</span><p>Se salti un giorno, tiene umido il cotone e i giorni di fila non si perdono. Si usa da solo.</p>
     <p class="pnote">Ne hai ${lids} su ${SPRAY.max}.</p>${full ? '<span class="tag planted">Scorta piena</span>' : ""}</div>${full ? "" : `<button class="btn water buy" data-buylid="1" ${S.gocce < SPRAY.cost ? "disabled" : ""}>Compra ${SPRAY.cost}${ICON.drop.replace("<svg", '<svg width="18" height="18"')}</button>`}</div>`;
-  return `<section class="sec"><div class="sechead"><h1>Negozio</h1><div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div></div><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
+  return `<section class="sec"><div class="sechead"><h1>Negozio</h1><button class="pill water" id="pGocce" data-drops="1" aria-label="${S.gocce} gocce: cosa sono">${ILL.drop}${S.gocce}</button></div><p class="lead">Spruzzini per i giorni no, vasi per sempre.</p>
     <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
     <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
 function renderSerra(){
   const empty = !S.garden.length;
-  return `<section class="sec"><div class="sechead"><h1>La tua serra</h1><div class="pill water" id="pGocce" aria-label="${S.gocce} gocce">${ILL.drop}${S.gocce}</div></div><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
+  return `<section class="sec"><div class="sechead"><h1>La tua serra</h1><button class="pill water" id="pGocce" data-drops="1" aria-label="${S.gocce} gocce: cosa sono">${ILL.drop}${S.gocce}</button></div><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
     ${testTools()}`;
 }
 let pickArea = "casa";
@@ -919,13 +920,10 @@ app.addEventListener("click", e => {
   const t = e.target.closest("button, [data-ztop]"); if (!t) return;
   if (t.dataset.tab) { if (tab === t.dataset.tab) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
   if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } openNode(+t.dataset.step); return; }
-  if (t.dataset.water !== undefined) {
-    const g = S.garden[+t.dataset.water]; if (S.gocce < RULES.waterCost) return toast("Zero gocce. Fai una lezione e torna (la pianta aspetta) (non a lungo).");
-    // Annaffiare con la terra ancora umida alza il livello di "zuppo"; con la terra asciutta lo azzera
-    const level = !care(g).bog && daysSince(g.wateredAt) < care(g).soak ? wetLevel(g) + 1 : 0;   // le piante di palude non si "inzuppano"
-    if (level >= care(g).rot) return ask("Ancora acqua?", `${esc(nameOf(g))} ha la terra ancora bagnata: con un altro sorso le radici marciscono${g.nick ? " e il soprannome se ne va con lei" : ""}. ${care(g).wetTip}`, "Annaffia lo stesso", () => water(g, level), "Aspetto");
-    return water(g, level);
-  }
+  // Col dito si annaffia tenendo premuto (vedi sotto). Il click "vero" arriva solo da tastiera (Invio/Spazio):
+  // lì il gesto è già intenzionale, quindi annaffia subito.
+  if (t.dataset.water !== undefined) { if (e.detail === 0) tryWater(+t.dataset.water); return; }
+  if (t.dataset.drops) return openDrops();
   if (t.dataset.nick !== undefined) return openNick(S.garden[+t.dataset.nick]);
   if (t.dataset.pot !== undefined) return openPotPicker(+t.dataset.pot);
   if (t.dataset.gift !== undefined) { const g = S.garden[+t.dataset.gift];
@@ -976,6 +974,52 @@ function zoneTop(el){
   scrollTo({ top: Math.abs(scrollY - y) < 8 ? 0 : Math.max(0, y), behavior: smooth });
 }
 document.addEventListener("keydown", e => { const z = e.target.closest?.("[data-ztop]"); if (z && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); zoneTop(z); } });
+/* --- Annaffiare tenendo premuto ---
+   Un tocco veloce non annaffia (evita le annaffiature per sbaglio mentre scorri): bisogna tenere premuto
+   per HOLD_MS. Intanto il bottone si riempie da sinistra; se lasci prima, si svuota e compare un suggerimento. */
+const HOLD_MS = 550;
+let hold = null;
+app.addEventListener("pointerdown", e => {
+  const b = e.target.closest(".btn.water[data-water]"); if (!b || b.disabled || e.button > 0) return;
+  hold = { b, x: e.clientX, y: e.clientY, t: setTimeout(() => { hold = null; b.classList.remove("holding"); navigator.vibrate?.(15); tryWater(+b.dataset.water); }, HOLD_MS) };
+  b.classList.add("holding");
+});
+const stopHold = (e, hint) => { if (!hold) return; clearTimeout(hold.t); hold.b.classList.remove("holding");
+  if (hint) toast("Tieni premuto per annaffiare. Così non lo fai per sbaglio."); hold = null; };
+app.addEventListener("pointerup", e => stopHold(e, true));
+app.addEventListener("pointercancel", e => stopHold(e, false));
+// se il dito scivola (stai scorrendo la pagina) l'annaffiatura si annulla senza suggerimenti
+app.addEventListener("pointermove", e => { if (hold && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > 12) stopHold(e, false); });
+app.addEventListener("contextmenu", e => { if (e.target.closest(".btn.water")) e.preventDefault(); });
+
+/* --- Modale delle gocce: cosa sono e a cosa servono --- */
+const CAN = `<svg viewBox="0 0 160 120" width="170" height="128" aria-hidden="true">
+  <path d="M104 52 146 22l6 7-38 34z" fill="#2589D6"/><path d="M140 14a11 11 0 0 1 16 15l-12 3-7-9z" fill="#4AB0F5"/>
+  <path d="M38 40h66l-6 62a8 8 0 0 1-8 7H52a8 8 0 0 1-8-7z" fill="#4AB0F5"/><path d="M76 40h28l-6 62a8 8 0 0 1-8 7H72z" fill="#2589D6"/>
+  <path d="M46 48c0-22 50-22 50 0" stroke="#2589D6" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="34" y="34" width="74" height="10" rx="5" fill="#2589D6"/><path d="M52 60h20" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+  <path class="cdrop" style="--i:0" d="M150 40c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/>
+  <path class="cdrop" style="--i:1" d="M141 46c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/>
+  <path class="cdrop" style="--i:2" d="M154 52c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/></svg>`;
+function openDrops(){
+  const row = (n, txt) => `<li><b>${n}</b><span>${txt}</span></li>`;
+  modal(`<div style="text-align:center"><div class="canhero">${CAN}</div>
+    <h2>Le gocce</h2><p style="color:var(--ink-2);margin:4px 0 14px">Sono l’acqua della tua serra, e anche i tuoi soldi. Ne hai <b>${S.gocce}</b>.</p></div>
+    <div class="kind">Come le guadagni</div>
+    <ul class="drows">${row(`+${RULES.stepGocce}`, "ogni lezione finita")}${row(`+${RULES.perfectBonusGocce}`, "se la finisci senza errori")}${row(`+${RULES.replayGocce}`, "ogni ripasso")}${row("+", "salendo di livello e con il fagiolo")}</ul>
+    <div class="kind">Come le spendi</div>
+    <ul class="drows">${row(RULES.waterCost, "un’annaffiata")}${row(RULES.replantCost, "ripiantare una pianta morta")}${row(`da ${Math.min(...Object.values(PLANTS).map(x => x.cost).filter(Boolean))}`, "un seme nel negozio")}${row(`da ${Math.min(...Object.values(POT_SHOP).map(x => x.cost))}`, "un vaso speciale")}${row(SPRAY.cost, "uno spruzzino per salvare il fagiolo")}</ul>
+    <p class="pnote" style="margin:12px 0 0">Annaffiare quando non serve non è generosità: costa gocce e fa marcire le radici.</p>
+    <button class="btn" data-close="1">Ho capito</button>`);
+}
+
+function tryWater(i){
+  const g = S.garden[i]; if (S.gocce < RULES.waterCost) return toast("Zero gocce. Fai una lezione e torna (la pianta aspetta) (non a lungo).");
+  // Annaffiare con la terra ancora umida alza il livello di "zuppo"; con la terra asciutta lo azzera
+  const level = !care(g).bog && daysSince(g.wateredAt) < care(g).soak ? wetLevel(g) + 1 : 0;   // le piante di palude non si "inzuppano"
+  if (level >= care(g).rot) return ask("Ancora acqua?", `${esc(nameOf(g))} ha la terra ancora bagnata: con un altro sorso le radici marciscono${g.nick ? " e il soprannome se ne va con lei" : ""}. ${care(g).wetTip}`, "Annaffia lo stesso", () => water(g, level), "Aspetto");
+  return water(g, level);
+}
 function water(g, level){
   S.gocce -= RULES.waterCost; g.wateredAt = now(); g.wet = level; felt.delete(g);
   const c = care(g), dead = level >= c.rot, n = nameOf(g);
