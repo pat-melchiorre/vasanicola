@@ -828,9 +828,13 @@ function renderNegozio(){
     <h2 class="shoph">Giorni di fila</h2><div class="shop">${lid}</div>
     <h2 class="shoph">Vasi</h2><p class="pnote" style="margin:-4px 0 12px">Si comprano una volta e valgono per sempre. Ma non tutti stanno bene a tutte.</p><div class="shop">${cards}</div></section>`;
 }
+// Serra: due viste. "stanza" è la prova nuova (js/room.js), "elenco" quella di sempre. Si cambia con l'interruttore.
+const serraView = () => S.serraView === "elenco" ? "elenco" : "stanza";
 function renderSerra(){
   const empty = !S.garden.length;
-  return `<section class="sec"><div class="sechead"><h1>La tua serra</h1><button class="pill water" id="pGocce" data-drops="1" aria-label="${S.gocce} gocce: cosa sono">${ILL.drop}${S.gocce}</button></div><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>${renderArea("casa")}${renderArea("balcone")}</section>
+  return `<section class="sec"><div class="sechead"><h1>La tua serra</h1><button class="pill water" id="pGocce" data-drops="1" aria-label="${S.gocce} gocce: cosa sono">${ILL.drop}${S.gocce}</button></div><p class="lead">${empty ? "È vuota. Silenzio. Pace. Nessuna vittima. Studia il basilico nel primo step del percorso e rovina tutto." : "Le gocce le tengono in vita, l’esperienza fa spazio. Il resto è ansia."}</p>
+    <div class="vtoggle" role="group" aria-label="Vista della serra">${[["stanza", "Stanza"], ["elenco", "Elenco"]].map(([v, l]) => `<button data-view="${v}" aria-pressed="${serraView() === v}">${l}</button>`).join("")}</div>
+    ${serraView() === "stanza" ? renderRoom() : renderArea("casa") + renderArea("balcone")}</section>
     ${testTools()}`;
 }
 let pickArea = "casa";
@@ -917,11 +921,12 @@ function startPlantPractice(id){
    Eventi
    ========================================================= */
 app.addEventListener("click", e => {
-  const t = e.target.closest("button, [data-ztop]"); if (!t) return;
+  const t = e.target.closest("button, [data-ztop], [data-sheetclose]"); if (!t) return;
   if (t.dataset.tab) { if (tab === t.dataset.tab) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
   if (t.dataset.step !== undefined) { if (t.getAttribute("aria-disabled")) { toast("Prima finisci lo step prima. Le piante non saltano le tappe (e neanche tu)."); return; } openNode(+t.dataset.step); return; }
   // Col dito si annaffia tenendo premuto (vedi sotto). Il click "vero" arriva solo da tastiera (Invio/Spazio):
   // lì il gesto è già intenzionale, quindi annaffia subito.
+  if (roomClick(t)) return;
   if (t.dataset.water !== undefined) { if (e.detail === 0) tryWater(+t.dataset.water); return; }
   if (t.dataset.drops) return openDrops();
   if (t.dataset.nick !== undefined) return openNick(S.garden[+t.dataset.nick]);
@@ -953,7 +958,7 @@ app.addEventListener("click", e => {
   if (t.dataset.streak) return openStreak();
   if (t.dataset.welcome) { scrollTo(0, 0); return renderWelcome(emPlants().length > 0); }
   if (t.dataset.buy) { return; if (a === "casa") S.slots++; else S.balcSlots++; render(); bump("#pXp"); toast("Nuovo posto in serra. Più spazio, più occasioni di fallire."); return; }
-  if (t.dataset.plantHere) return openPicker(t.dataset.plantHere);
+  if (t.dataset.plantHere) { pickSpot = null; return openPicker(t.dataset.plantHere); }
   if (t.dataset.skip) { felt = new WeakMap(); S.offset += +t.dataset.skip * DAY; render(); toast(`Sono passati ${t.dataset.skip} giorni. Le piante hanno preso appunti.`); return; }
   if (t.id === "reset") return ask("Ricominciare da zero?", "Si perde tutto: piante, gocce, esperienza. Anche la dignità.", "Ricomincia", () => { S = fresh(); tab = "path"; render(); }, "Annulla");
   if (t.dataset.card) return openCard(t.dataset.card);
@@ -1096,7 +1101,7 @@ document.addEventListener("click", e => {
   if (S.gocce < cost) return;
   S.gocce -= cost; if (free) S.tutorialPlanted = true;
   // Ogni pianta nuova parte dal seme, anche quella "presa dal fioraio": la crescita la vedi tu, fase per fase
-  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), growAt: now(), mile: 0, dead:false });
+  S.garden.push({ plant:id, area:pickArea, wateredAt: now(), bornAt: now(), growAt: now(), mile: 0, dead:false, spot: pickSpot }); pickSpot = null;
   document.querySelector(".modal")?.remove(); render(); bump("#pGocce");
   toast(id === "basilico" ? "Seme di basilico piantato. Stavolta va diversamente. (Diciamo sempre così.)" : `${PLANTS[id].name}: seme piantato. ${gen(id, "Benvenuto", "Benvenuta")} nella tua famiglia disfunzionale.`);
 });

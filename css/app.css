@@ -625,3 +625,43 @@ button.pill.water{cursor:pointer;border:0;font:inherit}
 .acts .btn.water{--d:6px}
 .btn:not(:disabled):active{transform:translateY(calc(var(--d) - 1.5px));box-shadow:0 1.5px 0 var(--sh)}
 @keyframes cdrop{0%{transform:translateY(-3px);opacity:0}20%{opacity:1}100%{transform:translateY(12px);opacity:0}}
+
+/* ===== Serra "stanza" (prova): interruttore, scena, vasi sui posti, scheda dal basso ===== */
+.vtoggle{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--surface-2,#eef3ea);margin:4px 0 14px}
+.vtoggle button{border:0;background:none;font:inherit;font-weight:800;font-size:14px;padding:6px 14px;border-radius:10px;color:var(--ink-2);cursor:pointer}
+.vtoggle button[aria-pressed="true"]{background:var(--bg);color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.rtabs{display:flex;gap:8px;margin-bottom:10px}
+.rtabs button{flex:1;border:2px solid var(--line);background:var(--bg);border-radius:14px;padding:8px;font:inherit;font-weight:900;font-size:16px;color:var(--ink-2);box-shadow:0 3px 0 var(--line);cursor:pointer}
+.rtabs button span{font-weight:700;font-size:13px;opacity:.75;margin-left:2px}
+.rtabs button[aria-selected="true"]{border-color:var(--leaf);color:var(--leaf-dark,var(--ink));box-shadow:0 3px 0 var(--leaf-shadow);background:var(--leaf-bg,#eaf7e6)}
+.room{position:relative;width:100%;aspect-ratio:360/480;border-radius:22px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.rart{position:absolute;inset:0;width:100%;height:100%;display:block}
+.rpot{position:absolute;transform:translate(-50%,-96.2%);border:0;background:none;padding:0;cursor:pointer;touch-action:none;-webkit-touch-callout:none;transition:transform .15s ease-out}
+.rpot svg{width:100%;height:auto;display:block;overflow:visible}
+.rpot.lift{z-index:5;transform:translate(-50%,-96.2%) scale(1.12);transition:none;filter:drop-shadow(0 10px 8px rgba(0,0,0,.22))}
+.rflag{position:absolute;top:2%;right:-4%;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.rflag.em{background:var(--bad)}
+.rflag.dry{background:#fff}
+.rflag.dry svg{width:16px;height:16px}
+/* posti: un'ombra ovale sul piano d'appoggio; "+" dove si può piantare; durante il trascinamento si vedono tutti */
+.rspot{position:absolute;transform:translate(-50%,-50%);aspect-ratio:4/1;border-radius:50%;border:0;padding:0;background:none;opacity:0;transition:opacity .15s;pointer-events:none}
+.rspot.plus{opacity:1;background:rgba(0,0,0,.08)}
+.rplus{position:absolute;left:50%;bottom:40%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;border:0;padding:0;background:var(--leaf);color:#fff;font:900 24px/1 inherit;display:grid;place-items:center;box-shadow:0 3px 0 var(--leaf-shadow);pointer-events:auto;cursor:pointer}
+.rplus:active{transform:translate(-50%,2px);box-shadow:0 1px 0 var(--leaf-shadow)}
+.room.dragging .rspot{opacity:1;background:rgba(255,255,255,.45);border:2px dashed rgba(0,0,0,.2)}
+.room.dragging .rspot.over{background:rgba(94,200,106,.45);border-color:var(--leaf)}
+.room.dragging .rplus{display:none}
+.rnote{font-size:14px;color:var(--ink-2);font-weight:700;margin:10px 2px 0}
+.room.closed .rart{filter:grayscale(.5) opacity(.55)}
+.rlock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:30px;color:var(--ink)}
+.rlock b{font-size:20px}.rlock span{color:var(--ink-2);font-weight:700}
+/* scheda dal basso */
+.rsheet-bg{position:fixed;inset:0;background:rgba(10,20,12,.35);z-index:60}
+.rsheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:86vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:6px 14px calc(16px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+.rsheet .slot{border:0;box-shadow:none;padding:6px 4px 0}
+.rsheet .grab{display:block;margin:6px auto 4px;width:44px;height:6px;border-radius:3px;border:0;background:var(--line);padding:0}
+@media (prefers-reduced-motion: no-preference){
+  .rsheet.fresh{animation:rsheetIn .22s ease-out}
+  .rsheet-bg.fresh{animation:fxIn .2s ease-out}
+  @keyframes rsheetIn{from{transform:translateY(100%)}}
+}
