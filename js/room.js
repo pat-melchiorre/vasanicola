@@ -87,7 +87,7 @@ function renderRoom(){
   const nx = nextSlotLevel(a);
   const note = !open ? "" : `<p class="rnote">${inArea(a)} di ${slotsOf(a)} posti usati.${nx ? ` Il prossimo si apre al livello ${nx.n}.` : ""}${inArea(a) ? " Tieni premuto un vaso per spostarlo." : ""}</p>`;
   const lock = open ? "" : `<div class="rlock">${IC("lock").replace("<svg", '<svg width="34" height="34"')}<b>Balcone chiuso</b><span>Si apre finendo la zona Casa tua, insieme al Mediterraneo.</span></div>`;
-  return `<div class="rtabs" role="tablist">${["casa", "balcone"].map(z => `<button role="tab" aria-selected="${z === a}" data-room="${z}">${AREAS[z].title} <span>${z === "balcone" && !balconyOpen() ? "" : `${inArea(z)}/${slotsOf(z)}`}</span></button>`).join("")}</div>
+  return `<div class="rtabs" role="tablist">${["casa", "balcone"].map(z => `<button role="tab" aria-selected="${z === a}" data-room="${z}">${AREAS[z].title}</button>`).join("")}</div>
     <div class="room${open ? "" : " closed"}" id="room" data-area="${a}"><svg class="rart" viewBox="0 0 ${ROOM_W} ${ROOM_H}" preserveAspectRatio="none" aria-hidden="true">${R.art}</svg>${open ? marks : ""}${pots}${lock}</div>${note}
     ${sheetHTML()}`;
 }

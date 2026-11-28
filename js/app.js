@@ -790,7 +790,7 @@ function renderArea(a){
   for (let k = inArea(a); k < slotsOf(a); k++) slots.push(`<button class="slot empty" data-plant-here="${a}"><span class="plus">+</span><b>Posto libero</b><span class="line">${a === "casa" ? "Una pianta da casa che conosci bene." : "Qualsiasi pianta che conosci bene."}</span></button>`);
   const nx = nextSlotLevel(a);
   if (nx) slots.push(`<div class="slot locked">${IC("lock").replace("<svg", '<svg width="34" height="34"')}<b>Posto bloccato</b><span class="line">Si apre al livello ${nx.n}<i class="lvsun">${ICON.sun}</i>, ${esc(nx.L.name)}.</span></div>`);
-  return `<div class="area"><h2>${A.title} <span>${inArea(a)}/${slotsOf(a)}</span></h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
+  return `<div class="area"><h2>${A.title}</h2><p class="lead">${A.lead}</p><div class="grid">${slots.join("")}</div></div>`;
 }
 function testTools(){
   if (!DEV) return "";
