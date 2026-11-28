@@ -164,6 +164,47 @@ function soilFeel(g){
   if (st === "assetata" || st === "appassita") return c.feelDry || "Secca e dura, anche più in fondo. Acqua, e in fretta.";
   return c.feelReady || "Asciutta nei primi centimetri. È il momento giusto per annaffiare.";
 }
+/* --- Prova del dito: scena a tutto schermo (per ora solo basilico) ---
+   1. compare il vaso della pianta in grande; 2. un dito col guanto da giardinaggio scende e affonda nel terriccio;
+   3. risale (sporco di terra se è bagnata); 4. al suo posto il verdetto in grande, il tempo di leggerlo, poi sparisce tutto.
+   Il guanto evita di scegliere un colore di pelle e sta bene col tema. Un tocco chiude subito. */
+const FINGER_PLANTS = new Set(["basilico"]);
+function feelKind(g){
+  const c = care(g), st = plantState(g);
+  if (wetLevel(g) > 0) return "fango";
+  if (daysSince(g.wateredAt) < c.soak) return "umida";
+  if (st === "assetata" || st === "appassita") return "secca";
+  return "asciutta";
+}
+const FEEL_HEAD = { fango:"Fango.", umida:"Umida.", asciutta:"Asciutta.", secca:"Secca." };
+function fingerScene(g){
+  const kind = feelKind(g), text = soilFeel(g), color = POTS[g.plant] || "#e0773a";
+  const dirt = kind === "fango" ? "#5a3b22" : kind === "umida" ? "#7a5634" : "#b08a5e";
+  // il dito: mano a pugno in alto, indice verso il basso, punta a (76, 92); la punta si sporca alla fine
+  const glove = `<g clip-path="url(#fxSoil)"><g class="fx-finger">
+    <rect x="59" y="-50" width="38" height="11" rx="3" fill="#e9e2cf"/><rect x="59" y="-42" width="38" height="3" fill="#d4ccb4"/>
+    <path d="M52 -26c0-5 4-8 8-7l6 2v20l-7 2c-4 1-7-2-7-6z" fill="#d9952b"/>
+    <rect x="58" y="-40" width="40" height="46" rx="13" fill="#f4b942"/>
+    <rect x="84" y="-24" width="17" height="10" rx="5" fill="#f4b942"/><rect x="84" y="-14" width="17" height="10" rx="5" fill="#f4b942"/><rect x="84" y="-4" width="16" height="10" rx="5" fill="#f4b942"/>
+    <path d="M87 -14h12M87 -4h12" stroke="#d9952b" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M70 0h13v86a6.5 6.5 0 0 1-13 0z" fill="#f4b942"/><path d="M78.5 0h4.5v86a6.5 6.5 0 0 1-2.5 5.1z" fill="#d9952b"/>
+    <path d="M72.5 34h7M72.5 60h7" stroke="#d9952b" stroke-width="1.6" stroke-linecap="round"/>
+    <path class="fx-dirt" d="M70 78h13v8a6.5 6.5 0 0 1-13 0z" fill="${dirt}"/></g></g>`;
+  // il dito è ritagliato sulla linea del terriccio: la parte sotto non si vede, così sembra entrarci dentro
+  const clip = `<clipPath id="fxSoil"><path d="M-60-200H180V82.5H93A33 2.8 0 0 1 27 82.5H-60z"/></clipPath>`;
+  const crumbs = [[68,80],[73,77],[80,78],[85,81],[76,75]].map(([x, y], k) => `<circle class="fx-crumb" style="--k:${k}" cx="${x}" cy="${y}" r="1.6" fill="${dirt}"/>`).join("");
+  const art = plantSVG(g.plant, 300, plantState(g), stageOf(g), g.pot).replace(/<\/svg>$/, `${clip}${glove}${crumbs}</svg>`).replace(/viewBox="0 0 120 132"/, 'viewBox="0 0 120 132" overflow="visible"');
+  const fx = document.createElement("div");
+  fx.className = `fx-feel k-${kind}`; fx.setAttribute("role", "dialog"); fx.setAttribute("aria-label", `Prova del dito: ${FEEL_HEAD[kind]} ${text}`);
+  fx.innerHTML = `<div class="fx-scene">${art}</div><div class="fx-result"><span>Prova del dito</span><h2>${FEEL_HEAD[kind]}</h2><p>${esc(text)}</p></div>`;
+  document.body.append(fx); document.documentElement.classList.add("locked");
+  // tempo di lettura: ~70 ms a carattere, minimo 2,4 secondi
+  const read = Math.max(2400, text.length * 70), timers = [];
+  const close = () => { timers.forEach(clearTimeout); fx.classList.add("out"); document.documentElement.classList.remove("locked"); setTimeout(() => fx.remove(), 260); };
+  timers.push(setTimeout(() => fx.classList.add("show-result"), 2100), setTimeout(close, 2100 + read));
+  fx.onclick = close;
+}
+
 const kOf = id => S.knowledge[id] || 0;
 const isReady = id => kOf(id) >= RULES.knowledgeMax;
 const inGarden = id => S.garden.some(g => g.plant === id);
@@ -890,6 +931,7 @@ app.addEventListener("click", e => {
   if (t.dataset.feel !== undefined) {
     const i = +t.dataset.feel, g = S.garden[i];
     felt.set(g, Date.now() + FEEL_MS); render();
+    if (FINGER_PLANTS.has(g.plant) && !matchMedia("(prefers-reduced-motion: reduce)").matches) fingerScene(g);
     // allo scadere, sfuma la riga e rimette la frase normale (solo se la riga è ancora a schermo)
     setTimeout(() => { const el = document.getElementById("line-" + i); if (!el || feltNow(g)) return;
       el.classList.add("fade"); setTimeout(() => { el.innerHTML = restLine(g, i); el.classList.remove("fade"); }, 300); }, FEEL_MS + 50);
