@@ -194,14 +194,18 @@ function fingerScene(g){
   const finger = `<g clip-path="url(#fxSoil)"><g transform="translate(97 75) rotate(-40)"><g class="fx-finger">
     <path d="M0-16H230V16H0A16 16 0 0 1 0-16z" fill="#f4b942"/><path d="M0 6H230V16H0A16 16 0 0 1-10.6 12z" fill="#d9952b"/>
     <path d="M20-16H0A16 16 0 0 0 0 16H20Q26 0 20-16z" fill="#e0a43a"/>
-    <path class="fx-dirt" d="M20-16H0A16 16 0 0 0 0 16H20Q26 0 20-16z" fill="${soil}"/>
+    ${kind === "fango" ? `<path class="fx-dirt" d="M26-16H0A16 16 0 0 0 0 16H26Q20 8 28 2Q22-6 26-16z" fill="${soil}"/>` : kind === "umida" ? `<path class="fx-dirt" d="M9-14H0A16 16 0 0 0 0 14H9Q5 0 9-14z" fill="${soil}" opacity=".45"/>` : ""}
     <path d="M58-12v24M104-12v24" stroke="#d9952b" stroke-width="2" stroke-linecap="round"/></g></g></g>`;
   // gobbe di terra che si sollevano dove entra il dito
   // le gobbe sono un po' più chiare della terra (la terra smossa prende luce), con una lunetta d'ombra sotto
   const lite = "#" + [1, 3, 5].map(i => Math.round(parseInt(soil.slice(i, i + 2), 16) * .7 + 255 * .3).toString(16).padStart(2, "0")).join("");
   const bumps = [[106,6.5],[118,5],[127.5,4],[88,4.5],[80.5,3]].map(([x, r], k) => `<path class="fx-crumb" style="--k:${k}" d="M${x - r} 75.5a${r} ${r} 0 0 1 ${2 * r} 0z" fill="${lite}"/>`).join("");
   const clip = `<clipPath id="fxSoil"><path d="M-200-300H400V75.5H-200z"/></clipPath>`;
-  const art = `<svg viewBox="0 0 200 190" overflow="visible" aria-hidden="true">${clip}${pot}${finger}${bumps}</svg>`;
+  // La pianta c'è, dietro al dito: è il suo disegno normale, ritagliato sopra il terriccio (y 83) e ingrandito
+  // perché il suo bordo (largo 66.8) coincida con quello del vaso grande (largo 140).
+  const k = 140 / 66.8, plant = plantSVG(g.plant, 100, plantState(g), stageOf(g), g.pot)
+    .replace(/<svg [^>]*?viewBox="0 0 120 132"/, `<svg x="${r1(30 - 26.6 * k)}" y="${r1(74.5 - 83 * k)}" width="${r1(120 * k)}" height="${r1(83 * k)}" viewBox="0 0 120 83"`);
+  const art = `<svg viewBox="0 0 200 190" overflow="visible" aria-hidden="true">${clip}${pot}${plant}${finger}${bumps}</svg>`;
   const fx = document.createElement("div");
   fx.className = `fx-feel k-${kind}`; fx.setAttribute("role", "dialog"); fx.setAttribute("aria-label", `Prova del dito: ${FEEL_HEAD[kind]} ${text}`);
   fx.innerHTML = `<div class="fx-scene">${art}</div><div class="fx-result"><span>Prova del dito</span><h2>${FEEL_HEAD[kind]}</h2><p>${esc(text)}</p></div>`;
