@@ -53,10 +53,11 @@ function basilSVG(droop = 0){
 // Con la sete si affloscia in modo teatrale (è famoso per questo): le foglie ricadono, il fiore si piega.
 function spathLeaf(L, W, light, dark){
   const f = r1;
-  // ovale largo con punta allungata; metà chiara e metà scura lungo la nervatura, nervatura chiara vicino al bordo
-  return `<path d="M0 0C${f(-W*1.05)} ${f(-L*.22)} ${f(-W*.95)} ${f(-L*.72)} ${f(-W*.12)} ${f(-L*.94)}Q0 ${f(-L*1.02)} ${f(W*.1)} ${f(-L*1.04)}C${f(W*.02)} ${f(-L*.6)} ${f(W*.02)} ${f(-L*.3)} 0 0z" fill="${light}"/>` +
-    `<path d="M0 0C${f(W*1.05)} ${f(-L*.22)} ${f(W*.9)} ${f(-L*.7)} ${f(W*.1)} ${f(-L*1.04)}C${f(W*.02)} ${f(-L*.6)} ${f(W*.02)} ${f(-L*.3)} 0 0z" fill="${dark}"/>` +
-    `<path d="M${f(-W*.3)} ${f(-L*.14)}Q${f(-W*.62)} ${f(-L*.5)} ${f(-W*.22)} ${f(-L*.84)}" stroke="#7ccb8e" stroke-width="1.3" stroke-linecap="round" fill="none"/>`;
+  // foglia classica: stretta all'attacco, più larga poco prima di metà, punta affusolata.
+  // Metà chiara (sinistra) e metà scura (destra) lungo la nervatura; nervatura laterale chiara.
+  const half = sgn => `M0 0C${f(sgn*W*.35)} ${f(-L*.03)} ${f(sgn*W)} ${f(-L*.18)} ${f(sgn*W)} ${f(-L*.42)}C${f(sgn*W)} ${f(-L*.68)} ${f(sgn*W*.38)} ${f(-L*.88)} 0 ${f(-L)}Q${f(sgn*.05)} ${f(-L*.5)} 0 0z`;
+  return `<path d="${half(-1)}" fill="${light}"/><path d="${half(1)}" fill="${dark}"/>` +
+    `<path d="M${f(-W*.28)} ${f(-L*.16)}Q${f(-W*.72)} ${f(-L*.46)} ${f(-W*.3)} ${f(-L*.8)}" stroke="#7ccb8e" stroke-width="1.3" stroke-linecap="round" fill="none"/>`;
 }
 function spathSVG(droop = 0){
   const d = droop, STEM = "#3e9a5c";
@@ -70,13 +71,18 @@ function spathSVG(droop = 0){
     [tx, ty] = rot(tx, ty, sx, 84, side * 32 * d);
     [tx, ty] = rot(tx, ty, bx, by, side * 38 * d);
     const L = Math.hypot(tx - bx, ty - by), ang = Math.atan2(tx - bx, -(ty - by)) * 180 / Math.PI;
-    const cx = sx + (bx - sx) * .15, cy = 84 - (84 - by) * .55;
-    return `<path d="M${sx} 84Q${r1(cx)} ${r1(cy)} ${r1(bx)} ${r1(by)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
-      `<g transform="translate(${r1(bx)} ${r1(by)}) rotate(${r1(ang)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}</g>`;
+    // il gambo esce dritto dalla terra e arriva alla foglia già nella direzione della lamina (curva a S):
+    // così stelo e foglia sono una linea sola, senza gomiti né riccioli. Dentro la foglia continua un attimo
+    // come attacco, nel verde scuro della foglia.
+    const ux = (tx - bx) / L, uy = (ty - by) / L, k = Math.hypot(bx - sx, by - 84);
+    const h = Math.min(k * .3, 9), c1x = sx, c1y = 84 - (84 - by) * .6, c2x = bx - ux * h, c2y = by - uy * h;
+    return `<path d="M${sx} 84C${r1(c1x)} ${r1(c1y)} ${r1(c2x)} ${r1(c2y)} ${r1(bx)} ${r1(by)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
+      `<g transform="translate(${r1(bx)} ${r1(by)}) rotate(${r1(ang)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}` +
+      `<path d="M0 1L0 ${r1(-L * .2)}" stroke="${STEM}" stroke-width="1.8" stroke-linecap="round"/></g>`;
   };
-  const back = [[58, 55, 54, 32, 36, 13, "#3f9a55", "#2e7d45"], [62, 64, 58, 88, 35, 13, "#3f9a55", "#2e7d45"]];
-  const mid = [[57, 49, 62, 14, 67, 12, "#46a05c", "#327f48"], [63, 71, 65, 106, 69, 12, "#46a05c", "#327f48"]];
-  const front = [[59, 56, 70, 31, 82, 11, "#4ea865", "#378a4e"]];
+  const back = [[57, 52, 52, 30, 34, 7.5, "#3f9a55", "#2e7d45"], [63, 67, 54, 90, 34, 7.5, "#3f9a55", "#2e7d45"]];
+  const mid = [[55, 44, 62, 13, 63, 7, "#46a05c", "#327f48"], [65, 76, 64, 107, 66, 7, "#46a05c", "#327f48"]];
+  const front = [[58, 50, 73, 27, 82, 6.5, "#4ea865", "#378a4e"]];
   // il fiore: gambo dritto, spata a goccia (bianco panna con i lati verdolini), spadice giallo a grani
   const fx = 63 + 18 * d, fy = 33 + 34 * d, fr = 110 * d;
   const grains = [-8, -11, -14, -17, -20, -23].map(y => `<circle cx="0" cy="${y}" r="2.3" fill="#f5cf45"/>`).join("");
