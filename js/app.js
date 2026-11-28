@@ -1002,14 +1002,9 @@ const CAN = `<svg viewBox="0 0 160 120" width="170" height="128" aria-hidden="tr
   <path class="cdrop" style="--i:1" d="M141 46c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/>
   <path class="cdrop" style="--i:2" d="M154 52c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/></svg>`;
 function openDrops(){
-  const row = (n, txt) => `<li><b>${n}</b><span>${txt}</span></li>`;
   modal(`<div style="text-align:center"><div class="canhero">${CAN}</div>
-    <h2>Le gocce</h2><p style="color:var(--ink-2);margin:4px 0 14px">Sono l’acqua della tua serra, e anche i tuoi soldi. Ne hai <b>${S.gocce}</b>.</p></div>
-    <div class="kind">Come le guadagni</div>
-    <ul class="drows">${row(`+${RULES.stepGocce}`, "ogni lezione finita")}${row(`+${RULES.perfectBonusGocce}`, "se la finisci senza errori")}${row(`+${RULES.replayGocce}`, "ogni ripasso")}${row("+", "salendo di livello e con il fagiolo")}</ul>
-    <div class="kind">Come le spendi</div>
-    <ul class="drows">${row(RULES.waterCost, "un’annaffiata")}${row(RULES.replantCost, "ripiantare una pianta morta")}${row(`da ${Math.min(...Object.values(PLANTS).map(x => x.cost).filter(Boolean))}`, "un seme nel negozio")}${row(`da ${Math.min(...Object.values(POT_SHOP).map(x => x.cost))}`, "un vaso speciale")}${row(SPRAY.cost, "uno spruzzino per salvare il fagiolo")}</ul>
-    <p class="pnote" style="margin:12px 0 0">Annaffiare quando non serve non è generosità: costa gocce e fa marcire le radici.</p>
+    <h2>Le gocce</h2><p style="color:var(--ink-2);margin:4px 0 6px">Sono l’acqua della tua serra, e anche i tuoi soldi. Le guadagni finendo le lezioni e le spendi per annaffiare, ripiantare e fare acquisti nel negozio.</p>
+    <p style="margin:0 0 6px">Ne hai <b>${S.gocce}</b>.</p></div>
     <button class="btn" data-close="1">Ho capito</button>`);
 }
 
