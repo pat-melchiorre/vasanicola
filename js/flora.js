@@ -47,33 +47,44 @@ function basilSVG(droop = 0){
     `<g transform="translate(${r1(tx)} ${r1(ty)}) rotate(${r1(hang(tan(1)))})">${basilLeaf(13, 10 * (1 - .3 * d), "#b8e97a", "#93d257")}</g>`;
 }
 
-// Spatifillo: poche foglie lanceolate a fontana, un solo fiore bianco grande sopra (è il suo segno di riconoscimento).
-// Niente cespo pieno alla base: ogni foglia è un pezzo a sé, così si può piegare da sola.
-// Con la sete si affloscia in modo teatrale (è famoso per questo): le foglie si aprono e cadono, il fiore si piega.
+// Spatifillo (dalla tavola di ChatGPT, ridisegnato a mano): 5 foglie larghe e appuntite su gambi lunghi
+// che escono dalla terra, un solo fiore bianco grande in cima a un gambo dritto.
+// Niente cespo pieno alla base: ogni foglia è un pezzo a sé, così si piega da sola.
+// Con la sete si affloscia in modo teatrale (è famoso per questo): le foglie ricadono, il fiore si piega.
 function spathLeaf(L, W, light, dark){
   const f = r1;
-  return `<path d="M0 0C${f(-W*.95)} ${f(-L*.36)} ${f(-W*.55)} ${f(-L*.8)} 0 ${f(-L)}C${f(-W*.12)} ${f(-L*.6)} ${f(-W*.1)} ${f(-L*.3)} 0 0z" fill="${light}"/>` +
-    `<path d="M0 0C${f(W*.95)} ${f(-L*.36)} ${f(W*.55)} ${f(-L*.8)} 0 ${f(-L)}C${f(-W*.12)} ${f(-L*.6)} ${f(-W*.1)} ${f(-L*.3)} 0 0z" fill="${dark}"/>` +
-    `<path d="M${f(-W*.06)} ${f(-L*.12)}Q${f(-W*.16)} ${f(-L*.5)} 0 ${f(-L*.86)}" stroke="#7bc796" stroke-width="1.2" stroke-linecap="round" fill="none"/>`;
+  // ovale largo con punta allungata; metà chiara e metà scura lungo la nervatura, nervatura chiara vicino al bordo
+  return `<path d="M0 0C${f(-W*1.05)} ${f(-L*.22)} ${f(-W*.95)} ${f(-L*.72)} ${f(-W*.12)} ${f(-L*.94)}Q0 ${f(-L*1.02)} ${f(W*.1)} ${f(-L*1.04)}C${f(W*.02)} ${f(-L*.6)} ${f(W*.02)} ${f(-L*.3)} 0 0z" fill="${light}"/>` +
+    `<path d="M0 0C${f(W*1.05)} ${f(-L*.22)} ${f(W*.9)} ${f(-L*.7)} ${f(W*.1)} ${f(-L*1.04)}C${f(W*.02)} ${f(-L*.6)} ${f(W*.02)} ${f(-L*.3)} 0 0z" fill="${dark}"/>` +
+    `<path d="M${f(-W*.3)} ${f(-L*.14)}Q${f(-W*.62)} ${f(-L*.5)} ${f(-W*.22)} ${f(-L*.84)}" stroke="#7ccb8e" stroke-width="1.3" stroke-linecap="round" fill="none"/>`;
 }
 function spathSVG(droop = 0){
   const d = droop, STEM = "#3e9a5c";
-  // [angolo del gambo, angolo extra della lamina, lunghezza gambo, lunghezza lamina, larghezza, chiaro, scuro]
-  const leaf = ([a, b, p, L, W, light, dark]) => {
-    const s = Math.sign(a) || 1, A = a + s * 38 * d, B = b + s * 50 * d, P = p * (1 - .15 * d);
-    return `<g transform="translate(60 84) rotate(${r1(A)})"><path d="M0 0Q${r1(s * 1.5)} ${r1(-P / 2)} 0 ${r1(-P)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
-      `<g transform="translate(0 ${r1(-P)}) rotate(${r1(B)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}</g></g>`;
+  const rot = (px, py, cx, cy, deg) => { const r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+    return [cx + (px - cx) * c - (py - cy) * s, cy + (px - cx) * s + (py - cy) * c]; };
+  // [x nella terra, base della lamina (x, y), punta (x, y), larghezza, chiaro, scuro]
+  const leaf = ([sx, bx, by, tx, ty, W, light, dark]) => {
+    const side = Math.sign(tx - 60) || 1;
+    // sete: tutta la foglia ruota verso l'esterno attorno al punto in cui esce dalla terra, poi la lamina cade ancora
+    [bx, by] = rot(bx, by, sx, 84, side * 32 * d);
+    [tx, ty] = rot(tx, ty, sx, 84, side * 32 * d);
+    [tx, ty] = rot(tx, ty, bx, by, side * 38 * d);
+    const L = Math.hypot(tx - bx, ty - by), ang = Math.atan2(tx - bx, -(ty - by)) * 180 / Math.PI;
+    const cx = sx + (bx - sx) * .15, cy = 84 - (84 - by) * .55;
+    return `<path d="M${sx} 84Q${r1(cx)} ${r1(cy)} ${r1(bx)} ${r1(by)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
+      `<g transform="translate(${r1(bx)} ${r1(by)}) rotate(${r1(ang)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}</g>`;
   };
-  const back = [[-14, -6, 9, 33, 14, "#2f7d4a", "#1f5e37"], [18, 8, 8, 31, 13, "#2f7d4a", "#1f5e37"]];
-  const front = [[-50, -28, 8, 36, 13, "#3e9a5c", "#2f7d4a"], [52, 30, 8, 35, 13, "#3e9a5c", "#2f7d4a"], [-26, -14, 8, 36, 13, "#46a565", "#357f4c"], [28, 14, 8, 34, 13, "#46a565", "#357f4c"]];
-  // il fiore: gambo lungo e sottile, cappuccio bianco (spata) attorno alla spiga gialla (spadice)
-  const fx = 63 + 15 * d, fy = 42 + 28 * d, rot = 95 * d;
-  const flower = `<path d="M61 84C62 68 ${r1(63 + 8 * d)} ${r1(52 + 4 * d)} ${r1(fx)} ${r1(fy)}" stroke="${STEM}" stroke-width="2" stroke-linecap="round" fill="none"/>` +
-    `<g transform="translate(${r1(fx)} ${r1(fy)}) rotate(${r1(rot)}) scale(1.35)">` +
-    `<path d="M0 0C-11-4-12-18 0-30C12-18 11-4 0 0z" fill="#f8f6ee"/><path d="M0 0C11-4 12-18 0-30C4-18 5-6 0 0z" fill="#e2ebdb"/>` +
-    `<path d="M0 0C-5-1-6-4-6-6C-3-5 3-5 6-6C6-4 5-1 0 0z" fill="#d8ebd3"/>` +
-    `<rect x="-2.4" y="-21" width="4.8" height="16" rx="2.4" fill="#f2d36b"/><path d="M-1-18.5h2M-1-15h2M-1-11.5h2M-1-8h2" stroke="#e0b94a" stroke-width="1" stroke-linecap="round"/></g>`;
-  return back.map(leaf).join("") + flower + front.map(leaf).join("");
+  const back = [[58, 55, 54, 32, 36, 13, "#3f9a55", "#2e7d45"], [62, 64, 58, 88, 35, 13, "#3f9a55", "#2e7d45"]];
+  const mid = [[57, 49, 62, 14, 67, 12, "#46a05c", "#327f48"], [63, 71, 65, 106, 69, 12, "#46a05c", "#327f48"]];
+  const front = [[59, 56, 70, 31, 82, 11, "#4ea865", "#378a4e"]];
+  // il fiore: gambo dritto, spata a goccia (bianco panna con i lati verdolini), spadice giallo a grani
+  const fx = 63 + 18 * d, fy = 33 + 34 * d, fr = 110 * d;
+  const grains = [-8, -11, -14, -17, -20, -23].map(y => `<circle cx="0" cy="${y}" r="2.3" fill="#f5cf45"/>`).join("");
+  const flower = `<path d="M61 84C61.5 64 ${r1(62 + 12 * d)} ${r1(46 + 6 * d)} ${r1(fx)} ${r1(fy)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
+    `<g transform="translate(${r1(fx)} ${r1(fy)}) rotate(${r1(fr)})">` +
+    `<path d="M0 0C-12-3-13-19 1-33C14-19 12-3 0 0z" fill="#dfe9d2"/><path d="M0-2.5C-8-6-8.5-19 1-31.5C9.5-19 8-6 0-2.5z" fill="#f7f4e8"/>` +
+    `<rect x="-1" y="-7" width="2" height="6" fill="#e0b94a"/>${grains}</g>`;
+  return back.map(leaf).join("") + flower + mid.map(leaf).join("") + front.map(leaf).join("");
 }
 
 const FLORA = {
