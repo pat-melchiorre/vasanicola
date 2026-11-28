@@ -76,21 +76,24 @@ function spathSVG(droop = 0){
     // come attacco, nel verde scuro della foglia.
     const ux = (tx - bx) / L, uy = (ty - by) / L, k = Math.hypot(bx - sx, by - 84);
     const h = Math.min(k * .3, 9), c1x = sx, c1y = 84 - (84 - by) * .6, c2x = bx - ux * h, c2y = by - uy * h;
-    return `<path d="M${sx} 84C${r1(c1x)} ${r1(c1y)} ${r1(c2x)} ${r1(c2y)} ${r1(bx)} ${r1(by)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
-      `<g transform="translate(${r1(bx)} ${r1(by)}) rotate(${r1(ang)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}` +
-      `<path d="M0 1L0 ${r1(-L * .2)}" stroke="${STEM}" stroke-width="1.8" stroke-linecap="round"/></g>`;
+    // stelo e lamina separati: prima si disegnano tutti gli steli, poi le foglie sopra (l'attacco resta nascosto)
+    return { stem: `<path d="M${sx} 84C${r1(c1x)} ${r1(c1y)} ${r1(c2x)} ${r1(c2y)} ${r1(bx)} ${r1(by)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>`,
+      blade: `<g transform="translate(${r1(bx)} ${r1(by)}) rotate(${r1(ang)})">${spathLeaf(L, W * (1 - .2 * d), light, dark)}</g>` };
   };
   const back = [[57, 52, 52, 30, 34, 7.5, "#3f9a55", "#2e7d45"], [63, 67, 54, 90, 34, 7.5, "#3f9a55", "#2e7d45"]];
   const mid = [[55, 44, 62, 13, 63, 7, "#46a05c", "#327f48"], [65, 76, 64, 107, 66, 7, "#46a05c", "#327f48"]];
   const front = [[58, 50, 73, 27, 82, 6.5, "#4ea865", "#378a4e"]];
   // il fiore: gambo dritto, spata a goccia (bianco panna con i lati verdolini), spadice giallo a grani
-  const fx = 63 + 18 * d, fy = 33 + 34 * d, fr = 110 * d;
+  const fx = 63 + 7 * d, fy = 47 + 25 * d, fr = 105 * d;
   const grains = [-8, -11, -14, -17, -20, -23].map(y => `<circle cx="0" cy="${y}" r="2.3" fill="#f5cf45"/>`).join("");
-  const flower = `<path d="M61 84C61.5 64 ${r1(62 + 12 * d)} ${r1(46 + 6 * d)} ${r1(fx)} ${r1(fy)}" stroke="${STEM}" stroke-width="2.2" stroke-linecap="round" fill="none"/>` +
-    `<g transform="translate(${r1(fx)} ${r1(fy)}) rotate(${r1(fr)})">` +
+  const stalk = `<path d="M61 84C61.5 70 ${r1(62 + 6 * d)} ${r1(58 + 6 * d)} ${r1(fx)} ${r1(fy)}" stroke="${STEM}" stroke-width="2.4" stroke-linecap="round" fill="none"/>`;
+  // il fiore è il segno di riconoscimento: spata e spadice ingranditi del 40%
+  const head = `<g transform="translate(${r1(fx)} ${r1(fy)}) rotate(${r1(fr)}) scale(1.4)">` +
     `<path d="M0 0C-12-3-13-19 1-33C14-19 12-3 0 0z" fill="#dfe9d2"/><path d="M0-2.5C-8-6-8.5-19 1-31.5C9.5-19 8-6 0-2.5z" fill="#f7f4e8"/>` +
     `<rect x="-1" y="-7" width="2" height="6" fill="#e0b94a"/>${grains}</g>`;
-  return back.map(leaf).join("") + flower + mid.map(leaf).join("") + front.map(leaf).join("");
+  const B = back.map(leaf), M = mid.map(leaf), F = front.map(leaf);
+  // ordine: steli (dietro a tutto), foglie dietro, fiore, foglie di lato, foglia davanti
+  return [...B, ...M, ...F].map(x => x.stem).join("") + stalk + B.map(x => x.blade).join("") + head + M.map(x => x.blade).join("") + F.map(x => x.blade).join("");
 }
 
 const FLORA = {

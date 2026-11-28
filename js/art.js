@@ -25,7 +25,7 @@ const POTS = { basilico:"#e0773a", pothos:"#5b8def", sansevieria:"#f2c230", ment
 const shade = (hex, k = .72) => "#" + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * k).toString(16).padStart(2, "0")).join("");
 function floraPot(c, wet){
   const d = shade(c);
-  return `<path d="M30 97H90V111C90 121 84 126.7 74 126.7H46C36 126.7 30 121 30 111z" fill="${c}"/><path d="M32.8 120.5H87.2C85 124.6 80 126.7 74 126.7H46C40 126.7 35 124.6 32.8 120.5z" fill="${d}"/><rect x="30" y="99" width="60" height="3.4" fill="${d}"/><rect x="26.6" y="82" width="66.8" height="17.4" rx="3.6" fill="${c}"/><path d="M27 82.5A33 2.8 0 0 0 93 82.5z" fill="${wet ? "#1d140c" : "#272727"}"/>` +
+  return `<path d="M30 97H90V111C90 121 84 126.7 74 126.7H46C36 126.7 30 121 30 111z" fill="${c}"/><path d="M32.8 120.5H87.2C85 124.6 80 126.7 74 126.7H46C40 126.7 35 124.6 32.8 120.5z" fill="${d}"/><rect x="30" y="99" width="60" height="3.4" fill="${d}"/><rect x="26.6" y="82" width="66.8" height="17.4" rx="3.6" fill="${c}"/><path d="M30 82.5A30 2.6 0 0 0 90 82.5z" fill="${wet ? "#1d140c" : "#272727"}"/>` +
     (wet ? '<ellipse cx="68" cy="83.4" rx="11" ry="1" fill="#8fcaff" opacity=".85"/>' : "");
 }
 function potDrawing(id, model, color, wet){
