@@ -974,6 +974,9 @@ function zoneTop(el){
   scrollTo({ top: Math.abs(scrollY - y) < 8 ? 0 : Math.max(0, y), behavior: smooth });
 }
 document.addEventListener("keydown", e => { const z = e.target.closest?.("[data-ztop]"); if (z && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); zoneTop(z); } });
+// iOS accende :active (l'effetto "schiacciato" dei bottoni) solo se la pagina ascolta i tocchi
+document.addEventListener("touchstart", () => {}, { passive: true });
+
 /* --- Annaffiare tenendo premuto ---
    Un tocco veloce non annaffia (evita le annaffiature per sbaglio mentre scorri): bisogna tenere premuto
    per HOLD_MS. Intanto il bottone si riempie da sinistra; se lasci prima, si svuota e compare un suggerimento. */
@@ -993,14 +996,19 @@ app.addEventListener("pointermove", e => { if (hold && Math.hypot(e.clientX - ho
 app.addEventListener("contextmenu", e => { if (e.target.closest(".btn.water")) e.preventDefault(); });
 
 /* --- Modale delle gocce: cosa sono e a cosa servono --- */
-const CAN = `<svg viewBox="0 0 160 120" width="170" height="128" aria-hidden="true">
-  <path d="M104 52 146 22l6 7-38 34z" fill="#2589D6"/><path d="M140 14a11 11 0 0 1 16 15l-12 3-7-9z" fill="#4AB0F5"/>
-  <path d="M38 40h66l-6 62a8 8 0 0 1-8 7H52a8 8 0 0 1-8-7z" fill="#4AB0F5"/><path d="M76 40h28l-6 62a8 8 0 0 1-8 7H72z" fill="#2589D6"/>
-  <path d="M46 48c0-22 50-22 50 0" stroke="#2589D6" stroke-width="7" fill="none" stroke-linecap="round"/>
-  <rect x="34" y="34" width="74" height="10" rx="5" fill="#2589D6"/><path d="M52 60h20" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>
-  <path class="cdrop" style="--i:0" d="M150 40c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/>
-  <path class="cdrop" style="--i:1" d="M141 46c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/>
-  <path class="cdrop" style="--i:2" d="M154 52c3 4 5 6 5 8.5a5 5 0 0 1-10 0c0-2.5 2-4.5 5-8.5z" fill="#4AB0F5"/></svg>`;
+// Annaffiatoio nello stile delle icone illustrate (goccia, sole): due toni di blu, riflesso bianco, niente contorni.
+// Il beccuccio parte da dentro il corpo (disegnato prima), così è attaccato e non galleggia.
+const CAN = `<svg viewBox="0 0 72 52" width="190" height="137" aria-hidden="true">
+  <path d="M37 37.5 57.6 14.4l4 3.4-20.6 25.6z" fill="#2589D6"/>
+  <ellipse cx="60.8" cy="14" rx="5.4" ry="3.2" transform="rotate(-48 60.8 14)" fill="#4AB0F5"/><ellipse cx="62.4" cy="15.6" rx="1.9" ry="3" transform="rotate(-48 62.4 15.6)" fill="#2589D6"/>
+  <path d="M17 13.5c0-10 22-10 22 0" stroke="#2589D6" stroke-width="4.4" fill="none" stroke-linecap="round"/>
+  <path d="M11 17h34l-2.2 26.5a4 4 0 0 1-4 3.5H17.2a4 4 0 0 1-4-3.5z" fill="#4AB0F5"/>
+  <path d="M12.6 36.5h30.8l-.6 7a4 4 0 0 1-4 3.5H17.2a4 4 0 0 1-4-3.5z" fill="#2589D6"/>
+  <rect x="9" y="14" width="38" height="6" rx="3" fill="#2589D6"/>
+  <ellipse cx="18.5" cy="27" rx="2.2" ry="5.4" transform="rotate(8 18.5 27)" fill="#fff" opacity=".75"/>
+  <path class="cdrop" style="--i:0" d="M64.5 22c1.6 2.2 2.6 3.4 2.6 4.6a2.6 2.6 0 0 1-5.2 0c0-1.2 1-2.4 2.6-4.6z" fill="#4AB0F5"/>
+  <path class="cdrop" style="--i:1" d="M68.5 18c1.6 2.2 2.6 3.4 2.6 4.6a2.6 2.6 0 0 1-5.2 0c0-1.2 1-2.4 2.6-4.6z" fill="#4AB0F5"/>
+  <path class="cdrop" style="--i:2" d="M60.5 25.5c1.6 2.2 2.6 3.4 2.6 4.6a2.6 2.6 0 0 1-5.2 0c0-1.2 1-2.4 2.6-4.6z" fill="#4AB0F5"/></svg>`;
 function openDrops(){
   modal(`<div style="text-align:center"><div class="canhero">${CAN}</div>
     <h2>Le gocce</h2><p style="color:var(--ink-2);margin:4px 0 6px">Sono l’acqua della tua serra, e anche i tuoi soldi. Le guadagni finendo le lezioni e le spendi per annaffiare, ripiantare e fare acquisti nel negozio.</p>

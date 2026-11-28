@@ -615,3 +615,12 @@ button.pill.water{cursor:pointer;border:0;font:inherit}
    dello stesso colore (6px di "spessore"); qui un bordo invisibile dello stesso colore e ombra di 6px */
 .acts .btn.water{border:2px solid var(--water);box-shadow:0 6px 0 var(--water-dark)}
 .acts .btn.water:disabled{border-color:transparent}
+
+/* Bottoni che "rientrano" quando li premi: la faccia scende e lo spessore sotto si assottiglia
+   (resta un filo, non sparisce), mentre il fondo del bottone resta fermo dov'è.
+   --d è lo spessore a riposo, --sh il suo colore. */
+.btn{--d:4px;--sh:var(--leaf-shadow);transition:transform .07s ease-out,box-shadow .07s ease-out}
+.btn.water{--sh:var(--water-dark)} .btn.sun{--sh:var(--sun-dark)} .btn.bad{--sh:var(--bad-dark)} .btn.ghost{--sh:var(--line)}
+.acts .btn.water{--d:6px}
+.btn:not(:disabled):active{transform:translateY(calc(var(--d) - 1.5px));box-shadow:0 1.5px 0 var(--sh)}
+@keyframes cdrop{0%{transform:translateY(-3px);opacity:0}20%{opacity:1}100%{transform:translateY(12px);opacity:0}}
