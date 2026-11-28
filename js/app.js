@@ -997,11 +997,11 @@ app.addEventListener("contextmenu", e => { if (e.target.closest(".btn.water")) e
 
 /* --- Modale delle gocce: cosa sono e a cosa servono --- */
 // Annaffiatoio nello stile delle icone illustrate (goccia, sole): due toni di blu, riflesso bianco, niente contorni.
-// Il beccuccio parte da dentro il corpo (disegnato prima), così è attaccato e non galleggia.
+// Beccuccio e maniglia (dietro, dal lato opposto) partono da dentro il corpo, disegnato dopo: così sono attaccati.
 const CAN = `<svg viewBox="0 0 72 52" width="190" height="137" aria-hidden="true">
   <path d="M37 37.5 57.6 14.4l4 3.4-20.6 25.6z" fill="#2589D6"/>
   <ellipse cx="60.8" cy="14" rx="5.4" ry="3.2" transform="rotate(-48 60.8 14)" fill="#4AB0F5"/><ellipse cx="62.4" cy="15.6" rx="1.9" ry="3" transform="rotate(-48 62.4 15.6)" fill="#2589D6"/>
-  <path d="M17 13.5c0-10 22-10 22 0" stroke="#2589D6" stroke-width="4.4" fill="none" stroke-linecap="round"/>
+  <path d="M14 21C2 20 2 39 14 39" stroke="#2589D6" stroke-width="4.4" fill="none" stroke-linecap="round"/>
   <path d="M11 17h34l-2.2 26.5a4 4 0 0 1-4 3.5H17.2a4 4 0 0 1-4-3.5z" fill="#4AB0F5"/>
   <path d="M12.6 36.5h30.8l-.6 7a4 4 0 0 1-4 3.5H17.2a4 4 0 0 1-4-3.5z" fill="#2589D6"/>
   <rect x="9" y="14" width="38" height="6" rx="3" fill="#2589D6"/>

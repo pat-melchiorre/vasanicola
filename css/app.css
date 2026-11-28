@@ -607,7 +607,8 @@ button.brand{padding:0;border:0;background:none;cursor:pointer}
 button.pill.water{cursor:pointer;border:0;font:inherit}
 .canhero{display:flex;justify-content:center;margin-bottom:4px}
 @media (prefers-reduced-motion: no-preference){
-  .cdrop{animation:cdrop 1.4s calc(var(--i) * .35s) ease-in infinite}
+  /* tre gocce, una dopo l'altra, una volta sola */
+  .cdrop{animation:cdrop .9s calc(.35s + var(--i) * .3s) ease-in both}
   @keyframes cdrop{0%{transform:translateY(-6px);opacity:0}20%{opacity:1}100%{transform:translateY(26px);opacity:0}}
 }
 
